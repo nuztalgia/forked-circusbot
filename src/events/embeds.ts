@@ -1,5 +1,6 @@
-import { MessageEmbed } from "discord.js";
+import { DiscordAPIError, MessageEmbed } from "discord.js";
 import { client } from '../client';
+import { saveEvents } from "./persistence";
 
 export async function updateEventEmbeds(event: CircusEvent) {
     const embed = createEventEmbed(event);
@@ -9,8 +10,24 @@ export async function updateEventEmbeds(event: CircusEvent) {
         const channel = await client.channels.fetch(channelId);
 
         if (channel?.isText()) {
-            const msg = await channel.messages.fetch(messageId);
-            await msg.edit({ embeds: [embed] });
+            let msg;
+
+            try {
+                msg = await channel.messages.fetch(messageId);
+                await msg.edit({ embeds: [embed] });
+            } catch (err) {
+                if (err instanceof DiscordAPIError) {
+                    console.error(`Failed to edit message for event ${event.id} (DiscordAPIError):`, err.message);
+                    
+                    if (err.message === 'Unknown Message') {
+                        delete event.published_channels[channelId];
+                        saveEvents();
+                        continue;
+                    }
+                }
+
+                console.error(`Failed to edit message for event ${event.id}`, err);
+            }
 
             if (event.signup_status === 'open' && !(msg.reactions.cache.get('❤️')?.count || 0 > 0)) {
                 console.log(`Event ${event.id} is open to sign-ups, adding sign-up reactions`);
@@ -44,8 +61,8 @@ export function createEventEmbed(event: CircusEvent) {
         `<:heal:933048000740229140>  ${event.role_requirements.healer}\n` +
         `<:dps:933048000866033774>  ${event.role_requirements.dps}\n\n` +
         `You may select up to one main role and up to three sub roles by using the reactions below. ` + 
-        `Clicking the same reaction a second time will cancel your sign-up for that role.` + 
-        `Please make sure you meet the requirements for your role before signing up!\n\n`;
+        `Clicking the same reaction a second time will cancel your sign-up for that role. ` + 
+        `Please make sure you meet the requirements for your role before signing up!\n⠀\n`;
 
     const embed = new MessageEmbed()
         .setColor("#0099ff")

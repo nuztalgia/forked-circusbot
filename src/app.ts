@@ -14,7 +14,8 @@ client.on('ready', () => {
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
-    let cmd = message.content.toLowerCase().split(' ')[0];
+    const messageContent = message.content.replace(/  +/g, ' ');
+    const cmd = messageContent.toLowerCase().split(' ')[0];
 
     // console.log('Message received: ' + message + ', cmd: ' + cmd);
 
@@ -30,9 +31,9 @@ client.on('messageCreate', async (message) => {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        const event_id = message.content.split(' ')[1].trim();
-        const event_field = message.content.split(' ')[2].trim();
-        const event_value = message.content.match('(.*?) (.*?) (.*?) (.*)')[4].trim();
+        const event_id = messageContent.split(' ')[1].trim();
+        const event_field = messageContent.split(' ')[2].trim();
+        const event_value = messageContent.match('(.*?) (.*?) (.*?) (.*)')[4].trim();
 
         if (!events.hasOwnProperty(event_id)) {
             sendError(message.channel, "Invalid Event", "Unable to edit event, no such event ID was found");
@@ -45,11 +46,11 @@ client.on('messageCreate', async (message) => {
             events[event_id].role_requirements.healer = event_value;
         } else if (event_field === 'dps_requirements') {
             events[event_id].role_requirements.dps = event_value;
-        } else if (event_field === 'tank_limits') {
+        } else if (event_field === 'tank_limit') {
             events[event_id].role_limits.tank = parseInt(event_value);
-        } else if (event_field === 'heal_limits' || event_field === 'healer_limits') {
+        } else if (event_field === 'heal_limit' || event_field === 'healer_limit') {
             events[event_id].role_limits.healer = parseInt(event_value);
-        } else if (event_field === 'dps_limits') {
+        } else if (event_field === 'dps_limit') {
             events[event_id].role_limits.dps = parseInt(event_value);
         } else if (events[event_id].hasOwnProperty(event_field)) {
             events[event_id][event_field] = event_value;
@@ -76,7 +77,7 @@ client.on('messageCreate', async (message) => {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        const event_id = message.content.split(' ')[1];
+        const event_id = messageContent.split(' ')[1];
 
         if (!events.hasOwnProperty(event_id)) {
             sendError(message.channel, "Invalid Event", "Unable to open event, no such event ID was found");
@@ -87,13 +88,13 @@ client.on('messageCreate', async (message) => {
         saveEvents();
         updateEventEmbeds(events[event_id]);
 
-        sendMessage(message.channel, `✅ Event ${message.content.split(' ')[1]} is now open for sign-ups!`);
+        sendMessage(message.channel, `✅ Event ${messageContent.split(' ')[1]} is now open for sign-ups!`);
         message.react('👍');
     } else if (cmd === '!close_event' || cmd === '!ce') {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        const event_id = message.content.split(' ')[1];
+        const event_id = messageContent.split(' ')[1];
 
         if (!events.hasOwnProperty(event_id)) {
             sendError(message.channel, "Invalid Event", "Unable to close event, no such event ID was found");
@@ -104,29 +105,54 @@ client.on('messageCreate', async (message) => {
         saveEvents();
         updateEventEmbeds(events[event_id]);
 
-        sendMessage(message.channel, `✅ Event ${message.content.split(' ')[1]} is now closed for sign-ups!`);
+        sendMessage(message.channel, `✅ Event ${messageContent.split(' ')[1]} is now closed for sign-ups!`);
         message.react('👍');
+    } else if (cmd === '!list_events' || cmd === '!le') {
+        if (!is_channel_whitelisted(message.channel)) return;
+
+        let fields = [];
+        const showAll = messageContent.match(/(-a|-A|all)/);
+
+        for (const event of Object.values(events)) {
+            if (!event.published_channels.hasOwnProperty(message.channel.id)) continue;
+            if (Date.parse(event.date || '') < Date.now() && !showAll) continue;
+
+            fields.push([ `[${event.id}](${message.url.replace(message.id, event.id || '')})`, event.date, event.title ])
+        }
+
+        const embed = new MessageEmbed()
+            .setColor("#0099ff")
+            .setDescription(`${showAll ? 'All' : 'Upcoming'} events in this channel:`)
+            .addFields([ 
+                { name: 'Event ID', value: fields.map(x => x[0]).join('\n'), inline: true },
+                { name: 'Date', value: fields.map(x => x[1]).join('\n'), inline: true },
+                { name: 'Title', value: fields.map(x => x[2]).join('\n'), inline: true },
+            ])
+
+        message.channel.send({ embeds: [embed] });
     } else if (cmd === '!refresh_event' || cmd === '!re') {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        updateEventEmbeds(events[message.content.split(' ')[1]]);
+        updateEventEmbeds(events[messageContent.split(' ')[1]]);
 
-        sendMessage(message.channel, `✅ Event ${message.content.split(' ')[1]} has been rebuilt across all channels`);
+        sendMessage(message.channel, `✅ Event ${messageContent.split(' ')[1]} has been rebuilt across all channels`);
         message.react('👍');
     } else if (cmd === '!event_adduser' || cmd === '!eau' || cmd === '!event_addusers') {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        const event_id = message.content.split(' ')[1].trim();
-        let event_role = message.content.split(' ')[2].trim();
-        const event_value = message.content.match('(.*?) (.*?) (.*?) (.*?) (.*)');
+        const event_id = messageContent.split(' ')[1].trim();
+        let event_role = messageContent.split(' ')[2].trim();
+        const event_value = messageContent.match('(.*?) (.*?) (.*?) (.*?) (.*)');
 
         if (event_role === 'heal' || event_role === 'healer' || event_role === 'heals') {
             event_role = 'healers';
         } else if (event_role === 'tank') {
             event_role = 'tanks';
         }
+
+        console.log(event_role);
 
         if (!events.hasOwnProperty(event_id)) {
             sendError(message.channel, "Invalid Event", "Unable to add user to event, no such event ID was found");
@@ -153,8 +179,8 @@ client.on('messageCreate', async (message) => {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        const event_id = message.content.split(' ')[1].trim();
-        let event_role = message.content.split(' ')[2].trim();
+        const event_id = messageContent.split(' ')[1].trim();
+        let event_role = messageContent.split(' ')[2].trim();
 
         if (event_role === 'heal' || event_role === 'healer' || event_role === 'heals') {
             event_role = 'healers';
@@ -182,7 +208,7 @@ client.on('messageCreate', async (message) => {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        const event_id = message.content.split(' ')[1];
+        const event_id = messageContent.split(' ')[1];
         const target_channel = message.mentions.channels.first();
 
         if (!events.hasOwnProperty(event_id)) {
@@ -211,8 +237,8 @@ client.on('messageCreate', async (message) => {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        const event_id = message.content.split(' ')[1].trim();
-        const ping_msg = message.content.match('(.*?) (.*?) (.*)')[3].trim();
+        const event_id = messageContent.split(' ')[1].trim();
+        const ping_msg = messageContent.match('(.*?) (.*?) (.*)')[3].trim();
 
         if (!events.hasOwnProperty(event_id)) {
             sendError(message.channel, "Invalid Event", "Unable to ping event, no such event ID was found");
@@ -233,7 +259,7 @@ client.on('messageCreate', async (message) => {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
 
-        const event_id = message.content.split(' ')[1].trim();
+        const event_id = messageContent.split(' ')[1].trim();
 
         if (!events.hasOwnProperty(event_id)) {
             sendError(message.channel, "Invalid Event", "Unable to export event, no such event ID was found");
@@ -256,7 +282,8 @@ client.on('messageCreate', async (message) => {
             "🏃 `event_adduser <EVENT_ID> <ROLE> <USER> <NOTES>`\nAdd a user to the sign-ups (roles are tank/healers/dps). Notes appear next to the username. The USER must be a MENTION.\n**Example:** `!event_adduser 123456789 tank @Cad#1234 (Titax)`\n\n" + 
             "🚪 `event_removeuser <EVENT_ID> <ROLE> <USER>`\nRemove a user from the sign-ups (roles are tank/healers/dps). The USER must be a mention.\n**Example:** `!event_removeuser 123456789 tank @Cad#1234`\n\n" + 
             "🔔 `ping_event <EVENT_ID> <MESSAGE>`\nPing all signed up users (non-subs) with a custom message (e.g. to inform them you are forming up).\n**Example:** `!ping_event 123456789 Now forming up pubside, please whisper Cadriel or x in allies`\n\n" + 
-            "🌎 `publish_event <EVENT_ID> <TARGET_CHANNEL>`\nPublish the event to the specified channel. All published events are sychronized. The channel must be a mention.\n**Example:** `!publish_event 123456789 #event-signups`\n\n");
+            "🌎 `publish_event <EVENT_ID> <TARGET_CHANNEL>`\nPublish the event to the specified channel. All published events are sychronized. The channel must be a mention.\n**Example:** `!publish_event 123456789 #event-signups`\n\n" + 
+            "📆 `list_events`\nList all upcoming events in the current channel.\n**Example:** `!list_events`\n\n");
     }
 });
 
