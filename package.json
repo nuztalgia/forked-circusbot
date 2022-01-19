@@ -1,0 +1,15 @@
+{
+    "name": "circus-bot",
+    "version": "0.0.1",
+    "main": "cirque-bot.js",
+    "scripts": {
+        "build": "esbuild src/app.ts --bundle --platform=node --outfile=cirque-bot.js"
+    },
+    "devDependencies": {
+        "esbuild": "^0.14.11",
+        "typescript": "^4.5.4"
+    },
+    "dependencies": {
+        "discord.js": "^13.6.0"
+    }
+}
