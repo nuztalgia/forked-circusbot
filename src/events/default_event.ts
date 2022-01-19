@@ -4,7 +4,7 @@ export function makeEmptyEvent(): CircusEvent {
         author: null, 
         authorId: null,
         messageId: null,
-        title: null,
+        title: 'Untitled Event',
         description: null,
         date: null,
         time: null,
