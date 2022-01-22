@@ -115,19 +115,24 @@ client.on('messageCreate', async (message) => {
 
         for (const event of Object.values(events)) {
             if (!event.published_channels.hasOwnProperty(message.channel.id)) continue;
-            if (Date.parse(event.date || '') < Date.now() && !showAll) continue;
+            if (Date.parse((event.date + ' ' + event.time) || '') <= Date.now() && !showAll) continue;
 
-            fields.push([ `[${event.id}](${message.url.replace(message.id, event.id || '')})`, event.date, event.title ])
+            fields.push([ `[${event.id}](${message.url.replace(message.id, event.id || '')})`, event.date + ' ' + event.time, event.title ])
         }
 
         const embed = new MessageEmbed()
-            .setColor("#0099ff")
-            .setDescription(`${showAll ? 'All' : 'Upcoming'} events in this channel:`)
-            .addFields([ 
-                { name: 'Event ID', value: fields.map(x => x[0]).join('\n'), inline: true },
-                { name: 'Date', value: fields.map(x => x[1]).join('\n'), inline: true },
-                { name: 'Title', value: fields.map(x => x[2]).join('\n'), inline: true },
-            ])
+            .setColor("#0099ff");
+
+        if (fields.length === 0) {
+            embed.setDescription(`There are no upcoming events in this channel. You can create an event using the \`!create_event\` command.`);
+        } else {
+            embed.setDescription(`${showAll ? 'All' : 'Upcoming'} events in this channel:`)
+                .addFields([ 
+                    { name: 'Event ID', value: fields.map(x => x[0]).join('\n'), inline: true },
+                    { name: 'Date', value: fields.map(x => x[1]).join('\n'), inline: true },
+                    { name: 'Title', value: fields.map(x => x[2]).join('\n'), inline: true },
+                ]);
+        }
 
         message.channel.send({ embeds: [embed] });
     } else if (cmd === '!refresh_event' || cmd === '!re') {
@@ -152,8 +157,6 @@ client.on('messageCreate', async (message) => {
             event_role = 'tanks';
         }
 
-        console.log(event_role);
-
         if (!events.hasOwnProperty(event_id)) {
             sendError(message.channel, "Invalid Event", "Unable to add user to event, no such event ID was found");
             return;
@@ -169,7 +172,11 @@ client.on('messageCreate', async (message) => {
         events[event_id].signups[event_role][user.id] = ((await message.guild?.members.fetch(user.id)).displayName || user.tag);
 
         if (event_value && event_value.length === 6) {
-            events[event_id].signups[event_role][user.id] += ' ' + event_value[5];
+            if ((events[event_id].signups[event_role][user.id] + event_value[5]).length > 20) {
+                events[event_id].signups[event_role][user.id]  = events[event_id].signups[event_role][user.id].substring(0, 20 - event_value[5].length) + ' ' + event_value[5];
+            } else {
+                events[event_id].signups[event_role][user.id] += ' ' + event_value[5];
+            }
         }
 
         saveEvents();
@@ -238,10 +245,16 @@ client.on('messageCreate', async (message) => {
         if (!is_channel_whitelisted(message.channel)) return;
 
         const event_id = messageContent.split(' ')[1].trim();
-        const ping_msg = messageContent.match('(.*?) (.*?) (.*)')[3].trim();
+        const target_channel = message.mentions.channels.first();
+        const ping_msg = messageContent.match('(.*?) (.*?) (.*?) (.*)')[4].trim();
 
         if (!events.hasOwnProperty(event_id)) {
             sendError(message.channel, "Invalid Event", "Unable to ping event, no such event ID was found");
+            return;
+        }
+        
+        if (!target_channel) {
+            sendError(message.channel, "Invalid Channel", "Please mention the channel in your message");
             return;
         }
 
@@ -254,7 +267,7 @@ client.on('messageCreate', async (message) => {
         allUsers = allUsers.concat(Object.keys(events[event_id].signups.healers));
         allUsers = allUsers.concat(Object.keys(events[event_id].signups.dps));
 
-        message.channel.send(allUsers.map(x => `<@${x}>`).join(' ') + ' ' + ping_msg);
+        target_channel.send(allUsers.map(x => `<@${x}>`).join(' ') + ' ' + ping_msg);
     } else if (cmd === '!export_event') {
         // Administrative functions can only be run in the whitelisted channels
         if (!is_channel_whitelisted(message.channel)) return;
@@ -281,7 +294,7 @@ client.on('messageCreate', async (message) => {
             "🔒 `close_event <EVENT_ID>`\nClose an event to prevent sign-ups (reaction emojis will be removed from the post)\n**Example:** `!close_event 123456789`\n\n" + 
             "🏃 `event_adduser <EVENT_ID> <ROLE> <USER> <NOTES>`\nAdd a user to the sign-ups (roles are tank/healers/dps). Notes appear next to the username. The USER must be a MENTION.\n**Example:** `!event_adduser 123456789 tank @Cad#1234 (Titax)`\n\n" + 
             "🚪 `event_removeuser <EVENT_ID> <ROLE> <USER>`\nRemove a user from the sign-ups (roles are tank/healers/dps). The USER must be a mention.\n**Example:** `!event_removeuser 123456789 tank @Cad#1234`\n\n" + 
-            "🔔 `ping_event <EVENT_ID> <MESSAGE>`\nPing all signed up users (non-subs) with a custom message (e.g. to inform them you are forming up).\n**Example:** `!ping_event 123456789 Now forming up pubside, please whisper Cadriel or x in allies`\n\n" + 
+            "🔔 `ping_event <EVENT_ID> <TARGET_CHANNEL> <MESSAGE>`\nPing all signed up users (non-subs) with a custom message (e.g. to inform them you are forming up).\n**Example:** `!ping_event 123456789 #lfg-groupfinder Now forming up pubside, please whisper Cadriel or x in allies`\n\n" + 
             "🌎 `publish_event <EVENT_ID> <TARGET_CHANNEL>`\nPublish the event to the specified channel. All published events are sychronized. The channel must be a mention.\n**Example:** `!publish_event 123456789 #event-signups`\n\n" + 
             "📆 `list_events`\nList all upcoming events in the current channel.\n**Example:** `!list_events`\n\n");
     }

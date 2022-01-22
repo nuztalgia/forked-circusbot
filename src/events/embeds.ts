@@ -48,14 +48,15 @@ export async function updateEventEmbeds(event: CircusEvent) {
 }
 
 export function createEventEmbed(event: CircusEvent) {
-    const tank_signups = (Object.values(event.signups.tanks).length > 0 ? "<:tank:933048000727629835> " : "") + (Object.values(event.signups.tanks).join("\n<:tank:933048000727629835> ") || '\u200b') + '\u200b\n'.repeat(event.role_limits.dps - Math.max(0, Object.values(event.signups.tanks).length - 1));
-    const healer_signups = (Object.values(event.signups.healers).length > 0 ? "<:heal:933048000740229140> " : "") + Object.values(event.signups.healers).join("\n<:heal:933048000740229140> ") || '\u200b';
-    const dps_signups = (Object.values(event.signups.dps).length > 0 ? "<:dps:933048000866033774> " : "") + Object.values(event.signups.dps).join("\n<:dps:933048000866033774> ") || '\u200b';
-    const tank_subs = (Object.values(event.signups.tank_subs).length > 0 ? "💙 " : "") + Object.values(event.signups.tank_subs).join("\n💙 ") || '\u200b'
-    const healer_subs = (Object.values(event.signups.healer_subs).length > 0 ? "💚 " : "") + Object.values(event.signups.healer_subs).join("\n💚 ") || '\u200b';
-    const dps_subs = (Object.values(event.signups.dps_subs).length > 0 ? "❤️ " : "") + Object.values(event.signups.dps_subs).join("\n❤️ ") || '\u200b';
+    const tank_signups = (Object.values(event.signups.tanks).length > 0 ? "<:tank:933048000727629835> " : "") + (Object.values(event.signups.tanks).map(x => x.substring(0, 21)).join("\n<:tank:933048000727629835> ") || '\u200b');
+    const healer_signups = (Object.values(event.signups.healers).length > 0 ? "<:heal:933048000740229140> " : "") + Object.values(event.signups.healers).map(x => x.substring(0, 21)).join("\n<:heal:933048000740229140> ") || '\u200b';
+    const dps_signups = (Object.values(event.signups.dps).length > 0 ? "<:dps:933048000866033774> " : "") + (Object.values(event.signups.dps).map(x => x.substring(0, 21)).join("\n<:dps:933048000866033774> ") || '\u200b') + '\u200b\n'.repeat(event.role_limits.dps - Math.max(0, Object.values(event.signups.dps).length - 1));
+    const tank_subs = (Object.values(event.signups.tank_subs).length > 0 ? "💙 " : "") + Object.values(event.signups.tank_subs).map(x => x.substring(0, 20)).join("\n💙 ") || '\u200b'
+    const healer_subs = (Object.values(event.signups.healer_subs).length > 0 ? "💚 " : "") + Object.values(event.signups.healer_subs).map(x => x.substring(0, 20)).join("\n💚 ") || '\u200b';
+    const dps_subs = (Object.values(event.signups.dps_subs).length > 0 ? "❤️ " : "") + Object.values(event.signups.dps_subs).map(x => x.substring(0, 20)).join("\n❤️ ") || '\u200b';
 
     const description = `:calendar_spiral: ${event.date}⠀⠀⠀⠀:alarm_clock: ${event.time} EST\n\n` + 
+        (event.description ? event.description + "\n\n" : "") +
         `**Requirements:**\n` + 
         `<:tank:933048000727629835>  ${event.role_requirements.tank}\n` +
         `<:heal:933048000740229140>  ${event.role_requirements.healer}\n` +
@@ -75,7 +76,7 @@ export function createEventEmbed(event: CircusEvent) {
             { name: `💚 Healer Subs (${Object.values(event.signups.healer_subs).length})`, value: healer_subs, inline: true },
             { name: `❤️ DPS Subs (${Object.values(event.signups.dps_subs).length})`, value: dps_subs, inline: true }
         )
-        .setFooter({ text: `🙈 Sign-ups are currently ${event.signup_status}  •  Event ID: ${event.id}`});
+        .setFooter({ text: `${event.signup_status == 'open' ? '📖' : '🙈'} Sign-ups are currently ${event.signup_status}  •  Event ID: ${event.id}`});
 
     if (event.title.match(/Pub/)) {
         embed.setAuthor({ name: event.title || 'Untitled Event', iconURL: 'https://cdn.discordapp.com/emojis/740147910435405864.webp?size=96&quality=lossless' });

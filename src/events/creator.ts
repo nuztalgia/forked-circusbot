@@ -1,5 +1,6 @@
 import { Client, Message } from "discord.js";
 import { sendError, sendMessage } from "../utils/embeds";
+import { log } from "../utils/logging";
 import { makeEmptyEvent } from "./default_event";
 import { createEvent } from "./persistence";
 
@@ -15,7 +16,7 @@ export function beginEventCreation(message: Message<boolean>) {
     eventSessions[message.channel.id].authorId = message.author.id;
     eventSessions[message.channel.id].author = `${message.author.tag} {${message.author.id}}`;
     eventSessions[message.channel.id].messageId = message.id;
-    console.info(`  User ${message.author.tag} {${message.author.id}} is now creating an event`);
+    log('info', `User ${message.author.tag} {${message.author.id}} is now creating an event`);
 
     if (message.content.includes('json')) {
         eventSessions[message.channel.id].step = 'json';
@@ -76,7 +77,7 @@ export function registerEventCreator(client: Client) {
                 sendMessage(message.channel, "Please enter the time for the event (e.g. 6:00 PM):");
                 break;
             case 'time':
-                if (!message.content.match(/^[0-2]?[0-9]:[0-9]{2} ?(AM|PM)$/i)) {
+                if (!message.content.match(/^[0-2]?[0-9]:[0-9]{2} (AM|PM)$/i)) {
                     sendError(message.channel, 'Invalid Time Format', 'Invalid time or time format was given, please try again');
                     message.react('👎');
                     return;
