@@ -47,7 +47,7 @@ registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau'], as
             } else if (query.size === 1) {
                 user = query.last()?.user;
             } else {
-                const fields = [];
+                const fields: string[][] = [];
 
                 for (let [_id, member] of query) {
                     fields.push([ member.user.id, member.user.tag, member.displayName ])
@@ -91,12 +91,12 @@ registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau'], as
 
     if (updated) {
         message.channel.send({ embeds: [new MessageEmbed()
-            .setColor("#0099ff")
+            .setColor("#77b255")
             .setDescription(`✅ Updated <@${user.id}> for [${events[event_id].title}](${message.url.replace(message.id, events[event_id].id)})`)
         ]});
     } else if (smartMatch) {
         message.channel.send({ embeds: [new MessageEmbed()
-            .setColor("#0099ff")
+            .setColor("#77b255")
             .setDescription(`✅ Added <@${user.id}> as a ${event_role.replace(/(tank|healer)s/, '$1')} to [${events[event_id].title}](${message.url.replace(message.id, events[event_id].id)})`)
         ]});
     } else {

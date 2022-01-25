@@ -47,6 +47,4 @@ registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
         updateEventEmbeds(events[event_id]);
         sendMessage(message.channel, `✅  [${events[event_id].title}](${message.url.replace(message.id, event_id)}) is now open for sign-ups (it may take several seconds to add reactions)`);
     }
-
-    message.react('👍');
 });

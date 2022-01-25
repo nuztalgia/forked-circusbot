@@ -16,6 +16,14 @@ function getCommand(message: string) {
     }
 }
 
+function getChannelName(message: Message<boolean>) {
+    if (message.guild) {
+        return message.guild.channels.cache.get(message.channel.id)?.name || message.channel.id;
+    } else {
+        return message.channel.id;
+    }
+}
+
 export function registerCommand(command: string, cmdAliases: string[], callback: (message: Message<boolean>) => any) {
     commands[command] = callback;
 
@@ -40,10 +48,10 @@ export function runCommand(message: Message<boolean>) {
     const cmd = getCommand(message.content);
 
     if (!checkPermissions(cmd, message.channel)) {
-        log('warn', `User ${message.author.tag} tried to run !${cmd} in #${message.guild?.channels.cache.get(message.channel.id).name} but channel is not in the whitelist`);
+        log('warn', `User ${message.author.tag} tried to run !${cmd} in #${getChannelName(message)} but channel is not in the whitelist`);
         sendError(message.channel, "Sorry, but I can only run this command in whitelisted channels.");
     } else if (commands.hasOwnProperty(cmd)) {
-        log('info', `User ${message.author.tag} ran !${cmd} in #${message.guild?.channels.cache.get(message.channel.id).name}`);
+        log('info', `User ${message.author.tag} ran a command in #${getChannelName(message)}: ${message.content}`);
         commands[cmd](message);
     }
 }

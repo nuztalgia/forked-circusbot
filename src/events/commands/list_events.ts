@@ -10,7 +10,6 @@ registerCommand('list_events', ['list_events', 'le'], message => {
     for (const event of Object.values(events)) {
         if (!event.published_channels.hasOwnProperty(message.channel.id)) continue;
         if (Date.parse((event.date + ' ' + event.time) || '') <= Date.now() && !showAll) continue;
-        console.log(event);
 
         fields.push([ `[${event.id}](${message.url.replace(message.id, event.id || '')})`, event.date + ' ' + event.time, event.title.substring(0,28) ])
     }

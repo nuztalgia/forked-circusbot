@@ -27,7 +27,6 @@ registerCommand('edit_event', ['event_edit', 'ee'], message => {
 
     if (!eventId) {
         editEventUsage(message.channel);
-        message.react('👎');
         return;
     } else if (!events.hasOwnProperty(eventId)) {
         sendError(message.channel, "Unable to edit event, no such event ID was found");
@@ -50,7 +49,6 @@ registerCommand('edit_event', ['event_edit', 'ee'], message => {
         events[eventId][eventField] = eventValue;
     } else {
         editEventUsage(message.channel);
-        message.react('👎');
         return;
     }
 
