@@ -25,7 +25,9 @@ interface CircusEvent {
         healer_subs: { [key: string]: string };
         dps_subs: { [key: string]: string };
     }
+    quick_create: boolean;
     step: string;
     signup_status: 'open' | 'closed';
+    open_signups_at: string?;
     published_channels: { [key: string]: string }
 }

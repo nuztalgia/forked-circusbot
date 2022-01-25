@@ -28,6 +28,8 @@ export function makeEmptyEvent(): CircusEvent {
         },
         step: 'none',
         signup_status: 'closed',
+        quick_create: false,
+        open_signups_at: null,
         published_channels: {}
     };
 }

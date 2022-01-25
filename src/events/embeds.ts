@@ -1,5 +1,6 @@
 import { DiscordAPIError, MessageEmbed } from "discord.js";
 import { client } from '../client';
+import { log } from "../utils/logging";
 import { saveEvents } from "./persistence";
 
 export async function updateEventEmbeds(event: CircusEvent) {
@@ -17,7 +18,7 @@ export async function updateEventEmbeds(event: CircusEvent) {
                 await msg.edit({ embeds: [embed] });
             } catch (err) {
                 if (err instanceof DiscordAPIError) {
-                    console.error(`Failed to edit message for event ${event.id} (DiscordAPIError):`, err.message);
+                    log('error', `Failed to edit message for event ${event.id} (DiscordAPIError): ${err.message}`);
                     
                     if (err.message === 'Unknown Message') {
                         delete event.published_channels[channelId];
@@ -26,19 +27,20 @@ export async function updateEventEmbeds(event: CircusEvent) {
                     }
                 }
 
-                console.error(`Failed to edit message for event ${event.id}`, err);
+                log('error', `Failed to edit message for event ${event.id}: ${err}`);
+                return;
             }
 
             if (event.signup_status === 'open' && !(msg.reactions.cache.get('❤️')?.count || 0 > 0)) {
-                console.log(`Event ${event.id} is open to sign-ups, adding sign-up reactions`);
+                log('debug', `Event ${event.id} is open to sign-ups, adding sign-up reactions (message: ${msg.id})`);
                 await msg.react('<:tank:933048000727629835>');
                 await msg.react('<:heal:933048000740229140>');
                 await msg.react('<:dps:933048000866033774');
                 await msg.react('💙');
                 await msg.react('💚');
                 await msg.react('❤️');
-            } else if (event.signup_status === 'closed') {
-                console.log(`Event ${event.id} is closed to sign-ups, removing sign-up reactions`);
+            } else if (event.signup_status === 'closed' && (msg.reactions.cache.get('❤️')?.count || 0) > 0) {
+                log('debug', `Event ${event.id} is closed to sign-ups, removing sign-up reactions (message: ${msg.id})`);
                 await msg.reactions.removeAll();
             }
         } else {

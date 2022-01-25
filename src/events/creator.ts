@@ -6,7 +6,7 @@ import { createEvent } from "./persistence";
 
 let eventSessions: { [channelId: string]: CircusEvent } = { };
 
-export function beginEventCreation(message: Message<boolean>) {
+export function beginEventCreation(message: Message<boolean>, quick: boolean) {
     if (eventSessions.hasOwnProperty(message.channel.id)) {
         sendError(message.channel, "In Progress", "Another user is already in the process of creating an event. Please wait for them to finish.");
         return;
@@ -16,6 +16,7 @@ export function beginEventCreation(message: Message<boolean>) {
     eventSessions[message.channel.id].authorId = message.author.id;
     eventSessions[message.channel.id].author = `${message.author.tag} {${message.author.id}}`;
     eventSessions[message.channel.id].messageId = message.id;
+    eventSessions[message.channel.id].quick_create = quick;
     log('info', `User ${message.author.tag} {${message.author.id}} is now creating an event`);
 
     if (message.content.includes('json')) {
@@ -57,8 +58,13 @@ export function registerEventCreator(client: Client) {
                 break;
             case 'title':
                 event.title = message.content;
-                event.step = 'description';
-                sendMessage(message.channel, "Please enter a **Description** for the event (or type '**next**' to skip):");
+                if (event.quick_create) { 
+                    event.step = 'date';
+                    sendMessage(message.channel, "Please enter the date for the event (using the format DD-MMM-YYYY, e.g. 03-Jan-2022):");
+                } else {
+                    event.step = 'description';
+                    sendMessage(message.channel, "Please enter a **Description** for the event (or type '**next**' to skip):");
+                }
                 break;
             case 'description':
                 event.description = message.content === 'next' ? null : message.content;
@@ -99,8 +105,14 @@ export function registerEventCreator(client: Client) {
                 break;
             case 'dps_requirements':
                 event.role_requirements.dps = message.content;
-                event.step = 'tank_limit';
-                sendMessage(message.channel, "Please enter the number of Tanks spots for this event:");
+                if (event.quick_create) { 
+                    event.step = 'none';
+                    createEvent(message.channel, event);
+                    delete eventSessions[message.channel.id];
+                } else {
+                    event.step = 'tank_limit';
+                    sendMessage(message.channel, "Please enter the number of Tanks spots for this event:");
+                }
                 break;
             case 'tank_limit':
                 if (!message.content.match(/^[0-9]+$/i)) {

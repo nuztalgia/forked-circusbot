@@ -13,9 +13,7 @@ export function sendMessage(channel: TextBasedChannel, message: string) {
 export function sendError(channel: TextBasedChannel, title: string, message: string) {
     const embed = new MessageEmbed()
         .setColor("#ff0000")
-        .setThumbnail('https://media.discordapp.net/attachments/814616443919532062/933036449052381234/299045_sign_error_icon.png?width=48&height=48')
-        .setTitle(title)
-        .setDescription(message)
+        .setDescription("<:error:935248898086273045> " + message)
     
     channel.send({ embeds: [embed] });
 
