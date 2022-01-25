@@ -40,14 +40,25 @@ export function runCommand(message: Message<boolean>) {
     const cmd = getCommand(message.content);
 
     if (!checkPermissions(cmd, message.channel)) {
-        log('warn', `User ${message.author.tag} tried to run !${cmd} in ${message.channel.id} but channel is not in the whitelist`);
+        log('warn', `User ${message.author.tag} tried to run !${cmd} in #${message.guild?.channels.cache.get(message.channel.id).name} but channel is not in the whitelist`);
         sendError(message.channel, "Sorry, but I can only run this command in whitelisted channels.");
     } else if (commands.hasOwnProperty(cmd)) {
-        log('info', `User ${message.author.tag} ran !${cmd} in ${message.channel.id}`);
+        log('info', `User ${message.author.tag} ran !${cmd} in #${message.guild?.channels.cache.get(message.channel.id).name}`);
         commands[cmd](message);
     }
 }
 
 export function checkPermissions(command: string, channel: TextBasedChannel) {
     return config.PERMISSIONS.hasOwnProperty(channel.id) && (config.PERMISSIONS[channel.id].includes("*") || config.PERMISSIONS[channel.id].includes(command));
+}
+
+export function parseCommand(message: Message<boolean>, regex: RegExp) {
+    const cmd = config.BOT_PREFIX + message.content.replace(config.BOT_PREFIX, '').split(' ')[0] + ' ';
+    let msg = message.content.replace(cmd, '').trim();
+
+    if (msg.match(regex)) {
+        return msg.match(regex)?.slice(1) || [];
+    } else {
+        return [];
+    }
 }

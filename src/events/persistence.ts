@@ -31,3 +31,9 @@ export async function createEvent(channel: TextBasedChannel, event: CircusEvent)
 
     return null;
 }
+
+export async function updateEvent(eventId: string, event: Partial<CircusEvent>) {
+    events[eventId] = Object.assign(events[eventId], event);
+    saveEvents();
+    updateEventEmbeds(events[eventId]);
+}

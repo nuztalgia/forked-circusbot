@@ -1,27 +1,25 @@
-import { registerCommand } from '../../utils/commands';
+import { parseCommand, registerCommand } from '../../utils/commands';
 import { sendError } from '../../utils/embeds';
 import { events } from '../persistence';
 
-registerCommand('ping_event', ['event_ping', 'pe'], message => {
-    const messageContent = message.content.replace(/  +/g, ' ');
-    const event_id = messageContent.split(' ')[1].trim();
-    const target_channel = message.mentions.channels.first();
-    const ping_msg = messageContent.match('(.*?) (.*?) (.*?) (.*)')[4].trim();
+registerCommand('ping_event', ['event_ping'], message => {
+    const [eventId, _, pingMsg] = parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
+    const targetChannel = message.mentions.channels.first();
 
-    if (!events.hasOwnProperty(event_id)) {
-        sendError(message.channel, "Unable to ping event, no such event ID was found");
+    if (!events.hasOwnProperty(eventId)) {
+        sendError(message.channel, "Unable to ping event, no such event ID was found. Correct usage:\n\n`!ping_event 123456789 #event-signups Now forming up, please x in guild`");
         return;
-    } else if (!target_channel) {
-        sendError(message.channel, "Please mention the channel in your message");
+    } else if (!targetChannel) {
+        sendError(message.channel, "Please mention the channel in your message. Correct usage:\n\n`!ping_event 123456789 #event-signups Now forming up, please x in guild`");
         return;
-    } else if (!ping_msg) {
-        sendError(message.channel, "Please provide a message for the ping");
+    } else if (!pingMsg) {
+        sendError(message.channel, "Please provide a message for the ping. Correct usage:\n\n`!ping_event 123456789 #event-signups Now forming up, please x in guild`");
         return;
     }
 
-    let allUsers = Object.keys(events[event_id].signups.tanks);
-    allUsers = allUsers.concat(Object.keys(events[event_id].signups.healers));
-    allUsers = allUsers.concat(Object.keys(events[event_id].signups.dps));
+    let allUsers = Object.keys(events[eventId].signups.tanks);
+    allUsers = allUsers.concat(Object.keys(events[eventId].signups.healers));
+    allUsers = allUsers.concat(Object.keys(events[eventId].signups.dps));
 
-    target_channel.send(allUsers.map(x => `<@${x}>`).join(' ') + ' ' + ping_msg);
+    targetChannel.send(allUsers.map(x => `<@${x}>`).join(' ') + ' ' + pingMsg);
 });

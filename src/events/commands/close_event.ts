@@ -1,21 +1,18 @@
-import { registerCommand } from '../../utils/commands';
+import { parseCommand, registerCommand } from '../../utils/commands';
 import { sendError, sendMessage } from '../../utils/embeds';
-import { updateEventEmbeds } from '../embeds';
-import { events, saveEvents } from '../persistence';
+import { events, updateEvent } from '../persistence';
 
 registerCommand('close_event', ['event_close'], message => {
-    const messageContent = message.content.replace(/  +/g, ' ');
-    const event_id = messageContent.split(' ')[1];
+    const [eventId] = parseCommand(message, /([0-9]+)/);
 
-    if (!events.hasOwnProperty(event_id)) {
+    if (!events.hasOwnProperty(eventId)) {
         sendError(message.channel, "Unable to close event, no such event ID was found");
         return;
     }
 
-    events[event_id].signup_status = 'closed';
-    saveEvents();
-    updateEventEmbeds(events[event_id]);
+    updateEvent(eventId, {
+        signup_status: 'closed'
+    });
 
-    sendMessage(message.channel, `✅ Event ${messageContent.split(' ')[1]} is now closed for sign-ups!`);
-    message.react('👍');
+    sendMessage(message.channel, `✅ [${events[eventId].title}](${message.url.replace(message.id, eventId)}) is now closed for sign-ups (it may take several seconds to remove reactions)`);
 });
