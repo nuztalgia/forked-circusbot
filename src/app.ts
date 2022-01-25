@@ -1,6 +1,4 @@
 import { eventCreationHandler } from './events/creator';
-import { events, saveEvents } from './events/persistence';
-import { updateEventEmbeds } from './events/embeds';
 import { registerEventReactions } from './events/reaction_signups';
 import { client } from './client';
 import { log } from './utils/logging';
@@ -23,24 +21,14 @@ import './events/commands/event_help';
 
 client.on('ready', () => {
   log('info', `Logged in as ${client?.user?.tag}!`);
-
-  for (const event of Object.values(events)) {
-      if (event.open_signups_at) {
-        log('debug', `Rescheduled event open for event ${event.id} (${event.title})`);
-
-        setTimeout(function() {
-            log('info', `Opening event ${event.id} (${event.title}) for sign-ups via scheduled !event_open`);
-            event.signup_status = 'open';
-            event.open_signups_at = null;
-            saveEvents();
-            updateEventEmbeds(event);
-        }, Date.parse(event.open_signups_at) - Date.now());
-      }
-  }
 });
 
 client.on('messageCreate', async (message) => {
-    if (!message.author.bot && isValidCommand(message.content)) {
+    if (message.author.bot) {
+        return;
+    }
+
+    if (isValidCommand(message.content)) {
         runCommand(message);
         return;
     }

@@ -4,6 +4,20 @@ import { log } from '../../utils/logging';
 import { updateEventEmbeds } from '../embeds';
 import { events, saveEvents } from '../persistence';
 
+for (const event of Object.values(events)) {
+    if (event.open_signups_at) {
+      log('debug', `Rescheduled event open for event ${event.id} (${event.title})`);
+
+      setTimeout(function() {
+          log('info', `Opening event ${event.id} (${event.title}) for sign-ups via scheduled !event_open`);
+          event.signup_status = 'open';
+          event.open_signups_at = null;
+          saveEvents();
+          updateEventEmbeds(event);
+      }, Date.parse(event.open_signups_at) - Date.now());
+    }
+}
+
 registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
     const messageContent = message.content.replace(/  +/g, ' ');
     const event_id = messageContent.split(' ')[1];
