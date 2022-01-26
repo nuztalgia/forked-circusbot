@@ -18,6 +18,7 @@ import './events/commands/publish_event';
 import './events/commands/ping_event';
 import './events/commands/export_event';
 import './events/commands/event_help';
+import './events/commands/register_slash_commands';
 
 client.on('ready', () => {
   log('info', `Logged in as ${client?.user?.tag}!`);

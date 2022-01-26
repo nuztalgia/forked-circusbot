@@ -12,6 +12,7 @@ Sample `config.json` file:
 
 ```
 {
+    "BOT_CLIENT_ID": "912376778939584562",
     "BOT_TOKEN": "YOUR_SECRET_BOT_TOKEN",
     "BOT_PREFIX": "!",
     "PERMISSIONS": {
@@ -20,4 +21,10 @@ Sample `config.json` file:
         "730432239325806632": ["event_help", "ping_event"]
     }
 }
+```
+
+Authorization URL:
+
+```
+https://discord.com/api/oauth2/authorize?client_id=912376778939584562&permissions=271969344&scope=bot%20applications.commands
 ```
