@@ -28,5 +28,5 @@ registerCommand('list_events', ['list_events', 'le'], message => {
             ]);
     }
 
-    message.channel.send({ embeds: [embed] });
+    message.reply({ embeds: [embed] });
 });

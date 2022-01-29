@@ -1,5 +1,6 @@
 interface CircusEvent {
-    id: string?;
+    id: string;
+    serverId: string;
     author: string?;
     authorId: sring?;
     messageId: string?;

@@ -13,6 +13,7 @@ export function beginEventCreation(message: Message<boolean>, quick: boolean) {
     }
 
     eventSessions[message.channel.id] = makeEmptyEvent();
+    eventSessions[message.channel.id].serverId = message.guildId || '';
     eventSessions[message.channel.id].authorId = message.author.id;
     eventSessions[message.channel.id].author = `${message.author.tag} {${message.author.id}}`;
     eventSessions[message.channel.id].messageId = message.id;

@@ -1,6 +1,7 @@
 export function makeEmptyEvent(): CircusEvent {
     return {
-        id: null,
+        id: '',
+        serverId: '',
         author: null, 
         authorId: null,
         messageId: null,

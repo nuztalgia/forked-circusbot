@@ -1,21 +1,40 @@
+import { client } from '../../client';
 import { registerCommand } from '../../utils/commands';
-import { sendError, sendMessage } from '../../utils/embeds';
+import { EMBED_SUCCESS_COLOR, sendError, sendMessage, sendReply } from '../../utils/embeds';
 import { log } from '../../utils/logging';
 import { updateEventEmbeds } from '../embeds';
 import { events, saveEvents } from '../persistence';
 
+const eventOpens = {};
+
 for (const event of Object.values(events)) {
     if (event.open_signups_at) {
-      log('debug', `Rescheduled event open for event ${event.id} (${event.title})`);
-
-      setTimeout(function() {
-          log('info', `Opening event ${event.id} (${event.title}) for sign-ups via scheduled !event_open`);
-          event.signup_status = 'open';
-          event.open_signups_at = null;
-          saveEvents();
-          updateEventEmbeds(event);
-      }, Date.parse(event.open_signups_at) - Date.now());
+        scheduleEventOpen(event);
     }
+}
+
+function scheduleEventOpen(event: CircusEvent) {
+    if (eventOpens[event.id]) {
+        log('debug', `Cancelling event open for event ${event.id} (${event.title})`);
+        clearTimeout(eventOpens[event.id]);
+    }
+
+    log('debug', `Scheduling event open for event ${event.id} (${event.title}) at ${event.open_signups_at}`);
+
+    eventOpens[event.id] = setTimeout(async function() {
+        const channel = await client.channels.fetch(Object.keys(event.published_channels)[0]);
+        
+        if (channel?.isText()) {
+            const eventLink = `https://discord.com/channels/${event.serverId}/${channel.id}/${event.id}`;
+            sendMessage(channel, `✅ Now opening sign-ups for [${event.title}](${eventLink})`);
+        }
+
+        log('info', `Opening event ${event.id} (${event.title}) for sign-ups via scheduled !event_open`);
+        event.signup_status = 'open';
+        event.open_signups_at = null;
+        saveEvents();
+        updateEventEmbeds(event);
+    }, Date.parse(event.open_signups_at + ' EST') - Date.now());
 }
 
 registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
@@ -28,6 +47,8 @@ registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
         return;
     }
 
+    const event = events[event_id];
+
     if (scheduled_time) {
         scheduled_time = scheduled_time.replace(/ *(AM|PM)/, " $1");
 
@@ -36,7 +57,7 @@ registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
             scheduled_time = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) + "-" + ('0' + d.getDate()).slice(-2) + ' ' + scheduled_time;
         }
 
-        let openAt = Date.parse(scheduled_time);
+        let openAt = Date.parse(scheduled_time + ' EST');
 
         if (!openAt) {
             message.react("👎");
@@ -44,21 +65,15 @@ registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
             return;
         }
 
-        setTimeout(function() {
-            log('info', `Opening event ${events[event_id].id} (${events[event_id].title}) for sign-ups via scheduled !event_open`);
-            events[event_id].signup_status = 'open';
-            events[event_id].open_signups_at = null;
-            saveEvents();
-            updateEventEmbeds(events[event_id]);
-        }, openAt - Date.now());
-
-        events[event_id].open_signups_at = scheduled_time;
-        sendMessage(message.channel, `✅ I will open sign-ups for ${messageContent.split(' ')[1]} in ${Math.floor((openAt - Date.now()) / (60*60*1000))} hours ${Math.floor(((openAt - Date.now()) / (60*1000)) % 60)} minutes`);
+        event.open_signups_at = scheduled_time;
         saveEvents();
+        scheduleEventOpen(event);
+        
+        sendReply(message, EMBED_SUCCESS_COLOR, `✅ I will open sign-ups for [${event.title}](${message.url.replace(message.id, event.id)}) in ${Math.floor((openAt - Date.now()) / (60*60*1000))} hours ${Math.floor(((openAt - Date.now()) / (60*1000)) % 60)} minutes`);
     } else {
         events[event_id].signup_status = 'open';
         saveEvents();
         updateEventEmbeds(events[event_id]);
-        sendMessage(message.channel, `✅  [${events[event_id].title}](${message.url.replace(message.id, event_id)}) is now open for sign-ups (it may take several seconds to add reactions)`);
+        sendReply(message, EMBED_SUCCESS_COLOR, `✅  [${events[event_id].title}](${message.url.replace(message.id, event_id)}) is now open for sign-ups (it may take several seconds to add reactions)`);
     }
 });
