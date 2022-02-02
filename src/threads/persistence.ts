@@ -101,6 +101,12 @@ export async function archiveThread(thread: CircusThread) {
     
     if (existingThread) {
         log('info', `Archiving thread ${existingThread.id} (${existingThread.name})`);
+
+        const embed = new MessageEmbed()
+            .setColor(EMBED_INFO_COLOR)
+            .setDescription('👋 This thread is now being archived. Goodbye.');
+
+        await existingThread.send({ embeds: [embed] });
         await existingThread.setArchived(true);
     }
 }
