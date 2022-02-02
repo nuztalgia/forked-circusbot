@@ -1,4 +1,5 @@
 import { eventCreationHandler } from './events/creator';
+import { threadCreationHandler } from './threads/thread_creator';
 import { registerEventReactions } from './events/reaction_signups';
 import { client } from './client';
 import { log } from './utils/logging';
@@ -20,6 +21,13 @@ import './events/commands/export_event';
 import './events/commands/event_help';
 import './events/commands/register_slash_commands';
 
+import './threads/commands/archive_thread';
+import './threads/commands/create_thread';
+import './threads/commands/edit_thread';
+import './threads/commands/list_threads';
+import './threads/commands/rebuild_thread';
+import './threads/commands/thread_help';
+
 client.on('ready', () => {
   log('info', `Logged in as ${client?.user?.tag}!`);
 });
@@ -35,6 +43,7 @@ client.on('messageCreate', async (message) => {
     }
 
     eventCreationHandler(message);
+    threadCreationHandler(message);
 });
 
 registerEventReactions(client);
