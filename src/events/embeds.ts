@@ -1,4 +1,4 @@
-import { DiscordAPIError, MessageEmbed } from "discord.js";
+import { DiscordAPIError, Message, MessageEmbed } from "discord.js";
 import { client } from '../client';
 import { log } from "../utils/logging";
 import { saveEvents } from "./persistence";
@@ -11,7 +11,7 @@ export async function updateEventEmbeds(event: CircusEvent) {
         const channel = await client.channels.fetch(channelId);
 
         if (channel?.isText()) {
-            let msg;
+            let msg: Message<boolean>;
 
             try {
                 msg = await channel.messages.fetch(messageId);
@@ -57,7 +57,12 @@ export function createEventEmbed(event: CircusEvent) {
     const healer_subs = (Object.values(event.signups.healer_subs).length > 0 ? "💚 " : "") + Object.values(event.signups.healer_subs).map(x => x.substring(0, 20)).join("\n💚 ") || '\u200b';
     const dps_subs = (Object.values(event.signups.dps_subs).length > 0 ? "❤️ " : "") + Object.values(event.signups.dps_subs).map(x => x.substring(0, 20)).join("\n❤️ ") || '\u200b';
 
-    const description = `:calendar_spiral: ${event.date}⠀⠀⠀⠀:alarm_clock: ${event.time} EST\n\n` + 
+
+    if (!event.time?.match(/ [A-Z]{3}$/)) {
+        event.time += ' EST';
+    }
+
+    const description = `:calendar_spiral: ${event.date}⠀⠀⠀⠀:alarm_clock: ${event.time}\n\n` + 
         (event.description ? event.description + "\n\n" : "") +
         `**Requirements:**\n` + 
         `<:tank:933048000727629835>  ${event.role_requirements.tank}\n` +

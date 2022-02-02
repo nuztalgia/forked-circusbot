@@ -1,4 +1,5 @@
 import { Client, MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
+import { messageUser } from '../utils/embeds';
 import { log } from '../utils/logging';
 import { updateEventEmbeds } from './embeds';
 import { events, saveEvents } from './persistence';
@@ -13,11 +14,16 @@ export function registerEventReactions(client: Client) {
             await reaction.fetch();
         }
 
-        let event = Object.values(events).find(x => x.id === reaction.message.id || Object.values(x.published_channels).includes(reaction.message.id));
+        const event = Object.values(events).find(x => x.id === reaction.message.id || Object.values(x.published_channels).includes(reaction.message.id));
 
         if (!event) return;
 
         reaction.users.remove(user.id);
+
+        if (event.signup_status === 'closed') {
+            log('debug', `Received reaction from ${user.tag} on closed event ${event.id} (${event.title})`);
+            return;
+        }
         
         // console.log(`REACTION ON EVENT ${reaction.message.id} : '${reaction.emoji.toString()}'`);
 
@@ -28,8 +34,9 @@ export function registerEventReactions(client: Client) {
                 updateEventEmbeds(event);
                 saveEvents();
                 return;
-            } else if (Object.values(event.signups.tanks).length === event.role_limits.tank) {
+            } else if (Object.values(event.signups.tanks).length >= event.role_limits.tank) {
                 log('info', `  Unable to sign-up user ${user.tag} as a Tank for event ${event.id} - Tank spots are full`);
+                messageUser(user, `<:error:935248898086273045> Sorry, tank sign-ups for ${event.title} are currently full. Please consider signing up for another role, or as a sub instead`);
                 return;
             }
 
@@ -50,8 +57,9 @@ export function registerEventReactions(client: Client) {
                 updateEventEmbeds(event);
                 saveEvents();
                 return;
-            } else if (Object.values(event.signups.dps).length === event.role_limits.dps) {
+            } else if (Object.values(event.signups.dps).length >= event.role_limits.dps) {
                 log('info', `  Unable to sign-up user ${user.tag} as a DPS for event ${event.id} - DPS spots are full`);
+                messageUser(user, `<:error:935248898086273045> Sorry, DPS sign-ups for ${event.title} are currently full. Please consider signing up for another role, or as a sub instead`);
                 return;
             }
 
@@ -72,8 +80,9 @@ export function registerEventReactions(client: Client) {
                 updateEventEmbeds(event);
                 saveEvents();
                 return;
-            } else if (Object.values(event.signups.healers).length === event.role_limits.healer) {
+            } else if (Object.values(event.signups.healers).length >= event.role_limits.healer) {
                 log('info', `  Unable to sign-up user ${user.tag} as a Healer for event ${event.id} - Healer spots are full`);
+                messageUser(user, `<:error:935248898086273045> Sorry, healer sign-ups for ${event.title} are currently full. Please consider signing up for another role, or as a sub instead`);
                 return;
             }
 

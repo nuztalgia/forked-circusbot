@@ -81,13 +81,20 @@ export function eventCreationHandler(message: Message<boolean>) {
             sendMessage(message.channel, "Please enter the time for the event (e.g. 6:00 PM):");
             break;
         case 'time':
-            if (!message.content.match(/^[0-2]?[0-9]:[0-9]{2} (AM|PM)$/i)) {
+            if (!message.content.match(/^([0-2]?[0-9]:[0-9]{2}) ?(AM|PM)( [A-Z]{3})?$/i)) {
                 sendError(message.channel, 'Invalid time or time format was given, please try again');
                 message.react('👎');
                 return;
             }
 
-            event.time = message.content;
+            let time = message.content.replace(/ ?(AM|PM)/, ' $1');
+
+            if (!time.match(/ [A-Z]{3}$/)) {
+                event.time = time + ' EST';
+            } else {
+                event.time = time;
+            }
+
             event.step = 'tank_requirements';
             sendMessage(message.channel, "Please enter the requirements for Tanks to sign-up for this event:");
             break;

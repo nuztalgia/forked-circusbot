@@ -21,6 +21,10 @@ function scheduleEventOpen(event: CircusEvent) {
 
     log('debug', `Scheduling event open for event ${event.id} (${event.title}) at ${event.open_signups_at}`);
 
+    if (!event.open_signups_at?.match(/ [A-Z]{3}$/)) {
+        event.open_signups_at += ' EST';
+    }
+
     eventOpens[event.id] = setTimeout(async function() {
         const channel = await client.channels.fetch(Object.keys(event.published_channels)[0]);
         
@@ -34,7 +38,7 @@ function scheduleEventOpen(event: CircusEvent) {
         event.open_signups_at = null;
         saveEvents();
         updateEventEmbeds(event);
-    }, Date.parse(event.open_signups_at + ' EST') - Date.now());
+    }, Date.parse(event.open_signups_at || '') - Date.now());
 }
 
 registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
@@ -52,12 +56,18 @@ registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
     if (scheduled_time) {
         scheduled_time = scheduled_time.replace(/ *(AM|PM)/, " $1");
 
-        if (scheduled_time.match(/^[0-9]{1,2}:[0-9]{2} (AM|PM)/i)) {
+        if (scheduled_time.match(/^([0-2]?[0-9]:[0-9]{2}) ?(AM|PM)( [A-Z]{3})?$/i)) {
             let d = new Date();
             scheduled_time = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) + "-" + ('0' + d.getDate()).slice(-2) + ' ' + scheduled_time;
         }
 
-        let openAt = Date.parse(scheduled_time + ' EST');
+        let openAt;
+
+        if (!scheduled_time.match(/ [A-Z]{3}$/)) {
+            openAt = Date.parse(scheduled_time + ' EST');
+        } else {
+            openAt = Date.parse(scheduled_time);
+        }
 
         if (!openAt) {
             message.react("👎");

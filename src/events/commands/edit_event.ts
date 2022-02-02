@@ -5,7 +5,7 @@ import { updateEventEmbeds } from '../embeds';
 import { events, saveEvents } from '../persistence';
 
 function editEventUsage(channel: TextBasedChannel) {
-    sendError(channel, "Incorrect syntax to edit event event. Correct usage:\n\n" +
+    sendError(channel, "Incorrect syntax to edit event. Correct usage:\n\n" +
         "`!edit_event <eventId> <FIELD_NAME> <NEW VALUE>`\n\n" +
         "Example:\n\n" +
         "`!edit_event 123456789 tank_requirements Previous tank clear in 8m required`\n\n" +

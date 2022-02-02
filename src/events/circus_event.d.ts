@@ -2,7 +2,7 @@ interface CircusEvent {
     id: string;
     serverId: string;
     author: string?;
-    authorId: sring?;
+    authorId: string?;
     messageId: string?;
     title: string;
     description: string?;
