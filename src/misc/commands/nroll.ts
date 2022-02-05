@@ -1,5 +1,4 @@
-import { MessageEmbed } from 'discord.js';
-import { EMBED_INFO_COLOR, registerCommand, getRandomInt, parseCommand, sendReply, EMBED_ERROR_COLOR, EMOJI_ERROR } from '../../utils';
+import { registerCommand, getRandomInt, parseCommand, sendReply, EMBED_ERROR_COLOR, EMOJI_ERROR, EMBED_SUCCESS_COLOR } from '../../utils';
 
 registerCommand('nroll', [], message => {
     let [params] = parseCommand(message, /(.*)/);
@@ -39,9 +38,5 @@ registerCommand('nroll', [], message => {
         msg += ' <:pepePointLaugh:925112330633740288>';
     }
 
-    const embed = new MessageEmbed()
-        .setColor(EMBED_INFO_COLOR)
-        .setDescription(msg);
-
-    message.reply({ embeds: [embed] });
+    sendReply(message, EMBED_SUCCESS_COLOR, msg);
 });
