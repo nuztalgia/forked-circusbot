@@ -90,9 +90,9 @@ export function eventCreationHandler(message: Message<boolean>) {
             let time = message.content.replace(/ ?(AM|PM)/, ' $1');
 
             if (!time.match(/ [A-Z]{3}$/)) {
-                event.time = time + ' EST';
+                event.time = time.toUpperCase() + ' EST';
             } else {
-                event.time = time;
+                event.time = time.toUpperCase();
             }
 
             event.step = 'tank_requirements';

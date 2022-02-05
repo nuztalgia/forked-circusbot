@@ -1,13 +1,13 @@
-import { parseCommand, registerCommand } from '../../utils/commands';
-import { sendError } from '../../utils/embeds';
-import { events } from '../persistence';
+import { parseCommand, registerCommand, sendError } from '../../utils';
+import { findEvent } from '../persistence';
 
 registerCommand('ping_event', ['event_ping'], message => {
     const [eventId, _, pingMsg] = parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
     const targetChannel = message.mentions.channels.first();
+    const event = findEvent(eventId);
 
-    if (!events.hasOwnProperty(eventId)) {
-        sendError(message.channel, "Unable to ping event, no such event ID was found. Correct usage:\n\n`!ping_event 123456789 #event-signups Now forming up, please x in guild`");
+    if (!event) {
+        sendError(message.channel, "Unable to ping event, invalid event ID provided");
         return;
     } else if (!targetChannel) {
         sendError(message.channel, "Please mention the channel in your message. Correct usage:\n\n`!ping_event 123456789 #event-signups Now forming up, please x in guild`");
@@ -17,9 +17,9 @@ registerCommand('ping_event', ['event_ping'], message => {
         return;
     }
 
-    let allUsers = Object.keys(events[eventId].signups.tanks);
-    allUsers = allUsers.concat(Object.keys(events[eventId].signups.healers));
-    allUsers = allUsers.concat(Object.keys(events[eventId].signups.dps));
+    let allUsers = Object.keys(event.signups.tanks);
+    allUsers = allUsers.concat(Object.keys(event.signups.healers));
+    allUsers = allUsers.concat(Object.keys(event.signups.dps));
 
     targetChannel.send(allUsers.map(x => `<@${x}>`).join(' ') + ' ' + pingMsg);
 });

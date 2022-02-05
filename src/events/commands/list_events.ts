@@ -1,21 +1,20 @@
 import { MessageEmbed } from 'discord.js';
-import { registerCommand } from '../../utils/commands';
+import { EMBED_INFO_COLOR, registerCommand } from '../../utils';
 import { events } from '../persistence';
 
 registerCommand('list_events', ['list_events', 'le'], message => {
-    const messageContent = message.content.replace(/  +/g, ' ');
-    const showAll = messageContent.match(/(-a|-A|all)/);
+    const showAll = message.content.match(/(-a|-A|all)/);
     let fields: string[][] = [];
 
     for (const event of Object.values(events)) {
         if (!event.published_channels.hasOwnProperty(message.channel.id)) continue;
         if (Date.parse((event.date + ' ' + event.time) || '') <= Date.now() && !showAll) continue;
 
-        fields.push([ event.id || '', event.date + ' ' + event.time, `[${event.title.substring(0,28)}](${message.url.replace(message.id, event.id || '')})` ])
+        fields.push([ event.id || '', event.date + ' ' + event.time?.toUpperCase().replace(/ [A-Z]{3}$/, ''), `[${event.title.substring(0,28)}](${message.url.replace(message.id, event.id || '')})` ])
     }
 
     const embed = new MessageEmbed()
-        .setColor("#0099ff");
+        .setColor(EMBED_INFO_COLOR);
 
     if (fields.length === 0) {
         embed.setDescription(`There are no upcoming events in this channel. You can create an event using the \`!create_event\` command.`);

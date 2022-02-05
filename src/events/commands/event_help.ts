@@ -1,5 +1,4 @@
-import { checkPermissions, registerCommand } from '../../utils/commands';
-import { sendMessage } from '../../utils/embeds';
+import { checkPermissions, registerCommand, sendMessage } from '../../utils';
 
 registerCommand('event_help', ['help'], message => {
     let helpMsg = '';

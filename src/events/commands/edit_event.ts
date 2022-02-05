@@ -1,11 +1,10 @@
-import { TextBasedChannel } from 'discord.js';
-import { parseCommand, registerCommand } from '../../utils/commands';
-import { sendError } from '../../utils/embeds';
+import { Message, TextBasedChannel } from 'discord.js';
+import { parseCommand, registerCommand, EMBED_ERROR_COLOR, EMOJI_ERROR, sendReply } from '../../utils';
 import { updateEventEmbeds } from '../embeds';
-import { events, saveEvents } from '../persistence';
+import { events, findEvent, saveEvents } from '../persistence';
 
-function editEventUsage(channel: TextBasedChannel) {
-    sendError(channel, "Incorrect syntax to edit event. Correct usage:\n\n" +
+function editEventUsage(message: Message<boolean>) {
+    sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Incorrect syntax to edit event. Correct usage:\n\n` +
         "`!edit_event <eventId> <FIELD_NAME> <NEW VALUE>`\n\n" +
         "Example:\n\n" +
         "`!edit_event 123456789 tank_requirements Previous tank clear in 8m required`\n\n" +
@@ -24,35 +23,36 @@ function editEventUsage(channel: TextBasedChannel) {
 
 registerCommand('edit_event', ['event_edit', 'ee'], message => {
     const [eventId, eventField, eventValue] = parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
+    const event = findEvent(eventId);
 
     if (!eventId) {
-        editEventUsage(message.channel);
+        editEventUsage(message);
         return;
-    } else if (!events.hasOwnProperty(eventId)) {
-        sendError(message.channel, "Unable to edit event, no such event ID was found");
+    } else if (!event) {
+        sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to edit event, invalid event ID provided`);
         return;
     }
 
     if (eventField.match(/(tank_requirements?|tank_reqs?)/i)) {
-        events[eventId].role_requirements.tank = eventValue;
+        event.role_requirements.tank = eventValue;
     } else if (eventField.match(/(heal(er)?_requirements?|heal(er)?_reqs?)/i)) {
-        events[eventId].role_requirements.healer = eventValue;
+        event.role_requirements.healer = eventValue;
     } else if (eventField.match(/(dps_requirements?|dps_reqs?)/i)) {
-        events[eventId].role_requirements.dps = eventValue;
+        event.role_requirements.dps = eventValue;
     } else if (eventField === 'tank_limit') {
-        events[eventId].role_limits.tank = parseInt(eventValue);
+        event.role_limits.tank = parseInt(eventValue);
     } else if (eventField === 'heal_limit' || eventField === 'healer_limit') {
-        events[eventId].role_limits.healer = parseInt(eventValue);
+        event.role_limits.healer = parseInt(eventValue);
     } else if (eventField === 'dps_limit') {
-        events[eventId].role_limits.dps = parseInt(eventValue);
-    } else if (events[eventId].hasOwnProperty(eventField)) {
-        events[eventId][eventField] = eventValue;
+        event.role_limits.dps = parseInt(eventValue);
+    } else if (event.hasOwnProperty(eventField)) {
+        event[eventField] = eventValue;
     } else {
-        editEventUsage(message.channel);
+        editEventUsage(message);
         return;
     }
 
     saveEvents();
-    updateEventEmbeds(events[eventId]);
+    updateEventEmbeds(event);
     message.react('👍');
 });

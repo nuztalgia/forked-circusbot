@@ -1,6 +1,7 @@
 
 const fs = require('fs');
 import { TextBasedChannel } from 'discord.js';
+import { log } from '../utils';
 import { createEventEmbed, updateEventEmbeds } from './embeds';
 
 export let events: { [eventId: string]: CircusEvent } = {};
@@ -8,6 +9,18 @@ export let events: { [eventId: string]: CircusEvent } = {};
 if (fs.existsSync('data/events.json')) {
     const eventData = fs.readFileSync('data/events.json');
     events = JSON.parse(eventData);
+}
+
+export function findEvent(eventId: string): CircusEvent | null {
+    eventId = eventId.trim();
+
+    if (events.hasOwnProperty(eventId)) {
+        return events[eventId];
+    }
+
+    return Object.values(events).find(event => {
+        return Object.values(event.published_channels).includes(eventId);
+    }) || null;
 }
 
 export function saveEvents() {
@@ -22,7 +35,7 @@ export async function createEvent(channel: TextBasedChannel, event: CircusEvent)
     const embed = createEventEmbed(event);
     let msg = await channel.send({ embeds: [embed] });
 
-    console.log(`Event has been created by ${event.author} - Event ID is ${msg.id}`);
+    log('info', `Event has been created by ${event.author} - Event ID is ${msg.id}`);
     event.id = msg.id;
     event.published_channels = { [channel.id]: msg.id };
     await updateEventEmbeds(event);

@@ -1,12 +1,13 @@
 import { parseCommand, registerCommand } from '../../utils/commands';
-import { sendError, sendMessage } from '../../utils/embeds';
-import { events, updateEvent } from '../persistence';
+import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, EMOJI_ERROR, sendReply } from '../../utils/embeds';
+import { findEvent, updateEvent } from '../persistence';
 
 registerCommand('close_event', ['event_close'], message => {
     const [eventId] = parseCommand(message, /([0-9]+)/);
+    const event = findEvent(eventId);
 
-    if (!events.hasOwnProperty(eventId)) {
-        sendError(message.channel, "Unable to close event, no such event ID was found");
+    if (!event) {
+        sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to close event, invalid event ID provided`);
         return;
     }
 
@@ -14,5 +15,5 @@ registerCommand('close_event', ['event_close'], message => {
         signup_status: 'closed'
     });
 
-    sendMessage(message.channel, `✅ [${events[eventId].title}](${message.url.replace(message.id, eventId)}) is now closed for sign-ups (it may take several seconds to remove reactions)`);
+    sendReply(message, EMBED_SUCCESS_COLOR, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) is now closed for sign-ups (it may take several seconds to remove reactions)`);
 });
