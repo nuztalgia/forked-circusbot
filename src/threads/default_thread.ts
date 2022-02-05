@@ -9,6 +9,7 @@ export function makeEmptyThread(): CircusThread {
         description: '',
         channel: '',
         newChannel: null,
+        enabled: true,
         visibility: 'public',
         threadId: null,
         autoAddRoles: [],

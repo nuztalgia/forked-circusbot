@@ -4,10 +4,12 @@ import { EMBED_INFO_COLOR } from '../../utils/embeds';
 import { threads } from '../persistence';
 
 registerCommand('list_threads', ['list_thread', 'thread_list'], message => {
+    const showAll = message.content.match(/(-a|-A|all)/);
     let fields: string[][] = [];
 
     for (const thread of Object.values(threads)) {
         if (thread.serverId !== message.guildId) continue;
+        if (!thread.enabled && !showAll) continue;
 
         fields.push([ thread.id, `Archived every ${thread.archiveDays} days at ${thread.archiveTime}`, `${thread.title}` ])
     }

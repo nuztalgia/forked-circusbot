@@ -10,6 +10,7 @@ interface CircusThread {
     newChannel: string?;
     visibility: string;
     threadId: string?;
+    enabled: boolean;
     autoAddRoles: string[];
     archiveDate: string?;
     archiveTime: string?;

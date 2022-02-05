@@ -109,7 +109,11 @@ export function threadCreationHandler(message: Message<boolean>) {
             sendMessage(message.channel, "Please provide a list of roles to add to the channel after it's created (use mentions):");
             break;
         case 'autoAdd':
-            thread.autoAddRoles = message.mentions.roles.map(x => x.id);
+            if (message.mentions.roles.size === 0) {
+                thread.autoAddRoles = message.content.split(',').map(x => x.trim()).map(x => message.guild?.roles.cache.find(y => y.name === x)?.id || '');
+            } else {
+                thread.autoAddRoles = message.mentions.roles.map(x => x.id);
+            }
             thread.step = 'none';
             createThread(message.channel, thread);
             delete threadSessions[message.channel.id];

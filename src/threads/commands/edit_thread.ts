@@ -13,6 +13,7 @@ function editEventUsage(channel: TextBasedChannel) {
         "Valid fields:\n\n" +
         " - title\n" + 
         " - description\n" +
+        " - enabled\n" +
         " - archiveDate\n" +
         " - archiveDays\n" +
         " - archiveTime\n" +
@@ -41,6 +42,9 @@ registerCommand('edit_thread', ['et'], message => {
         scheduleThreadArchival(threads[threadId]);
     } else if (threadField === 'archiveDate') {
         threads[threadId].archiveDate = threadValue;
+        scheduleThreadArchival(threads[threadId]);
+    } else if (threadField === 'enabled') {
+        threads[threadId].enabled = threadValue === 'true';
         scheduleThreadArchival(threads[threadId]);
     } else if (threadField === 'channel') {
         threads[threadId].newChannel = message.mentions.channels.first()?.id || '';

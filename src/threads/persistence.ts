@@ -25,6 +25,10 @@ export function scheduleThreadArchival(thread: CircusThread) {
         clearTimeout(archiveTimers[thread.id]);
     }
 
+    if (!thread.enabled) {
+        return;
+    }
+
     const date = Date.parse(thread.archiveDate + ' ' + thread.archiveTime + ' EST');
 
     log('debug', `Scheduling thread archival for thread ${thread.id} (${thread.title}) for ${getFormattedDate(new Date(date))}`);
@@ -37,7 +41,7 @@ export function scheduleThreadArchival(thread: CircusThread) {
         date.setDate(date.getDate() + thread.archiveDays);
         thread.archiveDate = getFormattedDate(date).split(' ')[0];
         saveThreads();
-    }, date - Date.now());
+    }, (date - Date.now()) + 5000);
 }
 
 export function saveThreads() {
@@ -55,7 +59,7 @@ export async function createThread(channel: TextBasedChannel, thread: CircusThre
     threads[thread.id] = JSON.parse(JSON.stringify(thread));
     saveThreads();
     
-    if (existingThread && existingThread.joinable) {
+    if (existingThread && (existingThread.joinable || existingThread.joined)) {
         threads[thread.id].threadId = existingThread.id;
         await existingThread.join();
         sendMessage(channel, `A new scheduled thread has been created. An existing thread was found in <#${thread.channel}>, so no new ones were created`);
