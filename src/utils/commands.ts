@@ -57,7 +57,8 @@ export function runCommand(message: Message<boolean>) {
 }
 
 export function checkPermissions(command: string, channel: TextBasedChannel) {
-    return config.PERMISSIONS.hasOwnProperty(channel.id) && (config.PERMISSIONS[channel.id].includes("*") || config.PERMISSIONS[channel.id].includes(command));
+    return (config.PERMISSIONS.hasOwnProperty(channel.id) && (config.PERMISSIONS[channel.id].includes("*") || config.PERMISSIONS[channel.id].includes(command)))
+      || (config.PERMISSIONS.hasOwnProperty('*') && (config.PERMISSIONS['*'].includes("*") || config.PERMISSIONS['*'].includes(command)));
 }
 
 export function parseCommand(message: Message<boolean>, regex: RegExp) {
