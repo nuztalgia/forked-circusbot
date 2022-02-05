@@ -62,7 +62,7 @@ export function checkPermissions(command: string, channel: TextBasedChannel) {
 
 export function parseCommand(message: Message<boolean>, regex: RegExp) {
     const cmd = config.BOT_PREFIX + message.content.replace(config.BOT_PREFIX, '').split(' ')[0] + ' ';
-    let msg = message.content.replace(cmd, '').trim();
+    let msg = (message.content + ' ').replace(cmd, '').trim();
 
     if (msg.match(regex)) {
         return msg.match(regex)?.slice(1) || [];

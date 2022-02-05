@@ -7,6 +7,7 @@ import config from '../config.json';
 
 import './events/commands';
 import './threads/commands';
+import './misc/commands';
 
 client.on('ready', () => {
   log('info', `Logged in as ${client?.user?.tag}!`);
