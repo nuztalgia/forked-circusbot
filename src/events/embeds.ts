@@ -1,12 +1,40 @@
 import { DiscordAPIError, Message, MessageEmbed } from "discord.js";
 import { client } from '../client';
 import { log } from "../utils/logging";
-import { saveEvents } from "./persistence";
+import { events, saveEvents } from "./persistence";
 import { EMOJI_DPS, EMOJI_DPS_SUB, EMOJI_HEAL, EMOJI_HEAL_SUB, EMOJI_TANK, EMOJI_TANK_SUB } from "./reactions";
 
+let lastUpdates = {};
+let queuedUpdates = {};
+
+export async function queueEventUpdate(event: CircusEvent) {
+    // Was last update within 2s?
+    if (lastUpdates.hasOwnProperty(event.id) && (performance.now() - lastUpdates[event.id]) < 1000) {
+        if (!queuedUpdates.hasOwnProperty(event.id)) {
+            queuedUpdates[event.id] = new Promise((resolve, _reject) => {
+                setTimeout(async () => {
+                    await updateEventEmbeds(event);
+                    delete queuedUpdates[event.id];
+                    resolve(event);
+                }, performance.now() - lastUpdates[event.id]);
+            });
+        }
+    }
+
+    // If there is an update in the queue, return it's promise instead
+    if (queuedUpdates.hasOwnProperty(event.id)) {
+        return await queuedUpdates[event.id]; 
+    }
+
+    return await updateEventEmbeds(event);
+}
+
 export async function updateEventEmbeds(event: CircusEvent) {
+    event = events[event.id];
+    lastUpdates[event.id] = performance.now();
+
     const embed = createEventEmbed(event);
-    const channels = Object.entries(event.published_channels);
+    const channels = Object.entries(event.published_channels).reverse();
 
     for (const [channelId, messageId] of channels) {
         const channel = await client.channels.fetch(channelId);
@@ -15,8 +43,14 @@ export async function updateEventEmbeds(event: CircusEvent) {
             let msg: Message<boolean>;
 
             try {
+                const startTime = performance.now()
                 msg = await channel.messages.fetch(messageId);
                 await msg.edit({ embeds: [embed] });
+                const editTime = Math.floor(performance.now() - startTime);
+
+                if (editTime > 1500) {
+                    log('debug', `Finished editing event embed for event ${event.id} (${event.title}) in ${editTime}ms (message id: ${msg.id})`);
+                }
             } catch (err) {
                 if (err instanceof DiscordAPIError) {
                     log('error', `Failed to edit message for event ${event.id} (DiscordAPIError): ${err.message}`);
@@ -70,6 +104,7 @@ export function createEventEmbed(event: CircusEvent) {
         `${EMOJI_DPS}  ${event.role_requirements.dps}\n\n` +
         `You may select up to one main role and up to three sub roles by using the reactions below. ` + 
         `Clicking the same reaction a second time will cancel your sign-up for that role. ` + 
+        `**It may up to 20 seconds to update the post after you sign-up, so please be patient.** ` + 
         `Please make sure you meet the requirements for your role before signing up!\n⠀\n`;
 
     const embed = new MessageEmbed()
@@ -83,7 +118,7 @@ export function createEventEmbed(event: CircusEvent) {
             { name: `${EMOJI_HEAL_SUB} Healer Subs (${Object.values(event.signups.healer_subs).length})`, value: healer_subs, inline: true },
             { name: `${EMOJI_DPS_SUB} DPS Subs (${Object.values(event.signups.dps_subs).length})`, value: dps_subs, inline: true }
         )
-        .setFooter({ text: `${event.signup_status == 'open' ? '📖' : '🙈'} Sign-ups are currently ${event.signup_status}  •  Event ID: ${event.id}`});
+        .setFooter({ text: `${event.signup_status == 'open' ? '📖' : '🙈'} Sign-ups are ${event.signup_status}  •  Event ID: ${event.id}`});
 
     if (event.title.match(/Pub/)) {
         embed.setAuthor({ name: event.title, iconURL: 'https://cdn.discordapp.com/emojis/740147910435405864.webp?size=96&quality=lossless' });
