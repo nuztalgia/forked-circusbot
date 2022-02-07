@@ -1,7 +1,8 @@
-import { parseCommand, registerCommand, sendError } from '../../utils';
+import { MessageEmbed } from 'discord.js';
+import { EMBED_INFO_COLOR, getDisplayName, parseCommand, registerCommand, sendError } from '../../utils';
 import { findEvent } from '../persistence';
 
-registerCommand('ping_event', ['event_ping'], message => {
+registerCommand('ping_event', ['event_ping'], async message => {
     const [eventId, _, pingMsg] = parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
     const targetChannel = message.mentions.channels.first();
     const event = findEvent(eventId);
@@ -21,5 +22,11 @@ registerCommand('ping_event', ['event_ping'], message => {
     allUsers = allUsers.concat(Object.keys(event.signups.healers));
     allUsers = allUsers.concat(Object.keys(event.signups.dps));
 
-    targetChannel.send(allUsers.map(x => `<@${x}>`).join(' ') + ' ' + pingMsg);
+    const embed = new MessageEmbed()
+        .setColor(EMBED_INFO_COLOR)
+        .setAuthor({ iconURL: message.author.avatarURL() || '', name: await getDisplayName(message.author, message.guild) })
+        .setFooter({ text: `Ping sent for the event '${event.title}'` })
+        .setDescription(pingMsg)
+
+    targetChannel.send({ content: allUsers.map(x => `<@${x}>`).join(' '), embeds: [embed] });
 });

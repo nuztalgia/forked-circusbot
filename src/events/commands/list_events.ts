@@ -27,5 +27,5 @@ registerCommand('list_events', ['list_events', 'le'], message => {
             ]);
     }
 
-    message.reply({ embeds: [embed] });
+    message.reply({ allowedMentions: { repliedUser: false }, embeds: [embed] });
 });
