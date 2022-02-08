@@ -1,19 +1,36 @@
 import { Message } from 'discord.js';
+import { client } from '../client';
 import { log, sendMessage } from '../utils';
 const unhomoglyph = require('unhomoglyph');
 
 const SCAM_TEXT = unhomoglyph("You've been gifted a subscription!");
+let deletedNitroLinks: { [key: string]: string[] } = {};
+
+client.on('messageUpdate', async (_oldMessage, newMessage) => {
+    if (newMessage.partial) {
+        newMessage = await newMessage.fetch();   
+    }
+
+    antispamHandler(newMessage);
+});
 
 export async function antispamHandler(message: Message<boolean>) {
+    if (!deletedNitroLinks.hasOwnProperty(message.guildId)) {
+        deletedNitroLinks[message.guildId] = [];
+    }
+
     if (message.content.includes('https://discord.gift/')) {
+        const giftLink = message.content.match(/(https:\/\/discord\.gift\/([A-Z0-9]+))/i)[1];
+        if (deletedNitroLinks[message.guildId].includes(giftLink)) return;
         log('warn', `Discord Nitro gift link detected in ${message.channel.name} (posted by ${message.author.tag}), deleting it`);
+        deletedNitroLinks[message.guildId].push(giftLink);
         message.channel.sendTyping();
         await message.delete();
-        sendMessage(message.channel, `A Discord nitro gift link has been automatically deleted (posted by <@${message.author.id}>) - Please send nitro gift links via DM so they don't get claimed by the wrong person`);
+        sendMessage(message.channel, `A Discord nitro gift link has been automatically deleted (posted by <@${message.author.id}>) - Please send nitro gift links via DM so they don't get claimed by the wrong person\n\nIf you meant to send Discord Nitro in this channel, please post it again, and it will not be deleted.`);
         return;
     }
 
-    if (message.content.includes('disocrds.gift') || message.content.match(/https?:\/\/[a-z]+\.gift/i) || message.embeds.find(x => unhomoglyph(x.title) === SCAM_TEXT)) {
+    if (message.content.includes('disocrds.gift') || message.content.match(/https?:\/\/[a-z]+\.gift/i) || message.embeds.find(x => unhomoglyph(x.title || '') === SCAM_TEXT)) {
         log('warn', `Discord Nitro scam link detected in ${message.channel.name} (posted by ${message.author.tag}), deleting it`);
         message.channel.sendTyping();
         await message.delete();
