@@ -2,6 +2,7 @@ import { eventCreationHandler } from './events/creator';
 import { threadCreationHandler } from './threads/thread_creator';
 import { registerEventReactions } from './events/reaction_signups';
 import { antispamHandler } from './misc/antispam';
+import { easterEggHandler } from './misc/easter_eggs';
 import { isValidCommand, runCommand, log } from './utils';
 import { client } from './client';
 import config from '../config.json';
@@ -31,6 +32,7 @@ client.on('messageCreate', async (message) => {
     eventCreationHandler(message);
     threadCreationHandler(message);
     antispamHandler(message);
+    easterEggHandler(message);
 });
 
 registerEventReactions(client);
