@@ -28,3 +28,13 @@ Authorization URL:
 ```
 https://discord.com/api/oauth2/authorize?client_id=912376778939584562&permissions=271969344&scope=bot%20applications.commands
 ```
+
+Docker Stuff
+============
+
+**Linux:**
+
+```
+docker build -t circusbot .
+docker run -itd -v /usr/src/circusbot/data:/usr/src/app/data -v /usr/src/circusbot:/usr/src/app circusbot
+```
