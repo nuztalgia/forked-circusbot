@@ -1,5 +1,6 @@
 
 const fs = require('fs');
+import { GuildFeature, ThreadAutoArchiveDuration } from 'discord-api-types';
 import { MessageEmbed, TextBasedChannel, TextChannel } from 'discord.js';
 import { client } from '../client';
 import { EMBED_INFO_COLOR, sendMessage } from '../utils/embeds';
@@ -78,9 +79,18 @@ export async function createThread(channel: TextBasedChannel, thread: CircusThre
 export async function updateThread(thread: CircusThread) {
     const channel = await client.channels.fetch(thread.channel) as TextChannel;
     const existingThread = channel.threads.cache.find(x => x.id === thread.threadId);
+
+    let autoArchiveDuration: ThreadAutoArchiveDuration = 1440;
+
+    if (channel.guild.features.includes('SEVEN_DAY_THREAD_ARCHIVE')) {
+        autoArchiveDuration = 10080;
+    } else if (channel.guild.features.includes('THREE_DAY_THREAD_ARCHIVE')) {
+        autoArchiveDuration = 4320;
+    }
     
     if (existingThread) {
-        existingThread.setName(thread.title);
+        await existingThread.setName(thread.title);
+        await existingThread.setAutoArchiveDuration(autoArchiveDuration);
 
         let messages = await existingThread.messages.fetch();
         let message = Array.from(messages.values()).find(x => x.author.bot && x.embeds.length !== 0);
@@ -124,9 +134,17 @@ export async function buildThread(thread: CircusThread) {
     const channel = await client.channels.fetch(thread.channel) as TextChannel;
     log('info', `Building thread ${thread.id} (${thread.title}) in ${channel.name}`);
 
+    let autoArchiveDuration: ThreadAutoArchiveDuration = 1440;
+
+    if (channel.guild.features.includes("SEVEN_DAY_THREAD_ARCHIVE")) {
+        autoArchiveDuration = 10080;
+    } else if (channel.guild.features.includes("THREE_DAY_THREAD_ARCHIVE")) {
+        autoArchiveDuration = 4320;
+    }
+
     const newThread = await channel.threads.create({
         type: thread.visibility === 'private' ? 'GUILD_PRIVATE_THREAD' : 'GUILD_PUBLIC_THREAD',
-        autoArchiveDuration: 4320,
+        autoArchiveDuration: autoArchiveDuration,
         name: thread.title,
         reason: 'Scheduled thread'
     });
