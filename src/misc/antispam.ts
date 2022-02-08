@@ -1,5 +1,8 @@
-import { DiscordAPIError, Message } from 'discord.js';
+import { Message } from 'discord.js';
 import { log, sendMessage } from '../utils';
+const unhomoglyph = require('unhomoglyph');
+
+const SCAM_TEXT = unhomoglyph("You've been gifted a subscription!");
 
 export async function antispamHandler(message: Message<boolean>) {
     if (message.content.includes('https://discord.gift/')) {
@@ -10,7 +13,7 @@ export async function antispamHandler(message: Message<boolean>) {
         return;
     }
 
-    if (message.content.includes('disocrds.gift') || message.content.match(/https?:\/\/[a-z]+\.gift/i)) {
+    if (message.content.includes('disocrds.gift') || message.content.match(/https?:\/\/[a-z]+\.gift/i) || message.embeds.find(x => unhomoglyph(x.title) === SCAM_TEXT)) {
         log('warn', `Discord Nitro scam link detected in ${message.channel.name} (posted by ${message.author.tag}), deleting it`);
         message.channel.sendTyping();
         await message.delete();
