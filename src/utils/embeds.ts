@@ -28,9 +28,7 @@ export async function sendReply(message: Message<boolean>, color: ColorResolvabl
         .setColor(color)
         .setDescription(reply)
 
-    await message.reply({ allowedMentions: { repliedUser: false }, embeds: [embed] });
-
-    return null;
+    return await message.reply({ allowedMentions: { repliedUser: false }, embeds: [embed] });
 }
 
 export function sendMessage(channel: TextBasedChannel, message: string) {
