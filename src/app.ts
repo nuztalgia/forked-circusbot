@@ -1,6 +1,7 @@
 import { eventCreationHandler } from './events/creator';
 import { threadCreationHandler } from './threads/thread_creator';
 import { registerEventReactions } from './events/reaction_signups';
+import { antispamHandler } from './misc/antispam';
 import { isValidCommand, runCommand, log } from './utils';
 import { client } from './client';
 import config from '../config.json';
@@ -29,6 +30,7 @@ client.on('messageCreate', async (message) => {
     // in case we are in the process of creating an event/thread.
     eventCreationHandler(message);
     threadCreationHandler(message);
+    antispamHandler(message);
 });
 
 registerEventReactions(client);
