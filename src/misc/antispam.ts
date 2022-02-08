@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 import { client } from '../client';
-import { log, sendMessage } from '../utils';
+import { EMBED_ERROR_COLOR, log, sendMessage, sendReply } from '../utils';
 const unhomoglyph = require('unhomoglyph');
 
 const SCAM_TEXT = unhomoglyph("You've been gifted a subscription!");
@@ -44,5 +44,16 @@ export async function antispamHandler(message: Message<boolean>) {
         await message.delete();
         sendMessage(message.channel, `A Discord Nitro scam link has been detected and automatically deleted <:pepetrash:740924034493055038> (posted by <@${message.author.id}>).\n\nPlease remember that Discord Nitro links are always \`discord.gift\`, make sure to double check the spelling before you click!`)
         return;
+    }
+
+    if (message.content.match(/(https?:\/\/(dis[a-z]{3,6}\.gg))/i) && !message.content.includes('discord.gg')) {
+        const link = message.content.match(/(https?:\/\/(dis[a-z]{3,6}\.gg))/i)[1];
+
+        if (link.includes('c') && link.includes('o')) {
+            log('warn', `Possible Discord scam link detected in ${message.channel.name} (posted by ${message.author.tag}): ${link}`);
+            message.channel.sendTyping();
+            sendReply(message, EMBED_ERROR_COLOR, `This may be a scam link, please double check it. It is NOT an official Discord link (discord links are from \`https://discord.gg\`)`);
+            return; 
+        }
     }
 }
