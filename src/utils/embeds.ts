@@ -22,7 +22,7 @@ export function messageUser(user: User | PartialUser, reply: string, title: stri
 }
 
 export async function sendReply(message: Message<boolean>, color: ColorResolvable, reply: string) {
-    message.channel.sendTyping();
+    await message.channel.sendTyping();
 
     const embed = new MessageEmbed()
         .setColor(color)
