@@ -30,7 +30,7 @@ registerCommand('nroll', [], message => {
     }
 
     const roll = getRandomInt(min, max);
-    let msg = `**${message.author.tag}** rolled **${roll == 69 ? '<:69:776740697892978728>' : roll}**`;
+    let msg = `<@${message.author.id}> rolled **${roll == 69 ? '<:69:776740697892978728>' : roll}**`;
 
     if (roll === max && max !== min) {
         msg += ' 🥳';
