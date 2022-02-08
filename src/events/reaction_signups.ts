@@ -20,7 +20,7 @@ let userRateLimits = {
      '💙': {},
      '💚': {},
      '❤️': {},
-  };
+};
 
 export function registerEventReactions(client: Client) {
     client.on('messageReactionAdd', async (reaction, user) => {

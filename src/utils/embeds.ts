@@ -21,12 +21,14 @@ export function messageUser(user: User | PartialUser, reply: string, title: stri
     return null;
 }
 
-export function sendReply(message: Message<boolean>, color: ColorResolvable, reply: string) {
+export async function sendReply(message: Message<boolean>, color: ColorResolvable, reply: string) {
+    message.channel.sendTyping();
+
     const embed = new MessageEmbed()
         .setColor(color)
         .setDescription(reply)
 
-    message.reply({ allowedMentions: { repliedUser: false }, embeds: [embed] });
+    await message.reply({ allowedMentions: { repliedUser: false }, embeds: [embed] });
 
     return null;
 }
