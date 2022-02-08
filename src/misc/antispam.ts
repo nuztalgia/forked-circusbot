@@ -15,18 +15,26 @@ client.on('messageUpdate', async (_oldMessage, newMessage) => {
 });
 
 export async function antispamHandler(message: Message<boolean>) {
-    if (!deletedNitroLinks.hasOwnProperty(message.guildId)) {
-        deletedNitroLinks[message.guildId] = [];
-    }
-
     if (message.content.includes('https://discord.gift/')) {
-        const giftLink = message.content.match(/(https:\/\/discord\.gift\/([A-Z0-9]+))/i)[1];
-        if (deletedNitroLinks[message.guildId].includes(giftLink)) return;
+        const guildId = message.guildId || '*';
+
+        if (!deletedNitroLinks.hasOwnProperty(guildId)) {
+            deletedNitroLinks[guildId] = [];
+        } else if (deletedNitroLinks[guildId].includes(message.author.id)) {
+            return;
+        }
+
         log('warn', `Discord Nitro gift link detected in ${message.channel.name} (posted by ${message.author.tag}), deleting it`);
-        deletedNitroLinks[message.guildId].push(giftLink);
+        deletedNitroLinks[guildId].push(message.author.id);
+        setTimeout(() => {
+            const index = deletedNitroLinks[guildId].indexOf(message.author.id);
+            deletedNitroLinks[guildId].splice(index, 1);
+        }, 1000 * 60 * 60);
+
         message.channel.sendTyping();
         await message.delete();
         sendMessage(message.channel, `A Discord nitro gift link has been automatically deleted (posted by <@${message.author.id}>) - Please send nitro gift links via DM so they don't get claimed by the wrong person\n\nIf you meant to send Discord Nitro in this channel, please post it again, and it will not be deleted.`);
+        
         return;
     }
 
