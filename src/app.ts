@@ -5,6 +5,7 @@ import { antispamHandler } from './misc/antispam';
 import { easterEggHandler } from './misc/easter_eggs';
 import { isValidCommand, runCommand, log } from './utils';
 import { client } from './client';
+import { DMChannel } from 'discord.js';
 import config from '../config.json';
 
 import './events/commands';
@@ -24,6 +25,12 @@ client.on('messageCreate', async (message) => {
     // If it's a registered command, call the command handler
     if (isValidCommand(message.content)) {
         runCommand(message);
+        return;
+    }
+
+    // Check if it's a DM
+    if (message.channel instanceof DMChannel) {
+        log('info', `New DM from ${message.author.tag}: ${message.content}`);
         return;
     }
 
