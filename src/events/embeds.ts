@@ -104,7 +104,7 @@ export function createEventEmbed(event: CircusEvent) {
         `${EMOJI_DPS}  ${event.role_requirements.dps}\n\n` +
         `You may select up to one main role and up to three sub roles by using the reactions below. ` + 
         `Clicking the same reaction a second time will cancel your sign-up for that role. ` + 
-        `**It may up to 20 seconds to update the post after you sign-up, so please be patient.** ` + 
+        `**It may take up to 20 seconds to update the post after you sign-up, so please be patient.** ` + 
         `Please make sure you meet the requirements for your role before signing up!\n⠀\n`;
 
     const embed = new MessageEmbed()
