@@ -1,14 +1,13 @@
-import { TextChannel } from 'discord.js';
 import { client } from '../../client';
 import { registerCommand, parseCommand } from '../../utils';
 
-registerCommand('admin_msg', ['msg'], async message => {
+registerCommand('admin_dm', ['dm'], async message => {
     if (message.author.id !== '200716538729201664') return;
         
-    let [channelId, timeDelay, textMsg] = parseCommand(message, /(.*?) (@[0-9]+ )?(.*)/);
-    const channel = await client.channels.fetch(channelId) as TextChannel;
+    let [userId, timeDelay, textMsg] = parseCommand(message, /(.*?) (@[0-9]+ )?(.*)/);
+    const user = await client.users.fetch(userId);
 
-    const msg = await channel.send(textMsg);
+    const msg = await user.send(textMsg);
     message.react('👍');
 
     if (timeDelay) {
