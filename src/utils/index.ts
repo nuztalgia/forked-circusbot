@@ -3,6 +3,7 @@ import { Guild, User } from 'discord.js';
 export * from './commands';
 export * from './embeds';
 export * from './logging';
+export * from './users';
 
 export function getRandomInt(min: number, max: number) {
     min = Math.ceil(min);

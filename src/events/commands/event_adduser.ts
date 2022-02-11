@@ -1,6 +1,4 @@
-import { MessageEmbed } from 'discord.js';
-import { parseCommand, registerCommand, sendError, sendReply, EMBED_SUCCESS_COLOR } from '../../utils';
-import { client } from '../../client';
+import { parseCommand, registerCommand, sendError, sendReply, EMBED_SUCCESS_COLOR, findMembers, EMBED_ERROR_COLOR, makeTable } from '../../utils';
 import { updateEventEmbeds } from '../embeds';
 import { findEvent, saveEvents } from '../persistence';
 
@@ -22,42 +20,26 @@ registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau'], as
         eventRole = 'tanks';
     }
 
-    if (!user) {
+    if (!user && message.guild) {
         smartMatch = true;
+        let users = await findMembers(message.guild, eventUser);
 
-        if (eventUser.match(/^@?(.*?#[0-9]{4})$/)) {
-            const userTag = eventUser.replace(/^@/, '');
-
-            // Fetch any members with similar names
-            await message.guild?.members.fetch({ query: userTag.split('#')[0] });
-            user = client.users.cache.find(u => u.tag === userTag);
+        if (users.length === 0) {
+            sendReply(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
+            return;
+        } else if (users.length === 1) {
+            user = users[0]?.user;
         } else {
-            // Fetch any members with similar names
-            let query = await message.guild?.members.fetch({ query: eventUser, limit: 20 });
+            const fields: string[][] = [];
 
-            if (!query || query.size === 0) {
-                sendError(message.channel, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
-                return;
-            } else if (query.size === 1) {
-                user = query.last()?.user;
-            } else {
-                const fields: string[][] = [];
-
-                for (let [_id, member] of query) {
-                    fields.push([ member.user.id, member.user.tag, member.displayName ])
-                }
-
-                const embed = new MessageEmbed()
-                    .setColor("#0099ff")
-                    .setDescription(`Multiple users were found that matched your query, please try again using their ID or Tag:`)
-                    .addFields([ 
-                        { name: 'User ID', value: fields.map(x => x[0]).join('\n'), inline: true },
-                        { name: 'User Tag', value: fields.map(x => x[1]).join('\n'), inline: true },
-                        { name: 'Display Name', value: fields.map(x => x[2]).join('\n'), inline: true },
-                    ]);
-                message.channel.send({ embeds: [embed] });
-                return;
+            for (let member of users) {
+                fields.push([ member.user.id, member.user.tag, member.displayName ])
             }
+
+            const embed = makeTable(['User Id', 'User Tag', 'Display Name'], fields)
+                .setDescription(`Multiple users were found that matched your query, please try again using their ID or Tag:`);
+            message.reply({ embeds: [embed] });
+            return;
         }
     }
 

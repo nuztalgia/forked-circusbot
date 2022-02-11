@@ -50,3 +50,14 @@ export function sendError(channel: TextBasedChannel, message: string) {
 
     return null;
 }
+
+export function makeTable(columns: string[], fields: string[][]) {
+    const embed = new MessageEmbed()
+        .setColor(EMBED_INFO_COLOR)
+        .addFields([ 
+            { name: columns[0], value: fields.map(x => x[0]).join('\n'), inline: true },
+            { name: columns[1], value: fields.map(x => x[1]).join('\n'), inline: true },
+            { name: columns[2], value: fields.map(x => x[2]).join('\n'), inline: true },
+        ]);
+    return embed;
+}
