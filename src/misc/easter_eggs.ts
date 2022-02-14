@@ -3,7 +3,7 @@ import { client } from '../client';
 import { EMBED_ERROR_COLOR, sendReply } from '../utils';
 
 const clowncilWarnings: { [userId: string]: number } = {};
-const clowncilRegex = /([s5].{0,4}h.{0,4}[a@4].{0,4}d.{0,4}[0o].{0,4}w.{0,4} c.{0,4}[1il].{0,4}[0o].{0,4}w.{0,4}n.{0,4}c.{0,4}i.{0,4}[1il])/i;
+const clowncilRegex = /([s5].{0,4}h.{0,4}[a@4].{0,4}d.{0,4}[0o].{0,4}w.{0,4} c.{0,4}[1il].{0,4}[0o].{0,4}w.{0,4}n.{0,4}c.{0,4}[i1l].{0,4}[1il])/i;
 let recentClowncilWarnings = 0;
 
 client.on('messageUpdate', async (_oldMessage, newMessage) => {
