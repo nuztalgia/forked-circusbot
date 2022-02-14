@@ -1,7 +1,7 @@
 
 
 import { parseCommand, registerCommand } from '../../utils/commands';
-import { EMBED_INFO_COLOR, sendReply } from '../../utils/embeds';
+import { EMBED_INFO_COLOR, sendReply } from '../../utils/replies';
 import { archiveThread, buildThread, threads } from '../persistence';
 
 registerCommand('rebuild_thread', ['rt'], async message => {

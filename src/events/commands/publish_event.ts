@@ -1,5 +1,5 @@
 import { registerCommand } from '../../utils/commands';
-import { sendError } from '../../utils/embeds';
+import { sendError } from '../../utils/replies';
 import { createEventEmbed, updateEventEmbeds } from '../embeds';
 import { events, saveEvents } from '../persistence';
 

@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import { registerCommand } from '../../utils/commands';
-import { EMBED_INFO_COLOR } from '../../utils/embeds';
+import { EMBED_INFO_COLOR } from '../../utils/replies';
 import { threads } from '../persistence';
 
 registerCommand('list_threads', ['list_thread', 'thread_list'], message => {

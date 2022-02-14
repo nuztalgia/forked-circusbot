@@ -1,7 +1,7 @@
 import { Guild, User } from 'discord.js';
 
 export * from './commands';
-export * from './embeds';
+export * from './replies';
 export * from './logging';
 export * from './users';
 

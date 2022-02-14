@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { sendError, sendMessage } from "../utils/embeds";
+import { sendError, sendMessage } from "../utils/replies";
 import { log } from "../utils/logging";
 import { makeEmptyEvent } from "./default_event";
 import { createEvent } from "./persistence";

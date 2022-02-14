@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { sendError, sendMessage } from "../utils/embeds";
+import { sendError, sendMessage } from "../utils/replies";
 import { getFormattedDate, log } from "../utils/logging";
 import { makeEmptyThread } from "./default_thread";
 import { createThread } from "./persistence";

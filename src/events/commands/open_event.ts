@@ -1,6 +1,6 @@
 import { client } from '../../client';
 import { parseCommand, registerCommand } from '../../utils/commands';
-import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, EMOJI_ERROR, sendError, sendMessage, sendReply } from '../../utils/embeds';
+import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, EMOJI_ERROR, sendError, sendMessage, sendReply } from '../../utils/replies';
 import { log } from '../../utils/logging';
 import { updateEventEmbeds } from '../embeds';
 import { events, findEvent, saveEvents } from '../persistence';

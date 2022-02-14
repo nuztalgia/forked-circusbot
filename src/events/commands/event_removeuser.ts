@@ -2,7 +2,7 @@ import { MessageEmbed } from 'discord.js';
 import { client } from '../../client';
 import { findMembers } from '../../utils';
 import { parseCommand, registerCommand } from '../../utils/commands';
-import { EMBED_ERROR_COLOR, makeTable, sendError, sendReply } from '../../utils/embeds';
+import { EMBED_ERROR_COLOR, makeTable, sendError, sendReply } from '../../utils/replies';
 import { updateEventEmbeds } from '../embeds';
 import { events, saveEvents } from '../persistence';
 

@@ -2,7 +2,7 @@
 
 import { TextBasedChannel } from 'discord.js';
 import { parseCommand, registerCommand } from '../../utils/commands';
-import { EMBED_INFO_COLOR, sendError, sendReply } from '../../utils/embeds';
+import { EMBED_INFO_COLOR, sendError, sendReply } from '../../utils/replies';
 import { saveThreads, scheduleThreadArchival, threads, updateThread } from '../persistence';
 
 function editEventUsage(channel: TextBasedChannel) {

@@ -2,6 +2,7 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/rest/v9';
 import { registerCommand } from '../../utils/commands';
 import { data as addUser } from '../slashcommands/event_adduser';
+import { data as help } from '../slashcommands/event_help';
 import config from '../../../config.json';
 
 import { SlashCommandBuilder } from '@discordjs/builders';
@@ -10,7 +11,8 @@ registerCommand('register_slash_commands', [], message => {
     let builder = new SlashCommandBuilder()
         .setName('event')
         .setDescription('Raid event sign-ups')
-        .addSubcommand(addUser);
+        .addSubcommand(addUser)
+        .addSubcommand(help);
 
     const rest = new REST({ version: '9' }).setToken(config.BOT_TOKEN);
 

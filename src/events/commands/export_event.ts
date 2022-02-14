@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import { parseCommand, registerCommand } from '../../utils/commands';
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, EMOJI_ERROR, sendReply } from '../../utils/embeds';
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, EMOJI_ERROR, sendReply } from '../../utils/replies';
 import { findEvent } from '../persistence';
 
 registerCommand('export_event', ['event_export'], message => {

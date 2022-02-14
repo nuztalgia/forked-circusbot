@@ -1,4 +1,4 @@
-import { ColorResolvable, Message, MessageEmbed, PartialUser, TextBasedChannel, User } from 'discord.js';
+import { ColorResolvable, CommandInteraction, Message, MessageEmbed, PartialUser, TextBasedChannel, User } from 'discord.js';
 
 export const EMBED_SUCCESS_COLOR = '#77b255';
 export const EMBED_ERROR_COLOR = '#e14f5e';
@@ -21,12 +21,18 @@ export function messageUser(user: User | PartialUser, reply: string, title: stri
     return null;
 }
 
-export async function sendReply(message: Message<boolean>, color: ColorResolvable, reply: string) {
-    await message.channel.sendTyping();
+export async function sendReply(message: Message<boolean> | CommandInteraction, color: ColorResolvable, reply: string | MessageEmbed) {
+    await message.channel?.sendTyping();
 
-    const embed = new MessageEmbed()
-        .setColor(color)
-        .setDescription(reply)
+    let embed: MessageEmbed;
+
+    if (reply instanceof MessageEmbed) {
+        embed = reply.setColor(color);
+    } else {
+        embed = new MessageEmbed()
+            .setColor(color)
+            .setDescription(reply)
+    }
 
     return await message.reply({ allowedMentions: { repliedUser: false }, embeds: [embed] });
 }
@@ -41,12 +47,16 @@ export function sendMessage(channel: TextBasedChannel, message: string) {
     return null;
 }
 
-export function sendError(channel: TextBasedChannel, message: string) {
+export function makeError(message: string) {
     const embed = new MessageEmbed()
         .setColor(EMBED_ERROR_COLOR)
         .setDescription(EMOJI_ERROR + ' ' + message)
     
-    channel.send({ embeds: [embed] });
+    return embed;
+}
+
+export function sendError(channel: TextBasedChannel, message: string) {
+    channel.send({ embeds: [makeError(message)] });
 
     return null;
 }

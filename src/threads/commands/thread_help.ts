@@ -1,5 +1,5 @@
 import { checkPermissions, registerCommand } from '../../utils/commands';
-import { sendMessage } from '../../utils/embeds';
+import { sendMessage } from '../../utils/replies';
 
 registerCommand('thread_help', ['thelp'], message => {
     let helpMsg = '';

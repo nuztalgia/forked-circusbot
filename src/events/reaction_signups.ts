@@ -1,5 +1,5 @@
 import { Client, MessageReaction, PartialMessageReaction, PartialUser, User } from 'discord.js';
-import { messageUser } from '../utils/embeds';
+import { messageUser } from '../utils/replies';
 import { log } from '../utils/logging';
 import { queueEventUpdate } from './embeds';
 import { events, saveEvents } from './persistence';

@@ -3,7 +3,7 @@ const fs = require('fs');
 import { GuildFeature, ThreadAutoArchiveDuration } from 'discord-api-types';
 import { MessageEmbed, TextBasedChannel, TextChannel } from 'discord.js';
 import { client } from '../client';
-import { EMBED_INFO_COLOR, sendMessage } from '../utils/embeds';
+import { EMBED_INFO_COLOR, sendMessage } from '../utils/replies';
 import { getFormattedDate, log } from '../utils/logging';
 
 export let threads: { [threadId: string]: CircusThread} = {};

@@ -1,5 +1,5 @@
 import { parseCommand, registerCommand } from '../../utils/commands';
-import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, EMOJI_ERROR, sendReply } from '../../utils/embeds';
+import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, EMOJI_ERROR, sendReply } from '../../utils/replies';
 import { findEvent, updateEvent } from '../persistence';
 
 registerCommand('close_event', ['event_close'], message => {
