@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import { client } from '../client';
+import { CLOWNS_GUILD_ID, SANDBOX_GUILD_ID } from '../constants';
 import { EMBED_ERROR_COLOR, sendReply } from '../utils';
 
 const clowncilWarnings: { [userId: string]: number } = {};
@@ -15,7 +16,7 @@ client.on('messageUpdate', async (_oldMessage, newMessage) => {
 });
 
 export async function easterEggHandler(message: Message<boolean>) {
-    if (message.content.toLowerCase().match(clowncilRegex)) {
+    if (message.content.toLowerCase().match(clowncilRegex) && [CLOWNS_GUILD_ID, SANDBOX_GUILD_ID].includes(message.guildId)) {
         clowncilWarnings[message.author.id] = clowncilWarnings.hasOwnProperty(message.author.id) ? clowncilWarnings[message.author.id] + 1 : 1;
         recentClowncilWarnings += 1;
         
