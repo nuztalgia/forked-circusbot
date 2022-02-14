@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { DMChannel, Message, PartialDMChannel } from 'discord.js';
 import { client } from '../client';
 import { EMBED_ERROR_COLOR, log, sendMessage, sendReply } from '../utils';
 const unhomoglyph = require('unhomoglyph');
@@ -15,6 +15,10 @@ client.on('messageUpdate', async (_oldMessage, newMessage) => {
 });
 
 export async function antispamHandler(message: Message<boolean>) {
+    if (message.channel instanceof DMChannel || message.channel.partial) {
+        return;
+    }
+
     if (message.content.includes('https://discord.gift/')) {
         const guildId = message.guildId || '*';
 
@@ -47,9 +51,9 @@ export async function antispamHandler(message: Message<boolean>) {
     }
 
     if (message.content.match(/(https?:\/\/(dis[a-z]{3,6}\.gg))/i) && !message.content.includes('discord.gg')) {
-        const link = message.content.match(/(https?:\/\/(dis[a-z]{3,6}\.gg))/i)[1];
+        const link = message.content.match(/(https?:\/\/(dis[a-z]{3,6}\.gg))/i);
 
-        if (link.includes('c') && link.includes('o')) {
+        if (link && link[1].includes('c') && link[1].includes('o')) {
             log('warn', `Possible Discord scam link detected in ${message.channel.name} (posted by ${message.author.tag}): ${link}`);
             message.channel.sendTyping();
             sendReply(message, EMBED_ERROR_COLOR, `This may be a scam link, please double check it. It is NOT an official Discord link (discord links are from \`https://discord.gg\`)`);

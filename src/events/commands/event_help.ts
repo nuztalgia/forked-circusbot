@@ -1,7 +1,8 @@
-import { checkPermissions, registerCommand, sendMessage } from '../../utils';
+import { MessageEmbed } from 'discord.js';
+import { checkPermissions, EMBED_SUCCESS_COLOR, registerCommand, sendMessage } from '../../utils';
 
-registerCommand('event_help', ['help'], message => {
-    let helpMsg = '';
+registerCommand('event_help', ['help', 'events', 'event'], message => {
+    let helpMsg = 'Create and manage sign-ups for scheduled events like raids/operations/social events.\n\n';
 
     if (checkPermissions('create_event', message.channel)) {
         helpMsg += "🗓️ `create_event`\nBegin creating a new event. You will be prompted for the event parameters.\n**Example:** `!create_event`\n\n";
@@ -40,7 +41,12 @@ registerCommand('event_help', ['help'], message => {
     if (!helpMsg) {
         sendMessage(message.channel, "There are no commands whitelisted for this channel");
         return;
-    }
+    }   
+    
+    const embed = new MessageEmbed()
+        .setColor(EMBED_SUCCESS_COLOR)
+        .setTitle('CirqueBot Help: ​ ​ `!events`')
+        .setDescription(helpMsg)
 
-    sendMessage(message.channel, helpMsg);
+    message.reply({ allowedMentions: { repliedUser: false }, embeds: [embed] });
 });
