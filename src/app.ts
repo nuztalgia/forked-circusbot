@@ -3,6 +3,7 @@ import { threadCreationHandler } from './threads/thread_creator';
 import { registerEventReactions } from './events/reaction_signups';
 import { antispamHandler } from './misc/antispam';
 import { easterEggHandler } from './misc/easter_eggs';
+import { cannedReplyHandler } from './cannedreplies/listener';
 import { isValidCommand, runCommand, log } from './utils';
 import { client } from './client';
 import { DMChannel } from 'discord.js';
@@ -40,6 +41,7 @@ client.on('messageCreate', async (message) => {
     threadCreationHandler(message);
     antispamHandler(message);
     easterEggHandler(message);
+    cannedReplyHandler(message);
 });
 
 registerEventReactions(client);

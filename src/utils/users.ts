@@ -59,8 +59,6 @@ export async function findMembers(guild: Guild, search: string) {
     let closestUsername = closestMatch(search, usersByUsername) as string;
     let closestNickname = closestMatch(search, usersByNickname) as string;
 
-    console.log(closestUsername, closestNickname, distance(search, closestUsername), distance(search, closestNickname));
-
     if (distance(search, closestUsername) <= 2) {
         return [guild.members.cache.find(x => x.user.username.toLowerCase() === closestUsername)];
     } else if (distance(search, closestNickname) <= 2) {
