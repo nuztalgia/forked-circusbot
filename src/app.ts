@@ -12,9 +12,16 @@ import config from '../config.json';
 import './events/commands';
 import './threads/commands';
 import './misc/commands';
+import './admin/removed_member_log';
 
-client.on('ready', () => {
+client.on('ready', async () => {
   log('info', `Logged in as ${client?.user?.tag}!`);
+
+  client.guilds.cache.forEach(async guild => {
+    log('debug', `Fetching members for server '${guild.name}'`);
+    await guild.members.fetch();
+    log('debug', `Finished fetching members for server '${guild.name}'`);
+  });
 });
 
 client.on('messageCreate', async (message) => {
