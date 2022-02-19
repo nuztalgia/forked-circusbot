@@ -34,6 +34,8 @@ export function eventCreationHandler(message: Message<boolean>) {
         return;
     }
 
+    // TODO: Replace this with message collectors?
+
     const event = eventSessions[message.channel.id];
 
     if (message.id === event.messageId) {

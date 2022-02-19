@@ -1,12 +1,23 @@
-import { DiscordAPIError, Message, MessageEmbed } from "discord.js";
+import { DiscordAPIError, Message, MessageEmbed } from 'discord.js';
 import { client } from '../client';
-import { log } from "../utils/logging";
-import { events, saveEvents } from "./persistence";
-import { EMOJI_DPS, EMOJI_DPS_SUB, EMOJI_HEAL, EMOJI_HEAL_SUB, EMOJI_TANK, EMOJI_TANK_SUB } from "./reactions";
+import { EMBED_INFO_COLOR, log } from '../utils';
+import { events, saveEvents } from './persistence';
+import { EMOJI_DPS, EMOJI_DPS_SUB, EMOJI_HEAL, EMOJI_HEAL_SUB, EMOJI_TANK, EMOJI_TANK_SUB } from './reactions';
+
+const PUB_SIDE_ICON_URL = 'https://cdn.discordapp.com/emojis/740147910435405864.webp?size=96&quality=lossless';
+const IMP_SIDE_ICON_URL = 'https://cdn.discordapp.com/emojis/740147893289091122.webp?size=96&quality=lossless';
+const SHARED_SIDE_ICON_URL = 'https://cdn.discordapp.com/emojis/933190190376288256.webp?size=96&quality=lossless';
 
 let lastUpdates = {};
 let queuedUpdates = {};
 
+/**
+ * Queue event updates to avoid making too many message edits in a short period of time (which will
+ * get us rate limited and can cause cascading delays as people re-toggle their reaction when they
+ * don't see their names appear)
+ * @param event The event to queue an update for
+ * @returns Promise<void>
+ */
 export async function queueEventUpdate(event: CircusEvent) {
     // Was last update within 2s?
     if (lastUpdates.hasOwnProperty(event.id) && (performance.now() - lastUpdates[event.id]) < 1000) {
@@ -79,7 +90,7 @@ export async function updateEventEmbeds(event: CircusEvent) {
                 await msg.reactions.removeAll();
             }
         } else {
-            console.error("An event channel wasn't a text channel, wtf?");
+            log('error', 'An event channel wasn\'t a text channel, wtf?');
         }
     }
 }
@@ -108,7 +119,7 @@ export function createEventEmbed(event: CircusEvent) {
         `Please make sure you meet the requirements for your role before signing up!\n⠀\n`;
 
     const embed = new MessageEmbed()
-        .setColor("#0099ff")
+        .setColor(EMBED_INFO_COLOR)
         .setDescription(description)
         .addFields(
             { name: `${EMOJI_TANK} Tanks (${Object.values(event.signups.tanks).length}/${event.role_limits.tank})`, value: tank_signups, inline: true },
@@ -121,11 +132,11 @@ export function createEventEmbed(event: CircusEvent) {
         .setFooter({ text: `${event.signup_status == 'open' ? '📖' : '🙈'} Sign-ups are ${event.signup_status}  •  Event ID: ${event.id}`});
 
     if (event.title.match(/Pub/)) {
-        embed.setAuthor({ name: event.title, iconURL: 'https://cdn.discordapp.com/emojis/740147910435405864.webp?size=96&quality=lossless' });
+        embed.setAuthor({ name: event.title, iconURL: PUB_SIDE_ICON_URL });
     } else if (event.title?.match(/(Imp|Empire)/)) {
-        embed.setAuthor({ name: event.title, iconURL: 'https://cdn.discordapp.com/emojis/740147893289091122.webp?size=96&quality=lossless' });
+        embed.setAuthor({ name: event.title, iconURL: IMP_SIDE_ICON_URL });
     } else {
-        embed.setAuthor({ name: event.title, iconURL: 'https://cdn.discordapp.com/emojis/933190190376288256.webp?size=96&quality=lossless' });
+        embed.setAuthor({ name: event.title, iconURL: SHARED_SIDE_ICON_URL });
     }
 
     return embed;
