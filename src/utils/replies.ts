@@ -26,6 +26,10 @@ export async function sendReply(message: Message<boolean> | CommandInteraction, 
 
     let embed: MessageEmbed;
 
+    if (reply === undefined || reply === null) {
+        return Promise.reject('Reply is undefined or null');
+    }
+
     if (reply instanceof MessageEmbed) {
         embed = reply.setColor(color);
     } else {

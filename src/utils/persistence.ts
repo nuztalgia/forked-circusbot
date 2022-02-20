@@ -8,7 +8,7 @@ export function savePersistentData(namespace: string, data: object) {
     fs.writeFileSync(`data/${namespace}.json`, JSON.stringify(data, null, 2));
 }
 
-export function loadPersistentData(namespace: string, defaultValue: object): object {
+export function loadPersistentData(namespace: string, defaultValue: object): any {
     if (fs.existsSync(`data/${namespace}.json`)) {
         const data = fs.readFileSync(`data/${namespace}.json`);
         return JSON.parse(data);
