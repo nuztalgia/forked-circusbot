@@ -9,10 +9,11 @@ import { client } from './client';
 import { DMChannel } from 'discord.js';
 import config from '../config.json';
 
+import './admin/removed_member_log';
+import './cannedreplies/commands';
 import './events/commands';
 import './threads/commands';
 import './misc/commands';
-import './admin/removed_member_log';
 
 client.on('ready', async () => {
   log('info', `Logged in as ${client?.user?.tag}!`);
