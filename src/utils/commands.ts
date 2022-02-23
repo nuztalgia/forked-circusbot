@@ -81,7 +81,11 @@ export function checkPermissions(command: string, channel: TextBasedChannel | nu
       || (config.PERMISSIONS.hasOwnProperty('*') && (config.PERMISSIONS['*'].includes("*") || config.PERMISSIONS['*'].includes(command)));
 }
 
-export function parseCommand(message: Message<boolean>, regex: RegExp) {
+export function parseCommand(message: Message<boolean> | CommandInteraction, regex: RegExp) {
+    if (message instanceof CommandInteraction) {
+        throw 'parseCommand does not support interactions yet';
+    }
+
     const cmd = config.BOT_PREFIX + message.content.replace(config.BOT_PREFIX, '').split(' ')[0] + ' ';
     let msg = (message.content + ' ').replace(cmd, '').trim();
 

@@ -6,6 +6,14 @@ export * from './logging';
 export * from './persistence';
 export * from './users';
 
+export function diffDate(date1: Date, date2: Date) {
+    return (date2.getTime() - date1.getTime()) / 1000;
+}
+
+export function arrayRandom(arr: any[]) {
+    return arr[Math.floor(Math.random()*arr.length)];
+}
+
 export function getRandomInt(min: number, max: number) {
     min = Math.ceil(min);
     max = Math.floor(max);

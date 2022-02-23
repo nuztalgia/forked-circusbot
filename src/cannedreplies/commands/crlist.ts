@@ -7,7 +7,20 @@ registerCommand('crlist', [], message => {
     let replies = cannedReplies[message.guildId];
 
     for (const [name, reply] of Object.entries(replies)) {
-        fields.push([ `=${name}`, reply.author ])
+        let flags = [];
+        if (reply.locked) {
+            flags.push('Locked');
+        }
+        
+        if (reply.value.startsWith('@')) {
+            flags.push('Alias(' + reply.value + ')');
+        }
+
+        if (reply.hasOwnProperty('url')) {
+            flags.push('Embed');
+        }
+
+        fields.push([ `=${name}`, reply.author, flags.join(', ') || '⠀' ])
     }
 
     const embed = new MessageEmbed()
@@ -20,6 +33,7 @@ registerCommand('crlist', [], message => {
             .addFields([ 
                 { name: 'Name', value: fields.map(x => x[0]).join('\n'), inline: true },
                 { name: 'Author', value: fields.map(x => x[1]).join('\n'), inline: true },
+                { name: 'Flags', value: fields.map(x => x[2]).join('\n'), inline: true },
             ]);
     }
 

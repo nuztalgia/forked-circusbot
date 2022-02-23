@@ -23,7 +23,8 @@ export function cannedReplyHandler(message: Message<boolean>) {
     }
 
     const content = message.content.substring(1);
-    const reply = cannedReplies[message.guildId][content.split('=')[0].toLowerCase()];
+    const name = content.split('=')[0].toLowerCase();
+    const reply = cannedReplies[message.guildId][name];
 
     // Assign a message
     if (content.includes('=')) {
@@ -32,7 +33,6 @@ export function cannedReplyHandler(message: Message<boolean>) {
             return;
         }
 
-        let name = content.split('=')[0].toLowerCase();
         let value = content.substring(name.length).trim().substring(1).trim().replace(/(^"|"$)/g, '');
 
         if (name === 'help' || name.startsWith('__')) {
@@ -54,7 +54,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
         message.react('👍');
         log('info', `New canned reply added by ${message.author.tag}: ${name}`);
         saveCannedReplies();
-    } else if (content.toLowerCase() === 'help') {
+    } else if (name === 'help') {
         sendReply(message, EMBED_INFO_COLOR, new MessageEmbed().setTitle('Canned Replies').setDescription(
             'Canned replies are a feature that allow you to save a message/attachment/link with a name, and then ' +
             'whenever that name is posted in a channel with CirqueBot, the contents will be posted as a reply. For ' +
@@ -66,7 +66,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
             'lock down a certain reply, admins can use the `!crlock` command' 
         ));
     } else if (reply) {
-        sendReply(message, EMBED_INFO_COLOR, renderCannedReply(reply));
+        sendReply(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
     } else {
         sendReply(message, EMBED_ERROR_COLOR, 'Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n`=name=Your custom text here`\n\nThen you can print the content of the canned reply using `=name` in any channel with this bot in it.');
     }
