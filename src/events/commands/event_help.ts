@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import { checkPermissions, EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, registerCommand, sendReply } from '../../utils';
+import { checkPermissions, EMBED_ERROR_COLOR, EMBED_INFO_COLOR, registerCommand, sendReply } from '../../utils';
 
 registerCommand('event_help', ['help', 'events', 'event'], interaction => {
     let helpMsg = 'Create and manage sign-ups for scheduled events like raids/operations/social events.\n\n';
@@ -44,5 +44,5 @@ registerCommand('event_help', ['help', 'events', 'event'], interaction => {
     }   
     
     const embed = new MessageEmbed().setTitle('CirqueBot Help: ​ ​ `!events`').setDescription(helpMsg)
-    sendReply(interaction, EMBED_SUCCESS_COLOR, embed);
+    sendReply(interaction, EMBED_INFO_COLOR, embed);
 });

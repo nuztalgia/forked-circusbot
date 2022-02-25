@@ -9,7 +9,6 @@ import { client } from './client';
 import { DMChannel } from 'discord.js';
 import config from '../config.json';
 
-import './admin/audit_events';
 import './admin/removed_member_log';
 import './cannedreplies/commands';
 import './events/commands';

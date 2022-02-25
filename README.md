@@ -1,12 +1,36 @@
-README
-======
+CircusBot Readme
+================
 
-Use Node.js 16 or higher.
+Features
+--------
+
+### Raid Events
+
+This feature is pretty specific to MMOs with the Tank/Healer/DPS roles. More flexibility *may* be added in the future. Events are created with an interactive wizard. For more info, use the `!event_help` command.
+
+### Scheduled Threads
+
+This feature allows a thread to be created in a designated channel, and archived every N days (regardless of activity). For example, a weekly discussion thread that gets archived every Monday.
+
+### Removed User Log
+
+Posts a message to the designated channel whenever a user leaves the server. Custom message if they left on their own, got kicked, or got banned. Shows kick/ban reasons, the date the user joined, their nickname when they left, and the roles they had before they left.
+
+### Canned Replies
+
+Allows users to collaboratively create and edit "canned replies" that can be reposted with the command name, e.g. `=parseinfo` might post the StarParse info for your guild. Use `=help` for more information.
+
+Deployment
+----------
+
+The only prerequisite is having Docker installed, and grabbing the docker image (which you may have to build yourself, see below). In this example, I've copied the source code to `/usr/src/circusbot` on my server, and am using a mounted volume to persist data across container restarts:
 
 ```
-npm install
-npm run build; node .\cirque-bot.js
+docker run -itd -v /usr/src/circusbot:/usr/src/app -v /usr/src/circusbot:/usr/src/app circusbot
 ```
+
+Configuration
+-------------
 
 Sample `config.json` file:
 
@@ -23,14 +47,29 @@ Sample `config.json` file:
 }
 ```
 
+Permissions will eventually be incorporated into a configuration module that works with bot commands, but for now, is hard coded in the config file.
+
+Adding The Bot To Your Server
+-----------------------------
+
 Authorization URL:
 
 ```
 https://discord.com/api/oauth2/authorize?client_id=912376778939584562&permissions=271969344&scope=bot%20applications.commands
 ```
 
-Docker Stuff
-============
+Development
+-----------
+
+Use Node.js 16 or higher.
+
+```
+npm install
+npm run build; node .\cirque-bot.js
+```
+
+Building The Docker Image
+-------------------------
 
 **Linux:**
 
