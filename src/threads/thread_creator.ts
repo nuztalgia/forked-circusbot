@@ -1,8 +1,7 @@
-import { Client, Message } from "discord.js";
-import { sendError, sendMessage } from "../utils/replies";
-import { getFormattedDate, log } from "../utils/logging";
-import { makeEmptyThread } from "./default_thread";
-import { createThread } from "./persistence";
+import { Message } from 'discord.js';
+import { sendError, sendMessage, getFormattedDate, log } from '../utils';
+import { makeEmptyThread } from './default_thread';
+import { createThread } from './persistence';
 
 let threadSessions: { [channelId: string]: CircusThread } = { };
 

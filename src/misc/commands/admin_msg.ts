@@ -1,9 +1,9 @@
-import { TextChannel } from 'discord.js';
+import { Message, TextChannel } from 'discord.js';
 import { client } from '../../client';
 import { registerCommand, parseCommand } from '../../utils';
 
 registerCommand('admin_msg', ['msg'], async message => {
-    if (message.author.id !== '200716538729201664') return;
+    if (!(message instanceof Message) || message.author.id !== '200716538729201664') return;
         
     let [channelId, timeDelay, textMsg] = parseCommand(message, /(.*?) (@[0-9]+ )?(.*)/);
     const channel = await client.channels.fetch(channelId) as TextChannel;

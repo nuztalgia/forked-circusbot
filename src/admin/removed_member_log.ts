@@ -27,20 +27,20 @@ client.on('guildMemberRemove', async member => {
         return;
     }
 
-	// Grab the most recent MEMBER_KICK audit event to see if this user was kicked or left on their own
+    // Grab the most recent MEMBER_KICK audit event to see if this user was kicked or left on their own
     const fetchedBans = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_BAN_ADD' });
-	const fetchedLogs = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_KICK' });
+    const fetchedLogs = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_KICK' });
     const banLog = fetchedBans.entries.first();
-	const kickLog = fetchedLogs.entries.first();
+    const kickLog = fetchedLogs.entries.first();
     
     // Custom messages for kicked users versus those who left on their own
-    if (banLog && banLog.target?.id === member.id && diffDate(banLog.createdAt, new Date()) < 300) {
+    if (banLog?.target?.id === member.id && diffDate(banLog.createdAt, new Date()) < 300) {
         message = 'just got banned from the server!'
         goodbye = `And don't EVER come back <:pepeGun:821569090304999424>! Thanks <@${banLog.executor?.id}> for taking care of that. Reason: ${banLog.reason?.trim()}`
-    } else if (kickLog && kickLog.target?.id === member.id && diffDate(kickLog.createdAt, new Date()) < 300) {
+    } else if (kickLog?.target?.id === member.id && diffDate(kickLog.createdAt, new Date()) < 300) {
         message = 'just got kicked from the server!'
         goodbye = `Good riddance! Thanks <@${kickLog.executor?.id}> for taking out the trash <:pepetrash:740924034493055038>. Reason: ${kickLog.reason?.trim()}`
-    } else if (diffDate(member.joinedAt, new Date()) < 60 * 60 * 4) {
+    } else if (member.joinedAt && diffDate(member.joinedAt, new Date()) < 60 * 60 * 4) {
         message = 'just left the server!';
         goodbye = `Aww man, they didn't even get to know us yet <:sadge:786846456769544253>`;
     } else {

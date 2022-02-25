@@ -1,7 +1,19 @@
-import { Guild, GuildMember } from 'discord.js';
+import { Guild, GuildMember, User } from 'discord.js';
 import { closestMatch, distance } from 'closest-match';
 
 let guildCacheFetched: string[] = [];
+
+export async function getGuildMember(user: User, guild: Guild) {
+    if (!guild) return null;
+
+    return await guild.members.fetch(user.id);
+}
+
+export async function getDisplayName(user: User, guild: Guild | null) {
+    if (!guild) return user.tag;
+
+    return (await guild.members.fetch(user.id))?.displayName || user.tag;
+}
 
 export async function findMembers(guild: Guild, search: string) {
     let member: GuildMember | undefined, members: GuildMember[];

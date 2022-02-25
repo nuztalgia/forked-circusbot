@@ -1,8 +1,9 @@
+import { Message } from 'discord.js';
 import { client } from '../../client';
 import { registerCommand, parseCommand } from '../../utils';
 
 registerCommand('admin_dm', ['dm'], async message => {
-    if (message.author.id !== '200716538729201664') return;
+    if (!(message instanceof Message) || message.author.id !== '200716538729201664') return;
         
     let [userId, timeDelay, textMsg] = parseCommand(message, /(.*?) (@[0-9]+ )?(.*)/);
     const user = await client.users.fetch(userId);
