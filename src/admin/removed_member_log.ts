@@ -6,11 +6,7 @@ const memberLeftMessages = [
     `Sad! Let's just hope that they enjoyed their stay <:sadge:786846456769544253>`,
     `Awww man, hopefully they enjoyed their stay <:sadge:786846456769544253>`,
     `Oh no, another one bites the dust! Hopefully they enjoyed their stay <:sadge:786846456769544253>`,
-    `Disappointing!  Let's just hope they enjoyed their stay <:sadge:786846456769544253>`,
-];
-
-const memberKickedMessages = [
-
+    `That's disappointing! Let's just hope they enjoyed their stay <:sadge:786846456769544253>`,
 ];
 
 client.on('guildMemberAdd', async member => {
@@ -44,14 +40,17 @@ client.on('guildMemberRemove', async member => {
     } else if (kickLog && kickLog.target?.id === member.id && diffDate(kickLog.createdAt, new Date()) < 300) {
         message = 'just got kicked from the server!'
         goodbye = `Good riddance! Thanks <@${kickLog.executor?.id}> for taking out the trash <:pepetrash:740924034493055038>. Reason: ${kickLog.reason?.trim()}`
+    } else if (diffDate(member.joinedAt, new Date()) < 60 * 60 * 4) {
+        message = 'just left the server!';
+        goodbye = `Aww man, they didn't even get to know us yet <:sadge:786846456769544253>`;
     } else {
         message = 'just left the server!';
         goodbye = arrayRandom(memberLeftMessages);
     }
 
     // Include their roles so they can be restored easier if the user accidentally left or comes back later
-    let roles = member.roles.cache.mapValues(x => x.name).filter(x => x !== '@everyone');
-    let roleText = roles.size > 0 ? `Their roles were:\n\n${roles.map(x => `- ${x}`).join('\n')}` : `They had no roles (maybe they were new)`;
+    let roles = member.roles.cache.filter(x => x.name !== '@everyone');
+    let roleText = roles.size > 0 ? `Their roles were:\n\n${roles.map(x => `- <@&${x.id}>`).join('\n')}` : `They had no roles (maybe they were new)`;
     let nickname = member.nickname ? `. Their nickname was ${member.nickname}` : '';
 
     // Send the message in the designated channel
