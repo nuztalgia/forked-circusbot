@@ -10,6 +10,7 @@ import { DMChannel } from 'discord.js';
 import config from '../config.json';
 
 import './admin/removed_member_log';
+import './admin/welcome_channel';
 import './cannedreplies/commands';
 import './events/commands';
 import './threads/commands';

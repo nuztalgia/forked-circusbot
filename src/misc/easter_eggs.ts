@@ -37,7 +37,7 @@ export async function easterEggHandler(message: Message<boolean>) {
         } else if (clowncilWarnings[message.author.id] === 5) {
             sendReply(message, EMBED_ERROR_COLOR, `THE SHADOW CLOWNCIL ISN'T REAL. YOU HAVE BEEN REPORTED TO THE ADMINISTRATORS. NO FURTHER WARNINGS WILL ENSUE.`);
         } else if (clowncilWarnings[message.author.id] === 10) {
-            sendReply(message, EMBED_ERROR_COLOR, `YOUR IRRATIONAL INSISTANCE THAT THE MYTHICAL ORGANIZATION CALLED SHADOW CLOWNCIL EXISTS WILL NOT BE TOLERATED. DRONES HAVE BEEN DISPATCHED TO YOUR LOCATION FOR RE-EDUCATION.`);
+            sendReply(message, EMBED_ERROR_COLOR, `YOUR IRRATIONAL INSISTANCE THAT THE MYTHICAL ORGANIZATION CALLED SHADOW CLOWNCIL EXISTS WILL NOT BE TOLERATED. RE-EDUCATION ASSISTANTS HAVE BEEN DISPATCHED TO YOUR LOCATION.`);
         } else if (clowncilWarnings[message.author.id] === 15) {
             sendReply(message, EMBED_ERROR_COLOR, `THE DRONES ARE ON THEIR WAY. YOUR RE-EDUCATION WILL BEGIN SHORTLY. CEASING COMMUNICATION UNTIL RE-EDUCATION IS COMPLETE.`);
         } else if (clowncilWarnings[message.author.id] === 20) {

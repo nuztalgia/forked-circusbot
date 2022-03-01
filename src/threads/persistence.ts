@@ -110,6 +110,7 @@ export async function updateThread(thread: CircusThread) {
 
 export async function archiveThread(thread: CircusThread) {
     const channel = await client.channels.fetch(thread.channel) as TextChannel;
+    await channel.threads.fetchActive();
     const existingThread = channel.threads.cache.find(x => x.id === thread.threadId);
     
     if (existingThread) {
@@ -120,7 +121,11 @@ export async function archiveThread(thread: CircusThread) {
             .setDescription('👋 This thread is now being archived. Goodbye.');
 
         await existingThread.send({ embeds: [embed] });
+        await existingThread.setLocked(true);
         await existingThread.setArchived(true);
+        log('info', `  Thread should now be archived (thread id was ${existingThread.id})`);
+    } else {
+        log('info', `Unable to archive thread for ${thread.id} (no thread with id ${thread.threadId} found in ${channel.name})`);
     }
 }
 

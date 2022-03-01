@@ -9,10 +9,6 @@ const memberLeftMessages = [
     `That's disappointing! Let's just hope they enjoyed their stay <:sadge:786846456769544253>`,
 ];
 
-client.on('guildMemberAdd', async member => {
-    log('info', `${member.user.tag} has just joined ${member.guild.name}`);
-});
-
 client.on('guildMemberRemove', async member => {
     let channel: GuildTextBasedChannel, goodbye: string, message: string;
 

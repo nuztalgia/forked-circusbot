@@ -1,4 +1,7 @@
-import { registerCommand, parseCommand, findMembers, makeTable, sendReply, EMBED_ERROR_COLOR, EMBED_INFO_COLOR } from '../../utils';
+import { Message, TextChannel } from 'discord.js';
+import { createWelcomeChannel } from '../../admin/welcome_channel';
+import { client } from '../../client';
+import { registerCommand, parseCommand, findMembers, makeTable, sendReply, EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log } from '../../utils';
 
 registerCommand('debug', [], async message => {
     let [subCommand, params] = parseCommand(message, /(.*?) (.*)/);
@@ -30,5 +33,20 @@ registerCommand('debug', [], async message => {
             .setDescription(`Multiple users were found that matched your query, please try again using their ID or Tag:`);
         message.channel.send({ embeds: [embed] });
         return;
+    } else if (subCommand === 'welcome' && message instanceof Message) {
+        createWelcomeChannel(message.mentions.members?.first(), false);
+    } else if (subCommand === 'archivethread' && message instanceof Message) {
+        const channel = message.mentions.channels.first() as TextChannel;
+        const existingThread = channel.threads.cache.find(x => x.id === params.split(' ')[1]);
+        
+        if (existingThread) {
+            log('info', `Archiving thread ${existingThread.id} (${existingThread.name})`);
+            await existingThread.setLocked(true);
+            await existingThread.setArchived(true);
+            log('info', `  Archived thread should now be archived`);
+            message.react('👍');
+        } else {
+            message.react('👎');
+        }
     }
 });
