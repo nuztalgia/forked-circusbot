@@ -10,6 +10,9 @@ export function saveCannedReplies() {
 export function renderCannedReply(reply: any) {
     if (reply.hasOwnProperty('url')) {
         return new MessageEmbed().setDescription(reply.value || '').setImage(reply.url);
+    } else if (reply.value.trim().match(/^<:.*?:([0-9]+)>$/)) {
+        const emoji = reply.value.trim().match(/^<:.*?:([0-9]+)>$/);
+        return new MessageEmbed().setThumbnail(`https://cdn.discordapp.com/emojis/${emoji[1]}.png?size=96&quality=lossless`);
     } else {
         return new MessageEmbed().setDescription(reply.value);
     }
