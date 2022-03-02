@@ -15,6 +15,16 @@ export async function getDisplayName(user: User, guild: Guild | null) {
     return (await guild.members.fetch(user.id))?.displayName || user.tag;
 }
 
+export async function findMember(guild: Guild, search: string) {
+    let members = (await findMembers(guild, search)).filter(x => x !== undefined);
+
+    if (members.length === 0 || members.length > 1) {
+        return null
+    } else {
+        return members[0] as GuildMember;
+    }
+}
+
 export async function findMembers(guild: Guild, search: string) {
     let member: GuildMember | undefined, members: GuildMember[];
     search = search.toLowerCase();

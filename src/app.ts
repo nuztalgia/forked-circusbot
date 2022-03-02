@@ -11,6 +11,7 @@ import config from '../config.json';
 
 import './admin/removed_member_log';
 import './admin/welcome_channel';
+import './admin/commands';
 import './cannedreplies/commands';
 import './events/commands';
 import './threads/commands';
