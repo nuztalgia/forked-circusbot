@@ -26,12 +26,15 @@ export function cannedReplyHandler(message: Message<boolean>) {
     }
 
     const content = message.content.substring(1);
-    const name = content.split('=')[0].toLowerCase();
+    const name = content.split('=')[0].toLowerCase().trim();
     const reply = cannedReplies[message.guildId][name];
 
     // Assign a message
     if (content.includes('=')) {
-        if (reply?.locked && !checkPermissions('crlock', message.channel)) {
+        if (name === '') {
+            sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=).');
+            return;
+        } else if (reply?.locked && !checkPermissions('crlock', message.channel)) {
             sendReply(message, EMBED_ERROR_COLOR, 'This canned reply is locked and can only be edited in command channels');
             return;
         }
@@ -68,7 +71,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
             'Canned replies are meant to be a collaborate feature, so anyone can create, edit, or use them. If you want to ' +
             'lock down a certain reply, admins can use the `!crlock` command' 
         ));
-    } else if (reply) {
+    } else if (reply && name) {
         sendReply(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
     } else {
         sendReply(message, EMBED_ERROR_COLOR, 'Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n`=name=Your custom text here`\n\nThen you can print the content of the canned reply using `=name` in any channel with this bot in it.');

@@ -4,7 +4,10 @@ import { cannedReplies, saveCannedReplies } from '../listener';
 registerCommand('crunlock', [], message => {
     const [name] = parseCommand(message, /=?(.*)/);
 
-    if (!cannedReplies[message.guildId].hasOwnProperty(name)) {
+    if (!name) {
+        sendReply(message, EMBED_ERROR_COLOR, makeError('Please specify the name of the canned reply to unlock'));
+        return;
+    } else if (!cannedReplies[message.guildId].hasOwnProperty(name)) {
         sendReply(message, EMBED_ERROR_COLOR, makeError('No such canned reply'));
         return;
     }
