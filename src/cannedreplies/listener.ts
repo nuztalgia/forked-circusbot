@@ -29,13 +29,15 @@ export function cannedReplyHandler(message: Message<boolean>) {
     }
 
     const content = message.content.substring(1);
-    const name = content.split('=')[0].toLowerCase().trim();
+    const name = content.split('=')[0].toLowerCase().replace(/\\/g, '').trim();
     const reply = cannedReplies[message.guildId][name];
+
+    console.log(name, reply, content);
 
     // Assign a message
     if (content.includes('=')) {
         if (name === '') {
-            sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=).');
+            sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=) or Discord escape character.');
             return;
         } else if (reply?.locked && !checkPermissions('crlock', message.channel)) {
             sendReply(message, EMBED_ERROR_COLOR, 'This canned reply is locked and can only be edited in command channels');
