@@ -1,7 +1,6 @@
-import { Guild, GuildMember, OverwriteResolvable, TextChannel } from "discord.js";
+import { Guild, GuildMember, MessageEmbed, OverwriteResolvable, TextChannel } from "discord.js";
 import { client } from "../client";
-import { CLOWNS_GUILD_ID, SANDBOX_GUILD_ID } from "../constants";
-import { findMember, getFormattedDate, loadPersistentData, log, randomStr, savePersistentData } from "../utils";
+import { EMBED_INFO_COLOR, findMember, getFormattedDate, loadPersistentData, log, randomStr, savePersistentData } from "../utils";
 import { getConfig } from "./configuration";
 
 const userWelcomeChannels = loadPersistentData('welcome', {});
@@ -32,9 +31,9 @@ client.on('ready', async () => {
         const member = await findMember(channel.guild, username);
 
         if (member === null) {
-            archiveWelcomeChannel(memberId, username, guild, `${username} has left the server`);
+            archiveWelcomeChannel(memberId, username, guild, null, `${username} has left the server`);
         } else if (member.roles.cache.size > 1) {
-            archiveWelcomeChannel(memberId, username, guild, `${username} was given a role`);
+            archiveWelcomeChannel(memberId, username, guild, null, `${username} was given a role`);
         }
     })
   });
@@ -53,7 +52,7 @@ client.on('guildMemberAdd', async member => {
 // role (e.g. a new user receiving the Piglet role).
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
     if (oldMember.roles.cache.size === 1 && newMember.roles.cache.size > 1 && userWelcomeChannels[newMember.guild.id].hasOwnProperty(newMember.id)) {
-        archiveWelcomeChannel(newMember.id, newMember.user.tag, newMember.guild, `${newMember.user.tag} was given a role`);
+        archiveWelcomeChannel(newMember.id, newMember.user.tag, newMember.guild, newMember.displayAvatarURL(), `${newMember.user.tag} was given a role`);
     }
 });
 
@@ -61,7 +60,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
 // have one.
 client.on('guildMemberRemove', async member => {
     if (userWelcomeChannels[member.guild.id].hasOwnProperty(member.id)) {
-        archiveWelcomeChannel(member.id, member.user.tag, member.guild, `${member.user.tag} has left the server`);
+        archiveWelcomeChannel(member.id, member.user.tag, member.guild, member.displayAvatarURL(), `${member.user.tag} has left the server`);
     }
 });
 
@@ -103,7 +102,7 @@ export async function createWelcomeChannel(member: GuildMember, ping: boolean) {
     });
 }
 
-async function archiveWelcomeChannel(memberId: string, userTag: string, guild: Guild, reason: string) {
+async function archiveWelcomeChannel(memberId: string, userTag: string, guild: Guild, avatar: string | null, reason: string) {
     const channel = await client.channels.fetch(userWelcomeChannels[guild.id][memberId]);
 
     if (!channel || !(channel instanceof TextChannel)) {
@@ -116,12 +115,19 @@ async function archiveWelcomeChannel(memberId: string, userTag: string, guild: G
     log('info', `Deleting welcome channel for ${userTag} in ${guild.name} (${reason})`);
 
     let messageLog = '';
+    let transcript = '';
 
     messages.reverse().forEach(message => {
         messageLog += `[${getFormattedDate(message.createdAt)}] ${message.author.tag}: ${message.content}\n`;
+        transcript += `<@${message.author.id}>: ${message.content}\n\n`;
     });
 
-    guild.systemChannel?.send(`The welcome channel for <@${memberId}> has been archived (${reason}). Transcript:\n\n\`\`\`\n${messageLog}\`\`\``);
+    const embed = new MessageEmbed()
+        .setColor(EMBED_INFO_COLOR)
+        .setAuthor({ iconURL: avatar || '', name: `The welcome channel for ${userTag} has been archived` })
+        .setDescription(`The welcome channel for <@${memberId}> has been archived (${reason}). Transcript:\n\n> \n> ${transcript.trim().replace(/\n/g, '\n> ')}\n> ⠀\n`);
+
+    guild.systemChannel?.send({ embeds: [embed] });
 
     channel?.delete(reason);
     delete userWelcomeChannels[guild.id][memberId];
