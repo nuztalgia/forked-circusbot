@@ -32,8 +32,6 @@ export function cannedReplyHandler(message: Message<boolean>) {
     const name = content.split('=')[0].toLowerCase().replace(/\\/g, '').trim();
     const reply = cannedReplies[message.guildId][name];
 
-    console.log(name, reply, content);
-
     // Assign a message
     if (content.includes('=')) {
         if (name === '') {

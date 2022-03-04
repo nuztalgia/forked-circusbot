@@ -1,4 +1,5 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, MessageEmbed, TextChannel } from 'discord.js';
+import { client } from '../../client';
 import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, EMBED_SUCCESS_COLOR, makeError, parseCommand, registerCommand, savePersistentData, sendReply } from '../../utils';
 import { getConfig, saveConfig } from '../configuration';
 
@@ -6,7 +7,7 @@ import { getConfig, saveConfig } from '../configuration';
  * !configure welcome 
  * !configure cannedreplies.enabled [true|false]
  */
-registerCommand('configure', ['conf'], message => {
+registerCommand('configure', ['conf'], async message => {
     const [namespace, option, value] = parseCommand(message, /^(.*?)(?:\.(.*?) ([\s\S]*))?$/m);
 
     console.log(namespace, option, value);
@@ -66,6 +67,40 @@ registerCommand('configure', ['conf'], message => {
                 '- You may use Markdown formatting (e.g. **bold text**) in your message.\n\n' + 
                 'Current Configuration:\n' + 
                 '```\n' + (config.greeting) + '\n```\n\n' + 
+                '');
+        sendReply(message, EMBED_INFO_COLOR, embed);
+    } else if (namespace === 'admin') {
+        const config = getConfig(message.guildId, 'admin', { removed_user_channel: '' });
+
+        if (option === 'removed_user_channel') {
+            config.removed_user_channel = message.mentions.channels.first()?.id;
+        } else if (option) {
+            sendReply(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
+            return;
+        }
+
+        if (option) {
+            saveConfig(message.guildId, 'admin', config);
+            message.react('👍');
+            return;
+        }
+
+        let removedUserChannel;
+        
+        try {
+            removedUserChannel = await client.channels.fetch(config.removed_user_channel) as TextChannel;
+        } catch {
+            removedUserChannel = { name: '<N/A>' };
+        }
+
+        const embed = new MessageEmbed()
+            .setAuthor({ iconURL: message.guild?.iconURL() || '', name: `Administration Config for "${message.guild?.name}"` })
+            .setDescription(
+                '🎪 `!configure admin.removed_user_channel`\n' + 
+                'The channel to log when a user leaves, gets kicked, or gets banned from the server. If blank, logs will ' + 
+                'be disabled.\n' + 
+                'Current Configuration:\n' + 
+                '```\n#' + removedUserChannel?.name + '\n```\n\n' + 
                 '');
         sendReply(message, EMBED_INFO_COLOR, embed);
     } else if (namespace === 'cannedreplies') {
