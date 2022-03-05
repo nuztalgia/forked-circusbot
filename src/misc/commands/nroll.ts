@@ -1,8 +1,14 @@
+import { Message } from 'discord.js';
 import { registerCommand, getRandomInt, parseCommand, sendReply, EMBED_ERROR_COLOR, EMOJI_ERROR, EMBED_SUCCESS_COLOR } from '../../utils';
 
-registerCommand('nroll', [], message => {
+registerCommand('nroll', ['roll'], message => {
     let [params] = parseCommand(message, /(.*)/);
     let min = 0, max = 0, minStr = '0', maxStr = '';
+
+    if (message instanceof Message && !message.content.includes('nroll')) {
+        min = 1;
+        minStr = '1';
+    }
 
     params = params.replace(/([0-9])-/, '$1 -').trim();
 
@@ -19,10 +25,10 @@ registerCommand('nroll', [], message => {
     }
 
     if (isNaN(min) || min.toString() !== minStr) {
-        sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} ${params.split(' -')[0]} is not a number I can understand`);
+        sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} ${params.split(' -')[0]} is not a number I can understand (min)`);
         return;
     } else if (isNaN(max) || max.toString() !== maxStr) {
-        sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} ${params.split(' -')[1]} is not a number I can understand`);
+        sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} ${params.split(' -')[1]} is not a number I can understand (max)`);
         return;
     } else if (min > max) {
         sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Minimum number cannot be greater then maximum number`);
