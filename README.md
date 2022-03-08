@@ -55,7 +55,7 @@ Adding The Bot To Your Server
 Authorization URL:
 
 ```
-https://discord.com/api/oauth2/authorize?client_id=912376778939584562&permissions=271969344&scope=bot%20applications.commands
+https://discord.com/api/oauth2/authorize?client_id=912376778939584562&permissions=1644388805842&scope=bot%20applications.commands
 ```
 
 Development
