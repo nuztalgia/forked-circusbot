@@ -32,8 +32,8 @@ export async function sendReply(message: Message<boolean> | CommandInteraction, 
 
     if (reply instanceof MessageEmbed) {
         embed = reply.setColor(color);
-    } else if (reply.match(/https?:\/\/.*\.mp4/i)) {
-        return await message.reply({ allowedMentions: { repliedUser: false }, content: reply });
+    } else if (reply.startsWith('noembed:')) {
+        return await message.reply({ allowedMentions: { repliedUser: false }, content: reply.substring(8) });
     } else {
         embed = new MessageEmbed()
             .setColor(color)

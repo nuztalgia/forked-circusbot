@@ -8,15 +8,22 @@ const WHITELISTED_DOMAINS = [
     'https://cdn.discordapp.com/',
     'https://media.discordapp.net/',
     'https://images-ext-1.discordapp.net/',
+    'https://tenor.com/',
+    'https://c.tenor.com/',
 ];
+
+const NO_EMBED_WHITELIST = [
+    /\.mp4$/i,
+    /https:\/\/tenor\.com\//i,
+]
 
 export function saveCannedReplies() {
     savePersistentData('cannedreplies', cannedReplies);
 }
 
 export function renderCannedReply(reply: any) {
-    if (reply.hasOwnProperty('url') && reply.url.endsWith('.mp4')) {
-        return reply.url;
+    if (reply.hasOwnProperty('url') && NO_EMBED_WHITELIST.some(x => reply.url.match(x))) {
+        return 'noembed:' + reply.url;
     } else if (reply.hasOwnProperty('url')) {
         return new MessageEmbed().setDescription(reply.value || '').setImage(reply.url);
     } else if (reply.value.trim().match(/^<:.*?:([0-9]+)>$/)) {
@@ -26,7 +33,7 @@ export function renderCannedReply(reply: any) {
         const emoji = reply.value.trim().match(/^<a:.*?:([0-9]+)>$/);
         return new MessageEmbed().setThumbnail(`https://cdn.discordapp.com/emojis/${emoji[1]}.gif?size=96&quality=lossless`);
     } else {
-        return new MessageEmbed().setDescription(reply.value);
+        return new MessageEmbed().setDescription(reply.value || '⠀');
     }
 }
 
@@ -65,6 +72,8 @@ export function cannedReplyHandler(message: Message<boolean>) {
             cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value: '', url: value.split(' ')[0], author: message.author.tag };
         } else if (message.attachments.size > 0) {
             cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value, url: message.attachments.first()?.url, author: message.author.tag };
+        } else if (value === '') {
+            delete cannedReplies[message.guildId][name];
         } else {
             cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value, author: message.author.tag };
         }
