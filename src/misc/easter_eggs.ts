@@ -15,6 +15,10 @@ client.on('messageUpdate', async (_oldMessage, newMessage) => {
 });
 
 export async function easterEggHandler(message: Message<boolean>) {
+    if (message.content.toLowerCase() === 'good bot' || message.content.includes(':goodCirqueBot:')) {
+        message.react('<:peepoBowBlush:853445359463038986>');
+    }
+
     if (message.content.toLowerCase().match(clowncilRegex) && [CLOWNS_GUILD_ID, SANDBOX_GUILD_ID].includes(message.guildId || '')) {
         const clowncilWarnings = easterEggData.clowncilWarnings;
         clowncilWarnings[message.author.id] = clowncilWarnings.hasOwnProperty(message.author.id) ? clowncilWarnings[message.author.id] + 1 : 1;
