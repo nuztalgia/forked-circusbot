@@ -3,6 +3,10 @@ import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log, sendReply, loadPersistentData
 
 export const cannedReplies = loadPersistentData('cannedreplies', {});
 
+/**
+ * Only load images/embeds from trusted domains for security reasons. Don't want spammers to
+ * abuse this feature.
+ */
 const WHITELISTED_DOMAINS = [
     'https://media.tenor.com/',
     'https://cdn.discordapp.com/',
@@ -12,6 +16,12 @@ const WHITELISTED_DOMAINS = [
     'https://c.tenor.com/',
 ];
 
+/**
+ * Don't use an embed if a canned reply matches any of the regular expressions here. Generally the
+ * Embed we use can only render static images, so gifs and videos shouldn't use an embed. This list
+ * only gets checked if the url already matches WHITELISTED_DOMAINS, so it should be safe to just 
+ * use a "naked" message, which Discord will handle appropriately (e.g. embedding the video).
+ */
 const NO_EMBED_WHITELIST = [
     /\.mp4$/i,
     /https:\/\/tenor\.com\//i,
@@ -21,6 +31,13 @@ export function saveCannedReplies() {
     savePersistentData('cannedreplies', cannedReplies);
 }
 
+/**
+ * Return a MessageEmbed or text reply for the contents of the Canned Message. If the message contains
+ * a URL, it will be embedded correct and can be used with sendReply.
+ * 
+ * @param reply The canned reply
+ * @returns MessageEmbed | string
+ */
 export function renderCannedReply(reply: any) {
     if (reply.hasOwnProperty('url') && NO_EMBED_WHITELIST.some(x => reply.url.match(x))) {
         return 'noembed:' + reply.url;
