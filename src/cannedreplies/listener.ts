@@ -3,12 +3,21 @@ import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log, sendReply, loadPersistentData
 
 export const cannedReplies = loadPersistentData('cannedreplies', {});
 
+const WHITELISTED_DOMAINS = [
+    'https://media.tenor.com/',
+    'https://cdn.discordapp.com/',
+    'https://media.discordapp.net/',
+    'https://images-ext-1.discordapp.net/',
+];
+
 export function saveCannedReplies() {
     savePersistentData('cannedreplies', cannedReplies);
 }
 
 export function renderCannedReply(reply: any) {
-    if (reply.hasOwnProperty('url')) {
+    if (reply.hasOwnProperty('url') && reply.url.endsWith('.mp4')) {
+        return reply.url;
+    } else if (reply.hasOwnProperty('url')) {
         return new MessageEmbed().setDescription(reply.value || '').setImage(reply.url);
     } else if (reply.value.trim().match(/^<:.*?:([0-9]+)>$/)) {
         const emoji = reply.value.trim().match(/^<:.*?:([0-9]+)>$/);
@@ -52,7 +61,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
             return;
         }
 
-        if (value.startsWith('https://cdn.discordapp.com/') || value.startsWith('https://media.discordapp.net/')) {
+        if (WHITELISTED_DOMAINS.some(x => value.startsWith(x))) {
             cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value: '', url: value.split(' ')[0], author: message.author.tag };
         } else if (message.attachments.size > 0) {
             cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value, url: message.attachments.first()?.url, author: message.author.tag };

@@ -14,8 +14,9 @@ const memberLeftMessages = [
 client.on('guildMemberRemove', async member => {
     let channel: GuildTextBasedChannel, goodbye: string, message: string;
     const config = getConfig(member.guild.id, 'admin', { removed_user_channel: null });
+    const nickname = member.nickname || member.user.tag;
 
-    log('info', `${member.user.tag} has just left ${member.guild.name}`);
+    log('info', `${member.user.tag} (${nickname}) has just left ${member.guild.name}`);
 
     if (!config.removed_user_channel) {
         return;
@@ -47,16 +48,15 @@ client.on('guildMemberRemove', async member => {
     // Include their roles so they can be restored easier if the user accidentally left or comes back later
     let roles = member.roles.cache.filter(x => x.name !== '@everyone');
     let roleText = roles.size > 0 ? `Their roles were:\n\n${roles.map(x => `- <@&${x.id}>`).join('\n')}` : `They had no roles (maybe they were new)`;
-    let nickname = member.nickname ? `. Their nickname was ${member.nickname}` : '';
 
     // Send the message in the designated channel
     const embed = new MessageEmbed()
         .setColor(EMBED_ERROR_COLOR)
         .setAuthor({
             iconURL: member.user.displayAvatarURL() || '',
-            name: `${member.user.tag} ${message}`
+            name: `${nickname} ${message}`
         })
-        .setDescription(`${goodbye}\n\nThey initially joined the server on ${getFormattedDate(member.joinedAt)}${nickname}. ${roleText}`)
+        .setDescription(`${goodbye}\n\n${member.user.tag} initially joined the server on ${getFormattedDate(member.joinedAt)}. ${roleText}`)
 
     channel.send({ embeds: [embed] });
 });
