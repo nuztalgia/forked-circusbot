@@ -26,6 +26,12 @@ client.on('ready', () => {
 });
 
 function scheduleReminder(reminder: any) {
+    if ((Date.parse(reminder.remindAt) - Date.now()) >= 2147483647) {
+        setTimeout(() => scheduleReminder(reminder), 2147483646)
+        log('info', `${reminder.remindedBy} has set a reminder for ${reminder.remindee} at ${reminder.remindAt} (scheduling recursively as value exceeds MAX_INT)`);
+        return;
+    }   
+
     log('info', `${reminder.remindedBy} has set a reminder for ${reminder.remindee} at ${reminder.remindAt}`);
 
     setTimeout(async () => {
@@ -47,7 +53,7 @@ function scheduleReminder(reminder: any) {
 registerCommand('remind_me', ['remindme', 'remind'], message => {
     if (!(message instanceof Message)) return;
 
-    let [user, remindTime, remindUnit, reminder] = parseCommand(message, /(<.*?> )?(([0-9]+) ?(?:s|seconds?|m|minutes?|h|hours?|d|days?|w|weeks?|m|months?)|[0-9]{1,2}:[0-9]{2} ?(?:AM|PM))(.*)/i);
+    let [user, remindTime, remindUnit, reminder] = parseCommand(message, /(<.*?> )?(([0-9]+) ?(?:s|seconds?|m|minutes?|h|hours?|d|days?|w|weeks?|mo|months?|y|years?)|[0-9]{1,2}:[0-9]{2} ?(?:AM|PM))(.*)/i);
     
     let remindee = user ? message.mentions.users.first() : message.author;
 
@@ -68,8 +74,10 @@ registerCommand('remind_me', ['remindme', 'remind'], message => {
         remindAt.setHours(remindAt.getHours() + parseInt(remindUnit) * 24);
     } else if (remindTime.includes('week') || remindTime.match(/[0-9] ?w$/)) {
         remindAt.setHours(remindAt.getHours() + parseInt(remindUnit) * 24 * 7);
-    } else if (remindTime.includes('month') || remindTime.match(/[0-9] ?m$/)) {
+    } else if (remindTime.includes('month') || remindTime.match(/[0-9] ?mo$/)) {
         remindAt.setMonth(remindAt.getMonth() + parseInt(remindUnit));
+    } else if (remindTime.includes('year') || remindTime.match(/[0-9] ?y$/)) {
+        remindAt.setFullYear(remindAt.getFullYear() + parseInt(remindUnit));
     } else {
         let scheduledTime = remindAt.getFullYear() + "-" + ('0' + (remindAt.getMonth() + 1)).slice(-2) + "-" + ('0' + remindAt.getDate()).slice(-2) + ' ' + remindTime + ' EST';
         remindAt = new Date(scheduledTime);
