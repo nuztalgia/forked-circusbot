@@ -1,13 +1,19 @@
 import { MessageEmbed } from 'discord.js';
-import { EMBED_INFO_COLOR, registerCommand } from '../../utils';
+import { EMBED_INFO_COLOR, parseCommand, registerCommand } from '../../utils';
 import { cannedReplies } from '../listener';
 
 registerCommand('crlist', [], message => {
+    const [searchTerm] = parseCommand(message, /=?(.*)/);
     let fields: string[][] = [];
     let replies = cannedReplies[message.guildId];
 
-    for (const [name, reply] of Object.entries(replies)) {
+    for (const [name, reply] of Object.entries(replies).sort()) {
         let flags = [];
+
+        if (searchTerm && !name.includes(searchTerm.toLowerCase())) {
+            continue;
+        }
+
         if (reply.locked) {
             flags.push('Locked');
         }
@@ -29,7 +35,7 @@ registerCommand('crlist', [], message => {
     if (fields.length === 0) {
         embed.setDescription(`There are no canned repleis events in this server. You can create a canned reply using the \`=\` command.`);
     } else {
-        embed.setDescription(`All canned replies in this server:`)
+        embed.setDescription(`${searchTerm ? 'All canned replies matching your search term' : 'All canned replies in this server'}:`)
             .addFields([ 
                 { name: 'Name', value: fields.map(x => x[0]).join('\n'), inline: true },
                 { name: 'Author', value: fields.map(x => x[1]).join('\n'), inline: true },
