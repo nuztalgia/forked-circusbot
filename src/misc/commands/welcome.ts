@@ -4,7 +4,7 @@ import { registerCommand, parseCommand, findMembers, sendReply, EMBED_ERROR_COLO
 registerCommand('welcome', [], async message => {
     if (!(message instanceof Message) || !message.member || !message.guild) {
         return;
-    } else if (!message.member.roles.cache.some(role => ['Bacon Maker', 'Clowncil'].includes(role.name))) {
+    } else if (!message.member.roles.cache.some(role => ['Bacon Maker', 'Clowncil', 'Goddess of Death'].includes(role.name))) {
         return;
     }
 

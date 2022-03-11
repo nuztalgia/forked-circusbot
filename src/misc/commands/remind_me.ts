@@ -53,7 +53,7 @@ function scheduleReminder(reminder: any) {
 registerCommand('remind_me', ['remindme', 'remind'], message => {
     if (!(message instanceof Message)) return;
 
-    let [user, remindTime, remindUnit, reminder] = parseCommand(message, /(<.*?> )?(([0-9]+) ?(?:s|seconds?|m|minutes?|h|hours?|d|days?|w|weeks?|mo|months?|y|years?)|[0-9]{1,2}:[0-9]{2} ?(?:AM|PM))(.*)/i);
+    let [user, remindTime, remindUnit, reminder] = parseCommand(message, /(<.*?> )?(([0-9]+) ?(?:seconds?|s|minutes?|m|hours?|h|days?|d|weeks?|w|months?|mo|years?|y)|[0-9]{1,2}:[0-9]{2} ?(?:AM|PM))(.*)/i);
     
     let remindee = user ? message.mentions.users.first() : message.author;
 
