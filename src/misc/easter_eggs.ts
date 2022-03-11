@@ -15,8 +15,16 @@ client.on('messageUpdate', async (_oldMessage, newMessage) => {
 });
 
 export async function easterEggHandler(message: Message<boolean>) {
-    if (message.content.toLowerCase() === 'good bot' || message.content.includes(':goodCirqueBot:')) {
+    if (message.content.match(/(<@\!?912376778939584562> )? *good bot *$/i) || message.content.includes(':goodBot:') || message.content.includes(':goodCirqueBot:')) {
         message.react('<:peepoBowBlush:853445359463038986>');
+    } else if (message.content.match(/(<@\!?912376778939584562> )? *bad bot *$/i)) {
+        message.react('<a:pepeRunCry:786844735754338304>');
+    } else if (message.content.match(/^((<@\!?912376778939584562> )? *(hi|hello|hey) cirquebot *|<@\!?912376778939584562> *(hi|hello|hey) *)$/i)) {
+        message.react('<a:clownWave:819822599726432266>');
+    } else if (message.content.match(/^(<@\!?912376778939584562>) *erp */)) {
+        message.react('<a:no:740146335197691945>');
+    } else if (message.content.match(/(<@\!?912376778939584562>)/)) {
+        message.react('<a:rooPing:833724789259894895>');
     }
 
     if (message.content.toLowerCase().match(clowncilRegex) && [CLOWNS_GUILD_ID, SANDBOX_GUILD_ID].includes(message.guildId || '')) {
