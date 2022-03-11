@@ -49,12 +49,12 @@ registerCommand('configure', ['conf'], async message => {
                 'Current Configuration:\n' + 
                 '```\n' + (config.enabled ? 'true' : 'false') + '\n```\n\n' + 
 
-                '🎪 `!configure welcome.prefix`\n' + 
+                '⚙️ `!configure welcome.prefix`\n' + 
                 'The channel prefix for welcome channels (a random id will be added after the prefix to ensure uniqueness).\n' + 
                 'Current Configuration:\n' + 
                 '```\n#' + (config.prefix) + '\n```\n\n' + 
 
-                '🎪 `!configure welcome.admin_roles`\n' + 
+                '⚙️ `!configure welcome.admin_roles`\n' + 
                 'A list of roles that will be added to the welcome channel when one is created.\n' + 
                 'Current Configuration:\n' + 
                 '```\n' + (adminRoles?.map(x => `@` + x.name).join(' ') || '-') + '\n```\n\n' + 
@@ -96,7 +96,7 @@ registerCommand('configure', ['conf'], async message => {
         const embed = new MessageEmbed()
             .setAuthor({ iconURL: message.guild?.iconURL() || '', name: `Administration Config for "${message.guild?.name}"` })
             .setDescription(
-                '🎪 `!configure admin.removed_user_channel`\n' + 
+                '👋 `!configure admin.removed_user_channel`\n' + 
                 'The channel to log when a user leaves, gets kicked, or gets banned from the server. If blank, logs will ' + 
                 'be disabled.\n' + 
                 'Current Configuration:\n' + 
@@ -106,6 +106,27 @@ registerCommand('configure', ['conf'], async message => {
     } else if (namespace === 'cannedreplies') {
 
     } else {
-        sendReply(message, EMBED_ERROR_COLOR, makeError('Unknown configuration option'));
+        const embed = new MessageEmbed()
+            .setAuthor({ iconURL: message.guild?.iconURL() || '', name: `CirqueBot Configuration for "${message.guild?.name}"` })
+            .setDescription(
+                '🎪 `!configure welcome`\n' + 
+                'The Welcome module is used to create per-user welcome channels for users, intended for use by private servers ' +
+                'that want to vet their members first (or assign specific roles).\n\n' +
+
+                '⚙️ `!configure admin`\n' + 
+                'The Admin module contains various helpful tools for server administrators, such as functionality to post when ' +
+                'a user has left your server.\n\n' +
+
+                '🥫 `!configure cannedreplies`\n' + 
+                'The Canned Replies module allows server members to create "saved messages" under an alias, and have the saved message ' +
+                'reposted whenever the alias is used. This module is intended to help create a convenient shared F.A.Q./Knowledge Base, ' + 
+                'without relying heavily on pinned comments which can be difficult to sort through.\n\n' +
+
+                '📆 `!configure events`\n' + 
+                'The Events module allows server admins to create events that users can sign-up for. Aimed primarily at MMO Raids, events ' +
+                'have multiple roles that a user can sign-up as, role limitations, role requirements, and functionality to open/close sign-ups ' +
+                'at a specific date/time, message users who signed up, etc.\n\n' +
+                '');
+        sendReply(message, EMBED_INFO_COLOR, embed);
     }
 });
