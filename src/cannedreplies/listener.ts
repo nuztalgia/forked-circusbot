@@ -1,5 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log, sendReply, loadPersistentData, savePersistentData, checkPermissions } from "../utils";
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log, sendReply, loadPersistentData, savePersistentData, checkPermissions, makeError } from "../utils";
 
 export const cannedReplies = loadPersistentData('cannedreplies', {});
 
@@ -89,12 +89,18 @@ export function cannedReplyHandler(message: Message<boolean>) {
             return;
         }
 
-        if (WHITELISTED_DOMAINS.some(x => value.startsWith(x))) {
-            cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value: '', url: value.split(' ')[0], author: message.author.tag };
+        if (value === '' && message.attachments.size === 0) {
+            delete cannedReplies[message.guildId][name];
+        } else if (cannedReplies[message.guildId][name] && cannedReplies[message.guildId][name].value.startsWith('@') && !value.startsWith('@')) {
+            sendReply(message, EMBED_ERROR_COLOR, makeError(`Unable to update this canned reply as it is an alias of "${cannedReplies[message.guildId][name].value.substring(1)}". To unassign the alias, please delete it first (using the syntax \`=name=\`)`));
+            return;
         } else if (message.attachments.size > 0) {
             cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value, url: message.attachments.first()?.url, author: message.author.tag };
-        } else if (value === '') {
-            delete cannedReplies[message.guildId][name];
+        } else if (WHITELISTED_DOMAINS.some(x => value.startsWith(x))) {
+            cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value: '', url: value.split(' ')[0], author: message.author.tag };
+        } else if (value.startsWith('@') && !cannedReplies[message.guildId].hasOwnProperty(value.substring(1))) {
+            sendReply(message, EMBED_ERROR_COLOR, makeError(`Unable to assign alias, there was no canned reply with the name "${value.substring(1)}"`));
+            return;
         } else {
             cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value, author: message.author.tag };
         }
