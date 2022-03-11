@@ -39,7 +39,11 @@ export function saveCannedReplies() {
  * @returns MessageEmbed | string
  */
 export function renderCannedReply(reply: any) {
-    if (reply.hasOwnProperty('url') && NO_EMBED_WHITELIST.some(x => reply.url.match(x))) {
+    if (!reply) {
+        return new MessageEmbed()
+            .setTitle('Well, this is embarassing')
+            .setDescription('<a:confusedPsyduck:861432384318996510> Hmmm, for some reason, there is nothing here.');
+    } else if (reply.hasOwnProperty('url') && NO_EMBED_WHITELIST.some(x => reply.url.match(x))) {
         return 'noembed:' + reply.url;
     } else if (reply.hasOwnProperty('url')) {
         return new MessageEmbed().setDescription(reply.value || '').setImage(reply.url);
