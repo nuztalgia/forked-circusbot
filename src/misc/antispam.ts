@@ -1,6 +1,6 @@
 import { DMChannel, Message, PartialDMChannel } from 'discord.js';
 import { client } from '../client';
-import { EMBED_ERROR_COLOR, log, sendMessage, sendReply } from '../utils';
+import { EMBED_ERROR_COLOR, log, sendMessage, sendReply, startTyping } from '../utils';
 const unhomoglyph = require('unhomoglyph');
 
 const SCAM_TEXT = unhomoglyph("You've been gifted a subscription!");
@@ -35,7 +35,7 @@ export async function antispamHandler(message: Message<boolean>) {
             deletedNitroLinks[guildId].splice(index, 1);
         }, 1000 * 60 * 60);
 
-        message.channel.sendTyping();
+        await startTyping(message.channel);
         await message.delete();
         sendMessage(message.channel, `A Discord nitro gift link has been automatically deleted (posted by <@${message.author.id}>) - Please send nitro gift links via DM so they don't get claimed by the wrong person\n\nIf you meant to send Discord Nitro in this channel, please post it again, and it will not be deleted.`);
         
@@ -44,7 +44,7 @@ export async function antispamHandler(message: Message<boolean>) {
 
     if (message.content.includes('disocrds.gift') || message.content.match(/https?:\/\/[a-z]+\.gift/i) || message.embeds.find(x => unhomoglyph(x.title || '') === SCAM_TEXT)) {
         log('warn', `Discord Nitro scam link detected in ${message.channel.name} (posted by ${message.author.tag}), deleting it`);
-        message.channel.sendTyping();
+        await startTyping(message.channel);
         await message.delete();
         sendMessage(message.channel, `A Discord Nitro scam link has been detected and automatically deleted <:pepetrash:740924034493055038> (posted by <@${message.author.id}>).\n\nPlease remember that Discord Nitro links are always \`discord.gift\`, make sure to double check the spelling before you click!`)
         return;
@@ -55,7 +55,7 @@ export async function antispamHandler(message: Message<boolean>) {
 
         if (link && link[1].includes('c') && link[1].includes('o')) {
             log('warn', `Possible Discord scam link detected in ${message.channel.name} (posted by ${message.author.tag}): ${link}`);
-            message.channel.sendTyping();
+            await startTyping(message.channel);
             sendReply(message, EMBED_ERROR_COLOR, `This may be a scam link, please double check it. It is NOT an official Discord link (discord links are from \`https://discord.gg\`)`);
             return; 
         }

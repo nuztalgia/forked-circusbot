@@ -1,4 +1,4 @@
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, EMOJI_ERROR, parseCommand, registerCommand, sendReply } from '../../utils';
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, EMOJI_ERROR, parseCommand, registerCommand, sendReply, startTyping } from '../../utils';
 import { queueEventUpdate } from '../embeds';
 import { findEvent } from '../persistence';
 
@@ -11,7 +11,7 @@ registerCommand('refresh_event', ['rebuild_event', 're'], async message => {
         return;
     }
     
-    message.channel.sendTyping();
+    await startTyping(message.channel);
     await queueEventUpdate(event);
     sendReply(message, EMBED_INFO_COLOR, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) has been re-rendered and updated across all channels`);
 });

@@ -1,4 +1,5 @@
 import { ColorResolvable, CommandInteraction, Message, MessageEmbed, PartialUser, TextBasedChannel, User } from 'discord.js';
+import { log } from './logging';
 
 export const EMBED_SUCCESS_COLOR = '#77b255';
 export const EMBED_ERROR_COLOR = '#e14f5e';
@@ -6,6 +7,14 @@ export const EMBED_INFO_COLOR = '#0099ff';
 export const EMBED_DMM_COLOR = '#9c59b6';
 
 export const EMOJI_ERROR = '<:error:935248898086273045>';
+
+export async function startTyping(channel: TextBasedChannel | null) {
+    try {
+        await channel?.sendTyping();
+    } catch (err: any) {
+        log('warn', 'sendTyping threw an error: ' + err + ` (HTTP code: ${err.httpStatus})`);
+    }
+}
 
 export function messageUser(user: User | PartialUser, reply: string, title: string | null = null) {
     const embed = new MessageEmbed()
@@ -22,7 +31,7 @@ export function messageUser(user: User | PartialUser, reply: string, title: stri
 }
 
 export async function sendReply(message: Message<boolean> | CommandInteraction, color: ColorResolvable, reply: string | MessageEmbed) {
-    await message.channel?.sendTyping();
+    await startTyping(message.channel);
 
     let embed: MessageEmbed;
 
