@@ -23,6 +23,8 @@ export async function easterEggHandler(message: Message<boolean>) {
         message.react('<a:clownWave:819822599726432266>');
     } else if (message.content.match(/^(<@\!?912376778939584562>) *erp */)) {
         message.react('<a:no:740146335197691945>');
+    } else if (message.content.match(/^((<@\!?912376778939584562> )? *(fuck off|fuck you) cirquebot *|<@\!?912376778939584562> *(fuck off|fuck you) *)$/i)) {
+        message.react('<a:ANGERY:823203660603457567>');
     } else if (message.content.match(/(<@\!?912376778939584562>)/)) {
         message.react('<a:rooPing:833724789259894895>');
     }
