@@ -12,6 +12,10 @@ const WHITELISTED_DOMAINS = [
     'https://cdn.discordapp.com/',
     'https://media.discordapp.net/',
     'https://images-ext-1.discordapp.net/',
+    'https://images-ext-2.discordapp.net/',
+    'https://images-ext-3.discordapp.net/',
+    'https://images-ext-4.discordapp.net/',
+    'https://images-ext-5.discordapp.net/',
     'https://tenor.com/',
     'https://c.tenor.com/',
 ];
@@ -42,17 +46,17 @@ export function renderCannedReply(reply: any) {
     if (!reply) {
         return new MessageEmbed()
             .setTitle('Well, this is embarassing')
-            .setDescription('<a:confusedPsyduck:861432384318996510> Hmmm, for some reason, there is nothing here.');
+            .setDescription('<a:confusedPsyduck:861432384318996510> Hmmm, for some reason, there is nothing here (probably a broken alias).');
     } else if (reply.hasOwnProperty('url') && NO_EMBED_WHITELIST.some(x => reply.url.match(x))) {
         return 'noembed:' + reply.url;
     } else if (reply.hasOwnProperty('url')) {
         return new MessageEmbed().setDescription(reply.value || '').setImage(reply.url);
     } else if (reply.value.trim().match(/^<:[^:]+?:([0-9]+)>$/)) {
         const emoji = reply.value.trim().match(/^<:.*?:([0-9]+)>$/);
-        return new MessageEmbed().setThumbnail(`https://cdn.discordapp.com/emojis/${emoji[1]}.png?size=96&quality=lossless`);
+        return new MessageEmbed().setImage(`https://cdn.discordapp.com/emojis/${emoji[1]}.png?size=96&quality=lossless`);
     } else if (reply.value.trim().match(/^<a:[^:]+?:([0-9]+)>$/)) {
         const emoji = reply.value.trim().match(/^<a:.*?:([0-9]+)>$/);
-        return new MessageEmbed().setThumbnail(`https://cdn.discordapp.com/emojis/${emoji[1]}.gif?size=96&quality=lossless`);
+        return new MessageEmbed().setImage(`https://cdn.discordapp.com/emojis/${emoji[1]}.gif?size=96&quality=lossless`);
     } else {
         return new MessageEmbed().setDescription(reply.value || '⠀');
     }
@@ -81,6 +85,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
 
         let value = content.substring(name.length).trim().substring(1).trim().replace(/(^"|"$)/g, '');
 
+        // Prohibit users from trying to assign a value to a reserved name (e.g. =help)
         if (name === 'help' || name.startsWith('__')) {
             sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name, that name is reserved for system use');
             return;
@@ -89,24 +94,57 @@ export function cannedReplyHandler(message: Message<boolean>) {
             return;
         }
 
+        // If the assign syntax is used with no attachments or content, it's a delete operation. E.g.
+        // 
+        //   =foo=
+        //
+        // This will delete the canned reply "foo"
         if (value === '' && message.attachments.size === 0) {
             delete cannedReplies[message.guildId][name];
-        } else if (cannedReplies[message.guildId][name] && cannedReplies[message.guildId][name].value.startsWith('@') && !value.startsWith('@')) {
-            sendReply(message, EMBED_ERROR_COLOR, makeError(`Unable to update this canned reply as it is an alias of "${cannedReplies[message.guildId][name].value.substring(1)}". To unassign the alias, please delete it first (using the syntax \`=name=\`)`));
+            message.react('👍');
+            log('info', `Deleting canned reply for ${message.author.tag}: ${name}`);
+            saveCannedReplies();
             return;
-        } else if (message.attachments.size > 0) {
-            cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value, url: message.attachments.first()?.url, author: message.author.tag };
-        } else if (WHITELISTED_DOMAINS.some(x => value.startsWith(x))) {
-            cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value: '', url: value.split(' ')[0], author: message.author.tag };
-        } else if (value.startsWith('@') && !cannedReplies[message.guildId].hasOwnProperty(value.substring(1))) {
-            sendReply(message, EMBED_ERROR_COLOR, makeError(`Unable to assign alias, there was no canned reply with the name "${value.substring(1)}"`));
-            return;
-        } else {
+        }
+
+        // If the value starts with an '@', we are creating an alias
+        if (value.startsWith('@')) {
+            // Check if the target of the alias exists
+            if (!cannedReplies[message.guildId].hasOwnProperty(value.substring(1))) {
+                sendReply(message, EMBED_ERROR_COLOR, makeError(`Unable to assign alias, there was no canned reply with the name "${value.substring(1)}"`));
+                return;
+            } 
+
+            // Check if the target is already an alias
+            if (cannedReplies[message.guildId][value.substring(1)].value.startsWith('@')) {
+                sendReply(message, EMBED_ERROR_COLOR, makeError(`Unable to assign alias, =${value.substring(1)} is also an alias of =${cannedReplies[message.guildId][value.substring(1)].value.substring(1)}`));
+                return;
+            }
+
             cannedReplies[message.guildId][name] = { locked: reply?.locked || false, value, author: message.author.tag };
+            message.react('👍');
+            log('info', `New canned reply added by ${message.author.tag}: ${name}`);
+            saveCannedReplies();
+            return;
+        } 
+
+        let target = name;
+
+        if (cannedReplies[message.guildId][name] && cannedReplies[message.guildId][name].value.startsWith('@') && !value.startsWith('@')) {
+            target = cannedReplies[message.guildId][name].value.substring(1);
+            sendReply(message, EMBED_INFO_COLOR, `=${name} is an alias for =${target}, updating =${target}. To unassign an alias, please delete it first (using a blank value, such as this: \`=name=\`)`);
+        } 
+
+        if (message.attachments.size > 0) {
+            cannedReplies[message.guildId][target] = { locked: reply?.locked || false, value, url: message.attachments.first()?.url, author: message.author.tag };
+        } else if (WHITELISTED_DOMAINS.some(x => value.startsWith(x))) {
+            cannedReplies[message.guildId][target] = { locked: reply?.locked || false, value: '', url: value.split(' ')[0], author: message.author.tag };
+        } else {
+            cannedReplies[message.guildId][target] = { locked: reply?.locked || false, value, author: message.author.tag };
         }
 
         message.react('👍');
-        log('info', `New canned reply added by ${message.author.tag}: ${name}`);
+        log('info', `New canned reply added by ${message.author.tag}: ${target}`);
         saveCannedReplies();
     } else if (name === 'help' || !name) {
         sendReply(message, EMBED_INFO_COLOR, new MessageEmbed().setTitle('Canned Replies').setDescription(
