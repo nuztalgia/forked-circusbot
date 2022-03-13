@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import { client } from '../client';
 import { CLOWNS_GUILD_ID, SANDBOX_GUILD_ID } from '../constants';
-import { EMBED_ERROR_COLOR, loadPersistentData, savePersistentData, sendReply } from '../utils';
+import { EMBED_DMM_COLOR, EMBED_ERROR_COLOR, loadPersistentData, savePersistentData, sendReply } from '../utils';
 
 const easterEggData = loadPersistentData('eastereggs', { clowncilWarnings: { '__recent__': 0 } });
 const clowncilRegex = /([s5].{0,4}h.{0,4}[a@4].{0,4}d.{0,4}[0o].{0,4}w.{0,4} c.{0,4}[1il].{0,4}[0o].{0,4}w.{0,4}n.{0,4}c.{0,4}[i1l].{0,4}[1il])/i;
@@ -19,15 +19,19 @@ export async function easterEggHandler(message: Message<boolean>) {
         message.react('<:peepoBowBlush:853445359463038986>');
     } else if (message.content.match(/(<@\!?912376778939584562> )? *bad bot *$/i)) {
         message.react('<a:pepeRunCry:786844735754338304>');
-    } else if (message.content.match(/^((<@\!?912376778939584562> )? *(hi|hello|hey) cirquebot *|<@\!?912376778939584562> *(hi|hello|hey) *)$/i)) {
+    } else if (message.content.match(/^((<@\!?912376778939584562> )? *(hi|hello|hey) cirque ?bot *|<@\!?912376778939584562> *(hi|hello|hey) *)$/i)) {
         message.react('<a:clownWave:819822599726432266>');
-    } else if (message.content.match(/^(<@\!?912376778939584562>) *erp */)) {
-        message.react('<a:no:740146335197691945>');
-    } else if (message.content.match(/^((<@\!?912376778939584562> )? *(fuck off|fuck you) cirquebot *|<@\!?912376778939584562> *(fuck off|fuck you) *)$/i)) {
-        message.react('<a:ANGERY:823203660603457567>');
+    } else if (message.content.match(/^(<@\!?912376778939584562>).*\berp\b/)) {
+        message.react('<:no:740146335197691945>');
+    } else if (message.content.match(/blame cirque ?bot/i)) {
+        message.react('<a:pineappleNopers:925470285015183400>');
+    } else if (message.content.match(/^((<@\!?912376778939584562> )? *(fuck off|fuck you) cirque ?bot *|<@\!?912376778939584562> *(fuck off|fuck you) *)$/i)) {
+        message.react('<:ANGERY:823203660603457567>');
+    } else if (message.content.match(/where( is)? cirque ?bot/i) || message.content.match(/^(<@\!?912376778939584562>) where (are|r) (you|u)/i)) {
+        sendReply(message, EMBED_DMM_COLOR, 'At your mom\'s place');
     } else if (message.content.match(/(<@\!?912376778939584562>)/)) {
-        message.react('<a:rooPing:833724789259894895>');
-    }
+        message.react('<:rooPing:833724789259894895>');
+    } 
 
     if (message.content.toLowerCase().match(clowncilRegex) && [CLOWNS_GUILD_ID, SANDBOX_GUILD_ID].includes(message.guildId || '')) {
         const clowncilWarnings = easterEggData.clowncilWarnings;

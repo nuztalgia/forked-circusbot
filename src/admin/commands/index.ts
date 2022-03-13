@@ -1,1 +1,2 @@
 import './configure';
+import './copyemote';
