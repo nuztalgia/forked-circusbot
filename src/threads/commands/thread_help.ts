@@ -1,7 +1,7 @@
 import { checkPermissions, registerCommand } from '../../utils/commands';
 import { sendMessage } from '../../utils/replies';
 
-registerCommand('thread_help', ['thelp'], message => {
+registerCommand('thread_help', ['thelp', 'threads', 'thread'], message => {
     let helpMsg = '';
 
     if (checkPermissions('create_thread', message.channel)) {

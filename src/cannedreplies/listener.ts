@@ -1,5 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log, sendReply, loadPersistentData, savePersistentData, checkPermissions, makeError } from "../utils";
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log, sendReply, loadPersistentData, savePersistentData, checkPermissions, makeError, execCommand } from "../utils";
 
 export const cannedReplies = loadPersistentData('cannedreplies', {});
 
@@ -75,8 +75,8 @@ export function cannedReplyHandler(message: Message<boolean>) {
 
     // Assign a message
     if (content.includes('=')) {
-        if (name === '') {
-            sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=) or Discord escape character.');
+        if (name === '' || name.includes('=') || name.includes('@')) {
+            sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=), alias character (@), or Discord escape character.');
             return;
         } else if (reply?.locked && !checkPermissions('crlock', message.channel)) {
             sendReply(message, EMBED_ERROR_COLOR, 'This canned reply is locked and can only be edited in command channels');
@@ -86,7 +86,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
         let value = content.substring(name.length).trim().substring(1).trim().replace(/(^"|"$)/g, '');
 
         // Prohibit users from trying to assign a value to a reserved name (e.g. =help)
-        if (name === 'help' || name.startsWith('__')) {
+        if (name.match(/^(search|find|help)\b/i) || name.startsWith('__')) {
             sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name, that name is reserved for system use');
             return;
         } else if (name.match(/^p[o0][o0]pd[0o]gs?$/i)) {
@@ -146,6 +146,8 @@ export function cannedReplyHandler(message: Message<boolean>) {
         message.react('👍');
         log('info', `New canned reply added by ${message.author.tag}: ${target}`);
         saveCannedReplies();
+    } else if (name.match(/^(search|find) /i)) {
+        execCommand('crlist', message);
     } else if (name === 'help' || !name) {
         sendReply(message, EMBED_INFO_COLOR, new MessageEmbed().setTitle('Canned Replies').setDescription(
             'Canned replies are a feature that allow you to save a message/attachment/link with a name, and then ' +
@@ -155,11 +157,13 @@ export function cannedReplyHandler(message: Message<boolean>) {
             'Then, anytime a user needs the parse or asks for it, instead of trying to dig thru your pinned messages to ' + 
             'find it, you can simply use the `=parse` command and CirqueBot will post your saved messages.\n\n' + 
             'Canned replies are meant to be a collaborate feature, so anyone can create, edit, or use them. If you want to ' +
-            'lock down a certain reply, admins can use the `!crlock` command' 
+            'lock down a certain reply, admins can use the `!crlock` and `!crunlock` commands.\n\n' +
+            'If you are trying to find a canned reply but cannot remember the exact name, you can use the `=search` command to ' + 
+            'find partial matches. For example: `=search guide` will return any canned replies with "guide" in the name.' 
         ));
     } else if (reply) {
         sendReply(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
     } else {
-        sendReply(message, EMBED_ERROR_COLOR, 'Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n`=name=Your custom text here`\n\nThen you can print the content of the canned reply using `=name` in any channel with this bot in it.');
+        sendReply(message, EMBED_ERROR_COLOR, `Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n\`=${name}=Your custom text here\`\n\nThen you can print the content of the canned reply using \`=${name}\` in any channel with this bot in it.`);
     }
 }

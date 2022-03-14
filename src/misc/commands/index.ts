@@ -2,6 +2,7 @@ import './8ball';
 import './admin_dm';
 import './admin_msg';
 import './debug';
+import './help';
 import './nroll';
 import './remind_me';
 import './plssnip';

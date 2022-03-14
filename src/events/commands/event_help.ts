@@ -1,7 +1,7 @@
 import { MessageEmbed } from 'discord.js';
 import { checkPermissions, EMBED_ERROR_COLOR, EMBED_INFO_COLOR, registerCommand, sendReply } from '../../utils';
 
-registerCommand('event_help', ['help', 'events', 'event'], interaction => {
+registerCommand('event_help', ['events', 'event'], interaction => {
     let helpMsg = 'Create and manage sign-ups for scheduled events like raids/operations/social events.\n\n';
 
     if (checkPermissions('create_event', interaction.channel)) {

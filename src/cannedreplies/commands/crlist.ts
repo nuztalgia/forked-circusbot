@@ -3,7 +3,7 @@ import { EMBED_INFO_COLOR, parseCommand, registerCommand } from '../../utils';
 import { cannedReplies } from '../listener';
 
 registerCommand('crlist', [], message => {
-    const [searchTerm] = parseCommand(message, /=?(.*)/);
+    const searchTerm = message.content.split(' ')[1];
     let fields: string[][] = [];
     let replies = cannedReplies[message.guildId];
 
