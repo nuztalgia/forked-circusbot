@@ -70,13 +70,13 @@ export function cannedReplyHandler(message: Message<boolean>) {
     }
 
     const content = message.content.substring(1);
-    const name = content.split('=')[0].toLowerCase().replace(/\\/g, '').trim();
+    const name = content.split('=')[0].toLowerCase().replace(/(\\|^\?)/g, '').trim();
     const reply = cannedReplies[message.guildId][name];
 
     // Assign a message
     if (content.includes('=')) {
-        if (name === '' || name.includes('=') || name.includes('@')) {
-            sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=), alias character (@), or Discord escape character.');
+        if (name === '' || name.includes('=') || name.includes('@') || name.startsWith('?')) {
+            sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=), alias character (@), source character(?), or Discord escape character.');
             return;
         } else if (reply?.locked && !checkPermissions('crlock', message.channel)) {
             sendReply(message, EMBED_ERROR_COLOR, 'This canned reply is locked and can only be edited in command channels');
@@ -161,6 +161,8 @@ export function cannedReplyHandler(message: Message<boolean>) {
             'If you are trying to find a canned reply but cannot remember the exact name, you can use the `=search` command to ' + 
             'find partial matches. For example: `=search guide` will return any canned replies with "guide" in the name.' 
         ));
+    } else if (reply && content.startsWith('?')) {
+        sendReply(message, EMBED_INFO_COLOR, '```\n' + reply.value.replace(/^```/, '\\`\\`\\`') + '\n```');
     } else if (reply) {
         sendReply(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
     } else {
