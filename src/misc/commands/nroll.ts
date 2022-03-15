@@ -42,6 +42,8 @@ bot.registerCommand('nroll', ['roll'], message => {
         msg += ' 🥳';
     } else if (roll === min && max !== min) {
         msg += ' <:pepePointLaugh:925112330633740288>';
+    } else if (roll != 69) {
+        msg += ' 🎲';
     }
 
     bot.replyTo(message, bot.COLORS.DM, msg);

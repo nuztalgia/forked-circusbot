@@ -19,8 +19,16 @@ class Bot {
         return config;
     }
 
+    /**
+     * Reply to the given message, but wrap the given reply in an embed (to help CirqueBot messages stand out
+     * from regular messages). If an embed is given, the color will be set and then sent as-is.
+     * @param message The message to reply to
+     * @param color The color for the embed
+     * @param reply The message to send (or a MessageEmbed)
+     * @returns Promise<Message<boolean>>
+     */
     public async replyTo(message: Message<boolean>, color: ColorResolvable, reply: string | MessageEmbed) {
-        return bot.replyTo(message, color, reply);
+        return sendReply(message, color, reply);
     }
 
     public checkPermissions(command: string, channel: TextBasedChannel | null) {
