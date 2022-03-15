@@ -12,6 +12,9 @@ let userRateLimits = {
     '💙': {},
     '💚': {},
     '❤️': {},
+    '✅': {},
+    '❓': {},
+    '❌': {},
  };
  let pendingUserUpdates = { 
      '<:tank:933048000727629835>': {},
@@ -20,6 +23,9 @@ let userRateLimits = {
      '💙': {},
      '💚': {},
      '❤️': {},
+     '✅': {},
+     '❓': {},
+     '❌': {},
 };
 
 export function registerEventReactions(client: Client) {
@@ -65,6 +71,7 @@ export function registerEventReactions(client: Client) {
 
         pendingUserUpdates[emoji][user.id] = true;
         await handleReactionAdd(event, emoji, reaction, user);
+        await handleGenericEventReactionAdd(event, emoji, reaction, user);
         await queueEventUpdate(event);
         saveEvents();
         delete pendingUserUpdates[emoji][user.id];
@@ -78,6 +85,81 @@ async function getDisplayName(reaction: MessageReaction | PartialMessageReaction
     }
 
     return (await reaction.message.guild?.members.fetch(user.id)).displayName || user.tag || user.id;
+}
+
+async function handleGenericEventReactionAdd(event: CircusEvent, emoji: string, reaction: MessageReaction, user: User | PartialUser) {
+    if (event.signup_status === 'closed') {
+        reaction.users.remove(user.id);
+        log('debug', `Received reaction from ${user.tag} on closed event ${event.id} (${event.title})`);
+        return;
+    }
+    
+    // console.log(`REACTION ON EVENT ${reaction.message.id} : '${reaction.emoji.toString()}'`);
+
+    if (emoji === '✅') {
+        if (event.signups.going.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Going for event ${event.id} (${event.title})`);
+            delete event.signups.going[user.id];
+            return;
+        } else if (Object.values(event.signups.going).length >= event.role_limits.going) {
+            log('info', `  Unable to sign-up user ${user.tag} as Going for event ${event.id} - Going spots are full`);
+            messageUser(user, `<:error:935248898086273045> Sorry, Going sign-ups for ${event.title} are currently full.`);
+            return;
+        }
+
+        if (event.signups.tentative.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Tentative for event ${event.id} (${event.title})`);
+            delete event.signups.tentative[user.id];
+        } else if (event.signups.notgoing.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Not Going for event ${event.id} (${event.title})`);
+            delete event.signups.notgoing[user.id];
+        } 
+
+        log('info', `User ${user.tag} has added themself as Going for event ${event.id} (${event.title})`);
+        event.signups.going[user.id] = await getDisplayName(reaction, user);
+    } else if (emoji === '❓') {
+        if (event.signups.tentative.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Tentative for event ${event.id} (${event.title})`);
+            delete event.signups.tentative[user.id];
+            return;
+        } else if (Object.values(event.signups.tentative).length >= event.role_limits.tentative) {
+            log('info', `  Unable to sign-up user ${user.tag} as Tentative for event ${event.id} - Tentative spots are full`);
+            messageUser(user, `<:error:935248898086273045> Sorry, Tentative sign-ups for ${event.title} are currently full.`);
+            return;
+        }
+
+        if (event.signups.going.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Going for event ${event.id} (${event.title})`);
+            delete event.signups.going[user.id];
+        } else if (event.signups.notgoing.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Not Going for event ${event.id} (${event.title})`);
+            delete event.signups.notgoing[user.id];
+        } 
+
+        log('info', `User ${user.tag} has added themself as Tentative for event ${event.id} (${event.title})`);
+        event.signups.tentative[user.id] = await getDisplayName(reaction, user);
+    } else if (emoji === '❌') {
+        if (event.signups.notgoing.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Not Going for event ${event.id} (${event.title})`);
+            delete event.signups.notgoing[user.id];
+            return;
+        } else if (Object.values(event.signups.notgoing).length >= event.role_limits.notgoing) {
+            log('info', `  Unable to sign-up user ${user.tag} as Not Going for event ${event.id} - Not Going spots are full`);
+            messageUser(user, `<:error:935248898086273045> Sorry, Not Going sign-ups for ${event.title} are currently full.`);
+            return;
+        }
+
+        if (event.signups.tentative.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Tentative for event ${event.id} (${event.title})`);
+            delete event.signups.tentative[user.id];
+        } else if (event.signups.going.hasOwnProperty(user.id)) {
+            log('info', `User ${user.tag} has removed themself as Going for event ${event.id} (${event.title})`);
+            delete event.signups.going[user.id];
+        } 
+
+        log('info', `User ${user.tag} has added themself as Not Going for event ${event.id} (${event.title})`);
+        event.signups.notgoing[user.id] = await getDisplayName(reaction, user);
+    }
 }
 
 async function handleReactionAdd(event: CircusEvent, emoji: string, reaction: MessageReaction, user: User | PartialUser) {

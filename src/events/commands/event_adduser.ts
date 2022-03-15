@@ -7,7 +7,7 @@ bot.registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau']
     let [eventId, eventRole, eventUser, userNotes] = bot.parseCommand(message, /(.*?) (.*?) (.*?)(?: |$)(.*)?/);
 
     if (!eventId || !eventRole || !eventUser) {
-        sendError(message.channel, 'Invalid syntax. The correct syntax is:\n\n`!event_adduser <EVENT_ID> <eventRole> <USER> <NOTES>`');
+        sendError(message.channel, 'Invalid syntax. The correct syntax is:\n\n`!event_adduser <EVENT_ID> <ROLE> <USER> <NOTES>`');
         return;
     }
 
@@ -53,7 +53,7 @@ bot.registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau']
         sendError(message.channel, "Please mention the user in your message. Notes can be provided after the mention.");
         return;
     } else if (!event.signups.hasOwnProperty(eventRole)) {
-        sendError(message.channel, "Invalid role, role should be one of `tank`, `healer`, `dps`, `tank_subs`, `healer_subs`, or `dps_subs`");
+        sendError(message.channel, "Invalid role, role should be one of `tank`, `healer`, `dps`, `tank_subs`, `healer_subs`, `dps_subs`, `going`, `tentative`, or `notgoing`");
         return;
     }
 

@@ -18,6 +18,10 @@ export function makeEmptyEvent(): CircusEvent {
             tank: 2,
             healer: 4,
             dps: 10,
+
+            going: 99,
+            tentative: 99,
+            notgoing: 99,
         },
         signups: {
             tanks: {},
@@ -26,7 +30,12 @@ export function makeEmptyEvent(): CircusEvent {
             tank_subs: {},
             healer_subs: {},
             dps_subs: {},
+
+            going: {},
+            tentative: {},
+            notgoing: {},
         },
+        template: 'swtor_raid',
         step: 'none',
         signup_status: 'closed',
         quick_create: false,

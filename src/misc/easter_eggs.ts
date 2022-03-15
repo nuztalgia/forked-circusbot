@@ -21,21 +21,21 @@ export async function easterEggHandler(message: Message<boolean>) {
     }
 
     if (message.content.match(/(<@\!?912376778939584562> )? *good bot *$/i) || message.content.includes(':goodBot:') || message.content.includes(':goodCirqueBot:')) {
-        message.react('<:peepoBowBlush:853445359463038986>');
+        setTimeout(() => message.react('<:peepoBowBlush:853445359463038986>'), 100);
     } else if (message.content.match(/(<@\!?912376778939584562> )? *bad bot *$/i)) {
-        message.react('<a:pepeRunCry:786844735754338304>');
-    } else if (message.content.match(/^((<@\!?912376778939584562> )? *(hi|hello|hey) cirque ?bot *|<@\!?912376778939584562> *(hi|hello|hey) *)$/i)) {
-        message.react('<a:clownWave:819822599726432266>');
+        setTimeout(() => message.react('<a:pepeRunCry:786844735754338304>'), 100);
+    } else if (message.content.match(/^((<@\!?912376778939584562> )? *(hi|hello|hey) cirque ?bot *|<@\!?912376778939584562> *(hi|hello|hey) *)/i)) {
+        setTimeout(() => message.react('<a:clownWave:819822599726432266>'), 100);
     } else if (message.content.match(/^(<@\!?912376778939584562>).*\berp\b/)) {
-        message.react('<:no:740146335197691945>');
+        setTimeout(() => message.react('<:no:740146335197691945>'), 100);
     } else if (message.content.match(/blame cirque ?bot/i)) {
-        message.react('<a:pineappleNopers:925470285015183400>');
+        setTimeout(() => message.react('<a:pineappleNopers:925470285015183400>'), 100);
     } else if (message.content.match(/^((<@\!?912376778939584562> )? *(fuck off|fuck you) cirque ?bot *|<@\!?912376778939584562> *(fuck off|fuck you) *)$/i)) {
-        message.react('<:ANGERY:823203660603457567>');
+        setTimeout(() => message.react('<:ANGERY:823203660603457567>'), 100);
     } else if (message.content.match(/where( is)? cirque ?bot/i) || message.content.match(/^(<@\!?912376778939584562>) where (are|r) (you|u)/i)) {
         bot.replyTo(message, bot.COLORS.DM, 'At your mom\'s place');
     } else if (message.content.match(/(<@\!?912376778939584562>)/)) {
-        message.react('<:rooPing:833724789259894895>');
+        setTimeout(() => message.react('<:rooPing:833724789259894895>'), 100);
     } 
 
     if (message.content.toLowerCase().match(SHADOW_CLOWNCIL_REGEX) && [CLOWNS_GUILD_ID, SANDBOX_GUILD_ID].includes(message.guildId || '')) {

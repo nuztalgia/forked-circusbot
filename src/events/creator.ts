@@ -24,8 +24,8 @@ export function beginEventCreation(message: Message<boolean>, quick: boolean) {
         eventSessions[message.channel.id].step = 'json';
         sendMessage(message.channel, "Creating new event (Advanced Mode). Please enter the JSON for the event:");
     } else {
-        eventSessions[message.channel.id].step = 'title';
-        sendMessage(message.channel, "Creating new event. Please enter a **Title** for the event (e.g. \"16p HM Revan (Pub Side)\"):");
+        eventSessions[message.channel.id].step = 'template';
+        sendMessage(message.channel, "Creating new event. Please select a **Template** for the event (`swtor` or `generic`):");
     }
 }
 
@@ -55,6 +55,21 @@ export function eventCreationHandler(message: Message<boolean>) {
             event.author = `${message.author.tag} {${message.author.id}}`;
             createEvent(message.channel, event);
             delete eventSessions[message.channel.id];
+            break;
+        case 'template':
+            let template = message.content.trim();
+            if (template === 'swtor') template = 'swtor_raid';
+            if (template === 'event' || template === 'social' || template === 'generic') template = 'generic_event';
+
+            if (template !== 'swtor_raid' && template !== 'generic_event') {
+                sendError(message.channel, 'Invalid template, please use one of `swtor` or `generic`');
+                message.react('👎');
+                return;
+            }
+
+            event.template = template;
+            eventSessions[message.channel.id].step = 'title';
+            sendMessage(message.channel, "Please enter a **Title** for the event (e.g. \"16p HM Revan (Pub Side)\"):");
             break;
         case 'title':
             event.title = message.content;
@@ -97,8 +112,14 @@ export function eventCreationHandler(message: Message<boolean>) {
                 event.time = time.toUpperCase();
             }
 
-            event.step = 'tank_requirements';
-            sendMessage(message.channel, "Please enter the requirements for Tanks to sign-up for this event:");
+            if (event.template === 'swtor_raid') {
+                event.step = 'tank_requirements';
+                sendMessage(message.channel, "Please enter the requirements for Tanks to sign-up for this event:");
+            } else if (event.template === 'generic_event') {
+                event.step = 'going_limit';
+                sendMessage(message.channel, "Please enter the maximum number of attendees for this event (that can be marked as 'Going'):");
+            }
+
             break;
         case 'tank_requirements':
             event.role_requirements.tank = message.content;
@@ -142,6 +163,18 @@ export function eventCreationHandler(message: Message<boolean>) {
             event.role_limits.healer = parseInt(message.content);
             event.step = 'dps_limit';
             sendMessage(message.channel, "Please enter the number of DPS spots for this event:");
+            break;
+        case 'going_limit':
+            if (!message.content.match(/^[0-9]+$/i)) {
+                sendError(message.channel, 'Invalid format, the entered value **must** be a number');
+                message.react('👎');
+                return;
+            }
+
+            event.role_limits.going = parseInt(message.content);
+            event.step = 'none';
+            createEvent(message.channel, event);
+            delete eventSessions[message.channel.id];
             break;
         case 'dps_limit':
             if (!message.content.match(/^[0-9]+$/i)) {

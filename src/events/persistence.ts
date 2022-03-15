@@ -38,8 +38,8 @@ export async function createEvent(channel: TextBasedChannel, event: CircusEvent)
     log('info', `Event has been created by ${event.author} - Event ID is ${msg.id}`);
     event.id = msg.id;
     event.published_channels = { [channel.id]: msg.id };
-    await updateEventEmbeds(event);
     events[event.id] = JSON.parse(JSON.stringify(event));
+    await updateEventEmbeds(event);
     saveEvents();
 
     return null;

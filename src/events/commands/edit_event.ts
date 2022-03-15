@@ -19,11 +19,12 @@ function editEventUsage(message: Message<boolean>) {
         " - dps_requirements\n" + 
         " - tank_limit\n" +
         " - healer_limit\n" + 
-        " - dps_limit");
+        " - dps_limit\n" +  
+        " - going_limit\n");
 }
 
 bot.registerCommand('edit_event', ['event_edit', 'ee'], message => {
-    const [eventId, eventField, eventValue] = bot.parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
+    const [eventId, eventField, eventValue] = bot.parseCommand(message, /([0-9]+) +([\S]+) +([\s\S]*)/);
     const event = findEvent(eventId);
 
     if (!eventId) {
@@ -46,6 +47,12 @@ bot.registerCommand('edit_event', ['event_edit', 'ee'], message => {
         event.role_limits.healer = parseInt(eventValue);
     } else if (eventField === 'dps_limit') {
         event.role_limits.dps = parseInt(eventValue);
+    } else if (eventField === 'going_limit') {
+        event.role_limits.going = parseInt(eventValue);
+    } else if (eventField === 'tentative_limit') {
+        event.role_limits.tentative = parseInt(eventValue);
+    } else if (eventField === 'notgoing_limit') {
+        event.role_limits.notgoing = parseInt(eventValue);
     } else if (event.hasOwnProperty(eventField)) {
         event[eventField] = eventValue;
     } else {
