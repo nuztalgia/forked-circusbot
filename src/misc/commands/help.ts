@@ -29,10 +29,10 @@ bot.registerCommand('help', [], async interaction => {
     helpMsg += "<:worrySnipe:953042402074050560> `pls rsnipe`\nThis completely obscure command allows you to 'snipe' a reaction that was removed from a message within the configured time limit. CirqueBot will repost the original reaction & author. Please use irresponsibly.\n\n";
 
     if (!helpMsg) {
-        bot.sendReply(interaction, bot.COLORS.ERROR, "There are no commands whitelisted for this channel");
+        bot.replyTo(interaction, bot.COLORS.ERROR, "There are no commands whitelisted for this channel");
         return;
     }   
     
     const embed = new MessageEmbed().setTitle('CirqueBot Help: ​ ​ `!help`').setDescription(helpMsg)
-    bot.sendReply(interaction, bot.COLORS.INFO, embed);
+    bot.replyTo(interaction, bot.COLORS.INFO, embed);
 });

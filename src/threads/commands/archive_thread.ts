@@ -10,5 +10,5 @@ bot.registerCommand('archive_thread', ['at'], async message => {
     
     await archiveThread(thread);
 
-    bot.sendReply(message, EMBED_INFO_COLOR, `✅ The thread "${thread.title}" has been archived in <#${thread.channel}>`);
+    bot.replyTo(message, EMBED_INFO_COLOR, `✅ The thread "${thread.title}" has been archived in <#${thread.channel}>`);
 });

@@ -48,7 +48,7 @@ bot.registerCommand('edit_thread', ['et'], message => {
         scheduleThreadArchival(threads[threadId]);
     } else if (threadField === 'channel') {
         threads[threadId].newChannel = message.mentions.channels.first()?.id || '';
-        bot.sendReply(message, EMBED_INFO_COLOR, 'The next time the thread is archived and recreated, the thread will be created in the updated channel. To move the thread now, use the `!rebuild_thread` command');
+        bot.replyTo(message, EMBED_INFO_COLOR, 'The next time the thread is archived and recreated, the thread will be created in the updated channel. To move the thread now, use the `!rebuild_thread` command');
         return;
     } else if (threads[threadId].hasOwnProperty(threadField)) {
         threads[threadId][threadField] = threadValue;

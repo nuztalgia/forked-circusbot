@@ -7,7 +7,7 @@ bot.registerCommand('close_event', ['event_close'], message => {
     const event = findEvent(eventId);
 
     if (!event) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to close event, invalid event ID provided`);
+        bot.replyTo(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to close event, invalid event ID provided`);
         return;
     }
 
@@ -15,5 +15,5 @@ bot.registerCommand('close_event', ['event_close'], message => {
         signup_status: 'closed'
     });
 
-    bot.sendReply(message, EMBED_SUCCESS_COLOR, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) is now closed for sign-ups (it may take several seconds to remove reactions)`);
+    bot.replyTo(message, EMBED_SUCCESS_COLOR, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) is now closed for sign-ups (it may take several seconds to remove reactions)`);
 });

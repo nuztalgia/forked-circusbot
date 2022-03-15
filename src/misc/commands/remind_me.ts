@@ -59,7 +59,7 @@ bot.registerCommand('remind_me', ['remindme', 'remind'], message => {
     let remindee = user ? message.mentions.users.first() : message.author;
 
     if (!remindee || !remindTime) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, makeError('Incorrect usage. Please specify a time and reason for the reminder, for example:\n\n```\n!remindme 3 hours Login for raid\n```\n'));
+        bot.replyTo(message, EMBED_ERROR_COLOR, makeError('Incorrect usage. Please specify a time and reason for the reminder, for example:\n\n```\n!remindme 3 hours Login for raid\n```\n'));
         return;
     }
 

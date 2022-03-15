@@ -8,11 +8,11 @@ bot.registerCommand('refresh_event', ['rebuild_event', 're'], async message => {
     const event = findEvent(eventId);
 
     if (!event) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to close event, invalid event ID provided`);
+        bot.replyTo(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to close event, invalid event ID provided`);
         return;
     }
     
     await startTyping(message.channel);
     await queueEventUpdate(event);
-    bot.sendReply(message, EMBED_INFO_COLOR, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) has been re-rendered and updated across all channels`);
+    bot.replyTo(message, EMBED_INFO_COLOR, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) has been re-rendered and updated across all channels`);
 });

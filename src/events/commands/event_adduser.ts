@@ -26,7 +26,7 @@ bot.registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau']
         let users = await findMembers(message.guild, eventUser);
 
         if (users.length === 0) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
+            bot.replyTo(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
             return;
         } else if (users.length === 1) {
             user = users[0]?.user;
@@ -69,9 +69,9 @@ bot.registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau']
     }
 
     if (updated) {
-        bot.sendReply(message, EMBED_SUCCESS_COLOR, `✅ Updated <@${user.id}> for [${event.title}](${message.url.replace(message.id, event.id)})`);
+        bot.replyTo(message, EMBED_SUCCESS_COLOR, `✅ Updated <@${user.id}> for [${event.title}](${message.url.replace(message.id, event.id)})`);
     } else if (smartMatch) {
-        bot.sendReply(message, EMBED_SUCCESS_COLOR, `✅ Added <@${user.id}> as a ${eventRole.replace(/(tank|healer)s/, '$1')} to [${event.title}](${message.url.replace(message.id, event.id)})`);
+        bot.replyTo(message, EMBED_SUCCESS_COLOR, `✅ Added <@${user.id}> as a ${eventRole.replace(/(tank|healer)s/, '$1')} to [${event.title}](${message.url.replace(message.id, event.id)})`);
     } else {
         message.react('👍');
     }

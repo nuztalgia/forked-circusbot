@@ -14,7 +14,7 @@ bot.registerCommand('welcome', [], async message => {
     const user = await findMembers(message.guild, userId);
 
     if (!user || user.length !== 1) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, 'Unknown user');
+        bot.replyTo(message, EMBED_ERROR_COLOR, 'Unknown user');
         return;
     }
 

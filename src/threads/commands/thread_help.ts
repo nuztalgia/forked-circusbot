@@ -21,9 +21,9 @@ bot.registerCommand('thread_help', ['thelp', 'threads', 'thread'], message => {
     }
     
     if (!helpMsg) {
-        bot.sendReply(message, EMBED_INFO_COLOR, "There are no commands whitelisted for this channel");
+        bot.replyTo(message, EMBED_INFO_COLOR, "There are no commands whitelisted for this channel");
         return;
     }
 
-    bot.sendReply(message, EMBED_INFO_COLOR, helpMsg);
+    bot.replyTo(message, EMBED_INFO_COLOR, helpMsg);
 });

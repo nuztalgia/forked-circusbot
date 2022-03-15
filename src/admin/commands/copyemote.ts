@@ -14,7 +14,7 @@ bot.registerCommand('copyemote', ['emote', 'addemote'], async message => {
     const member = await message.guild.members.fetch(message.author.id)
 
     if (!member.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, makeError("Sorry, but you don't have permission to do that"));
+        bot.replyTo(message, EMBED_ERROR_COLOR, makeError("Sorry, but you don't have permission to do that"));
         return;
     }
 
@@ -34,7 +34,7 @@ bot.registerCommand('copyemote', ['emote', 'addemote'], async message => {
         let m = emoji.match(/<(a?):([^:]+):([0-9]+)>/i);
 
         if (!m) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, makeError("No emoji detected"));
+            bot.replyTo(message, EMBED_ERROR_COLOR, makeError("No emoji detected"));
             return;
         }
 
@@ -53,9 +53,9 @@ bot.registerCommand('copyemote', ['emote', 'addemote'], async message => {
         const newEmoji = await message.guild.emojis.create(url, name.replace(/:/g, ''));
         log('info', `${message.author.tag} has added a new emote (${url}, name: ${newEmoji.name}, id: ${newEmoji.id})`);
         setTimeout(() => {
-            bot.sendReply(message, EMBED_SUCCESS_COLOR, `Your new emote has been added <${url.includes('.gif') ? 'a' : ''}:${newEmoji.name}:${newEmoji.id}>`);
+            bot.replyTo(message, EMBED_SUCCESS_COLOR, `Your new emote has been added <${url.includes('.gif') ? 'a' : ''}:${newEmoji.name}:${newEmoji.id}>`);
         }, 100);
     } catch (err) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, makeError("Failed to create emoji: " + err));
+        bot.replyTo(message, EMBED_ERROR_COLOR, makeError("Failed to create emoji: " + err));
     }
 });

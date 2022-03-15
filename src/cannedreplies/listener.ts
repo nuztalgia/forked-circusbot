@@ -77,10 +77,10 @@ export function cannedReplyHandler(message: Message<boolean>) {
     // Assign a message
     if (content.includes('=')) {
         if (name === '' || name.includes('=') || name.includes('@') || name.startsWith('?')) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=), alias character (@), source character(?), or Discord escape character.');
+            bot.replyTo(message, EMBED_ERROR_COLOR, 'Invalid canned reply name. Names must not be blank or contain the prefix character (=), alias character (@), source character(?), or Discord escape character.');
             return;
         } else if (reply?.locked && !bot.checkPermissions('crlock', message.channel)) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, 'This canned reply is locked and can only be edited in command channels');
+            bot.replyTo(message, EMBED_ERROR_COLOR, 'This canned reply is locked and can only be edited in command channels');
             return;
         }
 
@@ -88,7 +88,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
 
         // Prohibit users from trying to assign a value to a reserved name (e.g. =help)
         if (name.match(/^(search|find|help)\b/i) || name.startsWith('__')) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, 'Invalid canned reply name, that name is reserved for system use');
+            bot.replyTo(message, EMBED_ERROR_COLOR, 'Invalid canned reply name, that name is reserved for system use');
             return;
         } else if (name.match(/^p[o0][o0]pd[0o]gs?$/i)) {
             message.react('<:no:740146335197691945>');
@@ -112,13 +112,13 @@ export function cannedReplyHandler(message: Message<boolean>) {
         if (value.startsWith('@')) {
             // Check if the target of the alias exists
             if (!cannedReplies[message.guildId].hasOwnProperty(value.substring(1))) {
-                bot.sendReply(message, EMBED_ERROR_COLOR, makeError(`Unable to assign alias, there was no canned reply with the name "${value.substring(1)}"`));
+                bot.replyTo(message, EMBED_ERROR_COLOR, makeError(`Unable to assign alias, there was no canned reply with the name "${value.substring(1)}"`));
                 return;
             } 
 
             // Check if the target is already an alias
             if (cannedReplies[message.guildId][value.substring(1)].value.startsWith('@')) {
-                bot.sendReply(message, EMBED_ERROR_COLOR, makeError(`Unable to assign alias, =${value.substring(1)} is also an alias of =${cannedReplies[message.guildId][value.substring(1)].value.substring(1)}`));
+                bot.replyTo(message, EMBED_ERROR_COLOR, makeError(`Unable to assign alias, =${value.substring(1)} is also an alias of =${cannedReplies[message.guildId][value.substring(1)].value.substring(1)}`));
                 return;
             }
 
@@ -133,7 +133,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
 
         if (cannedReplies[message.guildId][name] && cannedReplies[message.guildId][name].value.startsWith('@') && !value.startsWith('@')) {
             target = cannedReplies[message.guildId][name].value.substring(1);
-            bot.sendReply(message, EMBED_INFO_COLOR, `=${name} is an alias for =${target}, updating =${target}. To unassign an alias, please delete it first (using a blank value, such as this: \`=name=\`)`);
+            bot.replyTo(message, EMBED_INFO_COLOR, `=${name} is an alias for =${target}, updating =${target}. To unassign an alias, please delete it first (using a blank value, such as this: \`=name=\`)`);
         } 
 
         if (message.attachments.size > 0) {
@@ -150,7 +150,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
     } else if (name.match(/^(search|find) /i)) {
         bot.execCommand('crlist', message);
     } else if (name === 'help' || !name) {
-        bot.sendReply(message, EMBED_INFO_COLOR, new MessageEmbed().setTitle('Canned Replies').setDescription(
+        bot.replyTo(message, EMBED_INFO_COLOR, new MessageEmbed().setTitle('Canned Replies').setDescription(
             'Canned replies are a feature that allow you to save a message/attachment/link with a name, and then ' +
             'whenever that name is posted in a channel with CirqueBot, the contents will be posted as a reply. For ' +
             'example, you could create a command that contains your guild\'s StarParse info:\n\n' +
@@ -163,10 +163,10 @@ export function cannedReplyHandler(message: Message<boolean>) {
             'find partial matches. For example: `=search guide` will return any canned replies with "guide" in the name.' 
         ));
     } else if (reply && content.startsWith('?')) {
-        bot.sendReply(message, EMBED_INFO_COLOR, '```\n' + reply.value.replace(/^```/, '\\`\\`\\`') + '\n```');
+        bot.replyTo(message, EMBED_INFO_COLOR, '```\n' + reply.value.replace(/^```/, '\\`\\`\\`') + '\n```');
     } else if (reply) {
-        bot.sendReply(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
+        bot.replyTo(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
     } else {
-        bot.sendReply(message, EMBED_ERROR_COLOR, `Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n\`=${name}=Your custom text here\`\n\nThen you can print the content of the canned reply using \`=${name}\` in any channel with this bot in it.`);
+        bot.replyTo(message, EMBED_ERROR_COLOR, `Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n\`=${name}=Your custom text here\`\n\nThen you can print the content of the canned reply using \`=${name}\` in any channel with this bot in it.`);
     }
 }

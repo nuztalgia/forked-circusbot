@@ -1,12 +1,11 @@
-import { Message } from 'discord.js';
 import { bot } from '../../bot';
-import { getRandomInt, sendReply, EMBED_ERROR_COLOR, EMOJI_ERROR, EMBED_SUCCESS_COLOR } from '../../utils';
+import { getRandomInt, EMOJI_ERROR } from '../../utils';
 
 bot.registerCommand('nroll', ['roll'], message => {
     let [params] = bot.parseCommand(message, /(.*)/);
     let min = 0, max = 0, minStr = '0', maxStr = '';
 
-    if (message instanceof Message && !message.content.includes('nroll')) {
+    if (!message.content.includes('nroll')) {
         min = 1;
         minStr = '1';
     }
@@ -26,13 +25,13 @@ bot.registerCommand('nroll', ['roll'], message => {
     }
 
     if (isNaN(min) || min.toString() !== minStr) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} ${params.split(' -')[0]} is not a number I can understand (min)`);
+        bot.replyTo(message, bot.COLORS.ERROR, `${EMOJI_ERROR} ${params.split(' -')[0]} is not a number I can understand (min)`);
         return;
     } else if (isNaN(max) || max.toString() !== maxStr) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} ${params.split(' -')[1]} is not a number I can understand (max)`);
+        bot.replyTo(message, bot.COLORS.ERROR, `${EMOJI_ERROR} ${params.split(' -')[1]} is not a number I can understand (max)`);
         return;
     } else if (min > max) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Minimum number cannot be greater then maximum number`);
+        bot.replyTo(message, bot.COLORS.ERROR, `${EMOJI_ERROR} Minimum number cannot be greater then maximum number`);
         return;
     }
 
@@ -45,5 +44,5 @@ bot.registerCommand('nroll', ['roll'], message => {
         msg += ' <:pepePointLaugh:925112330633740288>';
     }
 
-    bot.sendReply(message, EMBED_SUCCESS_COLOR, msg);
+    bot.replyTo(message, bot.COLORS.DM, msg);
 });

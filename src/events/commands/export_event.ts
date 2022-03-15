@@ -8,7 +8,7 @@ bot.registerCommand('export_event', ['event_export'], message => {
     const event = findEvent(eventId);
 
     if (!event) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to export event, invalid event ID provided`);
+        bot.replyTo(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to export event, invalid event ID provided`);
         return;
     }
 

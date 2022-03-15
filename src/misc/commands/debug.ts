@@ -15,10 +15,10 @@ bot.registerCommand('debug', [], async message => {
         let members = await findMembers(message.guild, params);
 
         if (members.length === 0) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, 'No users were found that matched your search parameter');
+            bot.replyTo(message, EMBED_ERROR_COLOR, 'No users were found that matched your search parameter');
             return;
         } else if (members.length === 1) {
-            bot.sendReply(message, EMBED_INFO_COLOR, `One user was found that match your search parameters: <@${members[0]?.user.id}>`);
+            bot.replyTo(message, EMBED_INFO_COLOR, `One user was found that match your search parameters: <@${members[0]?.user.id}>`);
             return;
         }
 

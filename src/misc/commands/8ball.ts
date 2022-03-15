@@ -28,9 +28,9 @@ bot.registerCommand('8ball', [], message => {
     let [question] = bot.parseCommand(message, /(.*)/);
     
     if (!question.trim()) {
-        bot.sendReply(message, bot.COLORS.ERROR, 'You must ask a question, to receive an answer');
+        bot.replyTo(message, bot.COLORS.ERROR, 'You must ask a question, to receive an answer');
         return;
     }
    
-    bot.sendReply(message, bot.COLORS.DM, arrayRandom(POSSIBLE_ANSWERS));
+    bot.replyTo(message, bot.COLORS.DM, arrayRandom(POSSIBLE_ANSWERS));
 });

@@ -19,8 +19,8 @@ class Bot {
         return config;
     }
 
-    public async sendReply(message: Message<boolean>, color: ColorResolvable, reply: string | MessageEmbed) {
-        return bot.sendReply(message, color, reply);
+    public async replyTo(message: Message<boolean>, color: ColorResolvable, reply: string | MessageEmbed) {
+        return bot.replyTo(message, color, reply);
     }
 
     public checkPermissions(command: string, channel: TextBasedChannel | null) {
@@ -79,7 +79,7 @@ class Bot {
             log('warn', `execCommand called from an invalid channel`);
         } else if (!this.checkPermissions(cmd, interaction.channel)) {
             log('warn', `User ${author.tag} tried to run !${cmd} in #${this.getChannelName(interaction)} but channel is not in the whitelist`);
-            bot.sendReply(interaction, EMBED_ERROR_COLOR, "Sorry, but I can only run this command in whitelisted channels.");
+            bot.replyTo(interaction, EMBED_ERROR_COLOR, "Sorry, but I can only run this command in whitelisted channels.");
         } else if (commands.hasOwnProperty(cmd)) {
             log('info', `User ${author.tag} ran a command in #${this.getChannelName(interaction)}: ${command}`);
             commands[cmd](interaction, author);

@@ -11,5 +11,5 @@ bot.registerCommand('rebuild_thread', ['rt'], async message => {
     await archiveThread(thread);
     await buildThread(thread);
 
-    bot.sendReply(message, EMBED_INFO_COLOR, `✅ The thread "${thread.title}" has been archived & recreated in <#${thread.channel}>`);
+    bot.replyTo(message, EMBED_INFO_COLOR, `✅ The thread "${thread.title}" has been archived & recreated in <#${thread.channel}>`);
 });

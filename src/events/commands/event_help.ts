@@ -40,10 +40,10 @@ bot.registerCommand('event_help', ['events', 'event'], interaction => {
     }
 
     if (!helpMsg) {
-        bot.sendReply(interaction, EMBED_ERROR_COLOR, "There are no commands whitelisted for this channel");
+        bot.replyTo(interaction, EMBED_ERROR_COLOR, "There are no commands whitelisted for this channel");
         return;
     }   
     
     const embed = new MessageEmbed().setTitle('CirqueBot Help: ​ ​ `!events`').setDescription(helpMsg)
-    bot.sendReply(interaction, EMBED_INFO_COLOR, embed);
+    bot.replyTo(interaction, EMBED_INFO_COLOR, embed);
 });

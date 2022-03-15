@@ -31,7 +31,7 @@ bot.registerCommand('configure', ['conf'], async message => {
             const newRoles = value.split(/[ ,]/).map(x => x.replace(/^@/, ''));
             config.admin_roles = message.guild?.roles.cache.filter(x => newRoles.includes(x.name)).concat(message.mentions.roles).map(x => x.id);
         } else if (option) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
+            bot.replyTo(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
             return;
         }
 
@@ -69,14 +69,14 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'Current Configuration:\n' + 
                 '```\n' + (config.greeting) + '\n```\n\n' + 
                 '');
-        bot.sendReply(message, EMBED_INFO_COLOR, embed);
+        bot.replyTo(message, EMBED_INFO_COLOR, embed);
     } else if (namespace === 'admin') {
         const config = getConfig(message.guildId, 'admin', { removed_user_channel: '' });
 
         if (option === 'removed_user_channel') {
             config.removed_user_channel = message.mentions.channels.first()?.id;
         } else if (option) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
+            bot.replyTo(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
             return;
         }
 
@@ -103,7 +103,7 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'Current Configuration:\n' + 
                 '```\n#' + removedUserChannel?.name + '\n```\n\n' + 
                 '');
-        bot.sendReply(message, EMBED_INFO_COLOR, embed);
+        bot.replyTo(message, EMBED_INFO_COLOR, embed);
     } else if (namespace === 'cannedreplies') {
 
     } else {
@@ -128,6 +128,6 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'have multiple roles that a user can sign-up as, role limitations, role requirements, and functionality to open/close sign-ups ' +
                 'at a specific date/time, message users who signed up, etc.\n\n' +
                 '');
-        bot.sendReply(message, EMBED_INFO_COLOR, embed);
+        bot.replyTo(message, EMBED_INFO_COLOR, embed);
     }
 });

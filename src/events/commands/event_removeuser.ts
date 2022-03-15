@@ -28,7 +28,7 @@ bot.registerCommand('event_removeuser', ['event_removeusers', 'event_remove_user
         let users = await findMembers(message.guild, eventUser);
 
         if (users.length === 0) {
-            bot.sendReply(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
+            bot.replyTo(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
             return;
         } else if (users.length === 1) {
             user = users[0]?.user;

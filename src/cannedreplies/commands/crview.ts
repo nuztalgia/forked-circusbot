@@ -7,12 +7,12 @@ bot.registerCommand('crview', [], message => {
     const guildId = message.guildId || '*';
 
     if (!cannedReplies[guildId].hasOwnProperty(name)) {
-        bot.sendReply(message, EMBED_ERROR_COLOR, makeError('No such canned reply'));
+        bot.replyTo(message, EMBED_ERROR_COLOR, makeError('No such canned reply'));
         return;
     }
 
     const embed = renderCannedReply(cannedReplies[guildId][name])
         .setFooter({ text: 'This message will be automatically updated when the canned reply is updated' });
 
-    bot.sendReply(message, EMBED_INFO_COLOR, embed);
+    bot.replyTo(message, EMBED_INFO_COLOR, embed);
 });
