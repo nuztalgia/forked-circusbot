@@ -9,7 +9,7 @@ bot.registerCommand('crlist', [], message => {
     let replies = cannedReplies[message.guildId || message.channelId];
 
     for (const [name, reply] of Object.entries(replies).sort()) {
-        let flags = [];
+        let flags: string[] = [];
 
         if (searchTerm && !name.includes(searchTerm.toLowerCase())) {
             continue;
