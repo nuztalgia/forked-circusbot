@@ -19,8 +19,11 @@ export function makeEmptyEvent(): CircusEvent {
             healer: 4,
             dps: 10,
 
-            going: 99,
+            group1: 99,
+            group2: 99,
+            group3: 99,
             tentative: 99,
+            waitlist: 99,
             notgoing: 99,
         },
         signups: {
@@ -31,8 +34,11 @@ export function makeEmptyEvent(): CircusEvent {
             healer_subs: {},
             dps_subs: {},
 
-            going: {},
+            group1: {},
+            group2: {},
+            group3: {},
             tentative: {},
+            waitlist: {},
             notgoing: {},
         },
         template: 'swtor_raid',

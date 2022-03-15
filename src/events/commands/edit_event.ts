@@ -47,8 +47,12 @@ bot.registerCommand('edit_event', ['event_edit', 'ee'], message => {
         event.role_limits.healer = parseInt(eventValue);
     } else if (eventField === 'dps_limit') {
         event.role_limits.dps = parseInt(eventValue);
-    } else if (eventField === 'going_limit') {
-        event.role_limits.going = parseInt(eventValue);
+    } else if (eventField === 'group1_limit') {
+        event.role_limits.group1 = parseInt(eventValue);
+    } else if (eventField === 'group2_limit') {
+        event.role_limits.group2 = parseInt(eventValue);
+    } else if (eventField === 'group3_limit') {
+        event.role_limits.group3 = parseInt(eventValue);
     } else if (eventField === 'tentative_limit') {
         event.role_limits.tentative = parseInt(eventValue);
     } else if (eventField === 'notgoing_limit') {

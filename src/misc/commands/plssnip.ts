@@ -6,7 +6,7 @@ bot.registerCommand('plssnip', [''], async message => {
     for (let [_id, m] of messages) {
         if (m.content.trim().match(/<:pantsgrab:[0-9]+>/i)) {
             m.delete();
-            message.react('👍')
+            message.react('<:snip:740155099967520848>')
             break;
         }
     }

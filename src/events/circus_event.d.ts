@@ -18,8 +18,11 @@ interface CircusEvent {
         healer: number;
         dps: number;
 
-        going: number;
+        group1: number;
+        group2: number;
+        group3: number;
         tentative: number;
+        waitlist: number;
         notgoing: number;
     };
     signups: {
@@ -30,14 +33,17 @@ interface CircusEvent {
         healer_subs: { [key: string]: string };
         dps_subs: { [key: string]: string };
 
-        going: { [key: string]: string };
+        group1: { [key: string]: string };
+        group2: { [key: string]: string };
+        group3: { [key: string]: string };
         tentative: { [key: string]: string };
+        waitlist: { [key: string]: string };
         notgoing: { [key: string]: string };
     }
     quick_create: boolean;
     step: string;
     signup_status: 'open' | 'closed';
-    template: 'swtor_raid' | 'generic_event'
+    template: 'swtor_raid' | 'generic_event' | 'lostark_raid';
     open_signups_at: string?;
     published_channels: { [key: string]: string }
 }

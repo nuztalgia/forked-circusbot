@@ -87,12 +87,15 @@ export async function updateEventEmbeds(event: CircusEvent) {
                     await msg.react(EMOJI_TANK_SUB);
                     await msg.react(EMOJI_HEAL_SUB);
                     await msg.react(EMOJI_DPS_SUB);
-                } else if (event.template === 'generic_event') {
-                    await msg.react('✅');
+                } else if (event.template === 'generic_event' || event.template === 'lostark_raid') {
+                    if (event.role_limits.group1 > 0) await msg.react('1️⃣');
+                    if (event.role_limits.group2 > 0) await msg.react('2️⃣');
+                    if (event.role_limits.group3 > 0) await msg.react('3️⃣');
                     await msg.react('❓');
+                    await msg.react('⌚');
                     await msg.react('❌');
                 }
-            } else if (event.signup_status === 'closed' && ((msg.reactions.cache.get(EMOJI_DPS_SUB)?.count || 0) > 0 || (msg.reactions.cache.get('✅')?.count || 0) > 0)) {
+            } else if (event.signup_status === 'closed' && ((msg.reactions.cache.get(EMOJI_DPS_SUB)?.count || 0) > 0 || (msg.reactions.cache.get('❌')?.count || 0) > 0)) {
                 log('debug', `Event ${event.id} is closed to sign-ups, removing sign-up reactions (message: ${msg.id})`);
                 await msg.reactions.removeAll();
             }
@@ -109,8 +112,11 @@ export function createEventEmbed(event: CircusEvent) {
     const tank_subs = formatSignups(event, 'tank_subs', '💙');
     const healer_subs = formatSignups(event, 'healer_subs', '💚');
     const dps_subs = formatSignups(event, 'dps_subs', '❤️');
-    const going_signups = formatSignups(event, 'going', '✅');
+    const group1_signups = formatSignups(event, 'group1', '1️⃣');
+    const group2_signups = formatSignups(event, 'group2', '2️⃣');
+    const group3_signups = formatSignups(event, 'group3', '3️⃣');
     const tenative_signups = formatSignups(event, 'tentative', '❓');
+    const waitlist_signups = formatSignups(event, 'waitlist', '⌚');
     const notgoing_signups = formatSignups(event, 'notgoing', '❌');
 
     if (!event.time?.match(/ [A-Z]{3}$/)) {
@@ -139,7 +145,7 @@ export function createEventEmbed(event: CircusEvent) {
             { name: `${EMOJI_HEAL_SUB} Healer Subs (${Object.values(event.signups.healer_subs).length})`, value: healer_subs, inline: true },
             { name: `${EMOJI_DPS_SUB} DPS Subs (${Object.values(event.signups.dps_subs).length})`, value: dps_subs, inline: true }
         ];
-    } else if (event.template === 'generic_event') {
+    } else if (event.template === 'generic_event' || event.template === 'lostark_raid') {
         description += 
             `You may sign-up to the event using the reactions below. If you are not 100% sure you can make it, ` + 
             `please mark yourself as tentative. ` + 
@@ -149,10 +155,21 @@ export function createEventEmbed(event: CircusEvent) {
             `!\n⠀\n`;
         
         fields = [
-            { name: `✅ Going (${Object.values(event.signups.going).length}/${event.role_limits.going})`, value: going_signups, inline: true },
-            { name: `❓ Tentative (${Object.values(event.signups.tentative).length}/${event.role_limits.tentative})`, value: tenative_signups, inline: true },
-            { name: `❌ Not Going (${Object.values(event.signups.notgoing).length}/${event.role_limits.notgoing})`, value: notgoing_signups, inline: true },
+            { name: `1️⃣ Going (${Object.values(event.signups.group1).length}/${event.role_limits.group1})`, value: group1_signups, inline: true },
+            { name: `2️⃣ Going (${Object.values(event.signups.group2).length}/${event.role_limits.group2})`, value: group2_signups, inline: true },
+            { name: `3️⃣ Going (${Object.values(event.signups.group3).length}/${event.role_limits.group3})`, value: group3_signups, inline: true },
+            { name: `❓ Tentative (${Object.values(event.signups.tentative).length})`, value: tenative_signups, inline: true },
+            { name: `⌚ Waitlist (${Object.values(event.signups.waitlist).length})`, value: waitlist_signups, inline: true },
+            { name: `❌ Not Going (${Object.values(event.signups.notgoing).length})`, value: notgoing_signups, inline: true },
         ];
+
+        if (event.role_limits.group2 === 0) {
+            fields[1] = { name: '\u200b', value: '\u200b', inline: true };
+        }
+
+        if (event.role_limits.group3 === 0) {
+            fields[2] = { name: '\u200b', value: '\u200b', inline: true };
+        }
     }
 
     const embed = new MessageEmbed()
@@ -163,6 +180,8 @@ export function createEventEmbed(event: CircusEvent) {
 
     if (event.template === 'generic_event') {
         embed.setAuthor({ name: event.title, iconURL: 'https://cdn.discordapp.com/attachments/814616443919532062/953372804756152340/Circle-icons-calendar.png' });
+    } else if (event.template === 'lostark_raid') {
+        embed.setAuthor({ name: event.title, iconURL: 'https://cdn.discordapp.com/attachments/814616443919532062/953383310917263421/ODEoHFKQfD4C2DnKS1FpoQMwLSwYb2Okej2E-3ZOsKQ.jpg' });
     } else if (event.title.match(/Pub/)) {
         embed.setAuthor({ name: event.title, iconURL: PUB_SIDE_ICON_URL });
     } else if (event.title?.match(/(Imp|Empire)/)) {
@@ -175,8 +194,15 @@ export function createEventEmbed(event: CircusEvent) {
 }
 
 function formatSignups(event: CircusEvent, role: keyof CircusEvent['signups'], emoji: string) {
+    if (!event.signups[role]) {
+        log('warn', `Event ${event.id} is missing a signup key for ${role}`);
+        return '';
+    }
+
     let signups = (Object.values(event.signups[role]).length > 0 ? `${emoji} ` : "");
     signups += Object.values(event.signups[role]).map(x => x.substring(0, 21)).join(`\n${emoji} `);
 
-    return signups || '\u200b\n'.repeat(Math.min(8, event.role_limits[role]) - Math.max(0, Object.values(event.signups[role]).length - 1));
+    let limit = event.role_limits[role] >= 99 ? 1 : Math.min(16, event.role_limits[role]);
+
+    return signups || '\u200b\n'.repeat(limit - Math.max(0, Object.values(event.signups[role]).length - 1));
 }

@@ -53,7 +53,7 @@ bot.registerCommand('event_removeuser', ['event_removeusers', 'event_remove_user
         sendError(message.channel, "Please mention the user in your message. Notes can be provided after the mention.");
         return;
     } else if (!events[eventId].signups.hasOwnProperty(eventRole)) {
-        sendError(message.channel, "Invalid role, role should be one of `tank`, `healer`, `dps`, `tank_subs`, `healer_subs`, `dps_subs`, `going`, `tentative`, or `notgoing`");
+        sendError(message.channel, "Invalid role, role should be one of `tank`, `healer`, `dps`, `tank_subs`, `healer_subs`, `dps_subs`, `group1`, `group2`, `group3`, `tentative`, or `notgoing`");
         return;
     }
 
