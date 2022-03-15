@@ -1,9 +1,9 @@
 import { client } from '../../client';
-import { parseCommand, registerCommand } from '../../utils/commands';
 import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, EMOJI_ERROR, sendError, sendMessage, sendReply } from '../../utils/replies';
 import { log } from '../../utils/logging';
 import { updateEventEmbeds } from '../embeds';
 import { events, findEvent, saveEvents } from '../persistence';
+import { bot } from '../../bot';
 
 const eventOpens = {};
 
@@ -41,12 +41,12 @@ function scheduleEventOpen(event: CircusEvent) {
     }, Date.parse(event.open_signups_at || '') - Date.now());
 }
 
-registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
-    let [eventId, scheduledTime] = parseCommand(message, /([0-9]+)( .*)?/);
+bot.registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
+    let [eventId, scheduledTime] = bot.parseCommand(message, /([0-9]+)( .*)?/);
     const event = findEvent(eventId);
 
     if (!event) {
-        sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to open event, invalid event ID provided`);
+        bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to open event, invalid event ID provided`);
         return;
     }
 
@@ -67,7 +67,7 @@ registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
         }
 
         if (!openAt) {
-            sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to parse date/time format, please use YYYY-MM-DD HH:mm:ss AM|PM`);
+            bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to parse date/time format, please use YYYY-MM-DD HH:mm:ss AM|PM`);
             return;
         }
 
@@ -75,11 +75,11 @@ registerCommand('open_event', ['event_open', 'oe', 'eo'], message => {
         saveEvents();
         scheduleEventOpen(event);
         
-        sendReply(message, EMBED_SUCCESS_COLOR, `✅ I will open sign-ups for [${event.title}](${message.url.replace(message.id, event.id)}) in ${Math.floor((openAt - Date.now()) / (60*60*1000))} hours ${Math.floor(((openAt - Date.now()) / (60*1000)) % 60)} minutes`);
+        bot.sendReply(message, EMBED_SUCCESS_COLOR, `✅ I will open sign-ups for [${event.title}](${message.url.replace(message.id, event.id)}) in ${Math.floor((openAt - Date.now()) / (60*60*1000))} hours ${Math.floor(((openAt - Date.now()) / (60*1000)) % 60)} minutes`);
     } else {
         event.signup_status = 'open';
         saveEvents();
         updateEventEmbeds(event);
-        sendReply(message, EMBED_SUCCESS_COLOR, `✅  [${event.title}](${message.url.replace(message.id, eventId)}) is now open for sign-ups (it may take several seconds to add reactions)`);
+        bot.sendReply(message, EMBED_SUCCESS_COLOR, `✅  [${event.title}](${message.url.replace(message.id, eventId)}) is now open for sign-ups (it may take several seconds to add reactions)`);
     }
 });

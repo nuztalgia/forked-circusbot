@@ -1,11 +1,6 @@
-import { Message } from 'discord.js';
-import { registerCommand } from '../../utils';
+import { bot } from '../../bot';
 
-registerCommand('plssnip', [''], async message => {
-    if (!(message instanceof Message)) {
-        return;
-    }
-
+bot.registerCommand('plssnip', [''], async message => {
     const messages = await message.channel.messages.fetch({ limit: 25 });
 
     for (let [_id, m] of messages) {

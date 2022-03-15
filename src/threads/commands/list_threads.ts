@@ -1,9 +1,9 @@
 import { MessageEmbed } from 'discord.js';
-import { registerCommand } from '../../utils/commands';
+import { bot } from '../../bot';
 import { EMBED_INFO_COLOR } from '../../utils/replies';
 import { threads } from '../persistence';
 
-registerCommand('list_threads', ['list_thread', 'thread_list'], message => {
+bot.registerCommand('list_threads', ['list_thread', 'thread_list'], message => {
     const showAll = message.content.match(/(-a|-A|all)/);
     let fields: string[][] = [];
 

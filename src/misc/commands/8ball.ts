@@ -1,5 +1,5 @@
-import { Message } from 'discord.js';
-import { registerCommand, getRandomInt, parseCommand, sendReply, EMBED_ERROR_COLOR, EMOJI_ERROR, EMBED_SUCCESS_COLOR, EMBED_DMM_COLOR, arrayRandom } from '../../utils';
+import { bot } from '../../bot';
+import { sendReply, EMBED_ERROR_COLOR, EMBED_DMM_COLOR, arrayRandom } from '../../utils';
 
 const POSSIBLE_ANSWERS = [
     'It is certain.',
@@ -24,13 +24,13 @@ const POSSIBLE_ANSWERS = [
     'Very doubtful.',
 ]
 
-registerCommand('8ball', [], message => {
-    let [question] = parseCommand(message, /(.*)/);
+bot.registerCommand('8ball', [], message => {
+    let [question] = bot.parseCommand(message, /(.*)/);
     
     if (!question.trim()) {
-        sendReply(message, EMBED_ERROR_COLOR, 'You must ask a question, to receive an answer');
+        bot.sendReply(message, bot.COLORS.ERROR, 'You must ask a question, to receive an answer');
         return;
     }
    
-    sendReply(message, EMBED_DMM_COLOR, arrayRandom(POSSIBLE_ANSWERS));
+    bot.sendReply(message, bot.COLORS.DM, arrayRandom(POSSIBLE_ANSWERS));
 });

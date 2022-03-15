@@ -1,6 +1,6 @@
-import { registerCommand } from '../../utils/commands';
+import { bot } from '../../bot';
 import { beginEventCreation } from '../creator';
 
-registerCommand('create_event', ['event_create', 'ce', 'ec'], message => {
+bot.registerCommand('create_event', ['event_create', 'ce', 'ec'], message => {
     beginEventCreation(message, false);
 });

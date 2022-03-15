@@ -1,4 +1,3 @@
-export * from './commands';
 export * from './logging';
 export * from './misc';
 export * from './persistence';

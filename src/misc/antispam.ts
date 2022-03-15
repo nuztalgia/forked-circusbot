@@ -56,7 +56,7 @@ export async function antispamHandler(message: Message<boolean>) {
         if (link && link[1].includes('c') && link[1].includes('o')) {
             log('warn', `Possible Discord scam link detected in ${message.channel.name} (posted by ${message.author.tag}): ${link}`);
             await startTyping(message.channel);
-            sendReply(message, EMBED_ERROR_COLOR, `This may be a scam link, please double check it. It is NOT an official Discord link (discord links are from \`https://discord.gg\`)`);
+            bot.sendReply(message, EMBED_ERROR_COLOR, `This may be a scam link, please double check it. It is NOT an official Discord link (discord links are from \`https://discord.gg\`)`);
             return; 
         }
     }

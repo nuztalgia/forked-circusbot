@@ -1,8 +1,9 @@
 import { Message, Permissions } from 'discord.js';
-import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, log, makeError, parseCommand, registerCommand, sendReply, startTyping } from '../../utils';
+import { bot } from '../../bot';
+import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, log, makeError, sendReply, startTyping } from '../../utils';
 
-registerCommand('copyemote', ['emote', 'addemote'], async message => {
-    const [emote] = parseCommand(message, /(.*)/);
+bot.registerCommand('copyemote', ['emote', 'addemote'], async message => {
+    const [emote] = bot.parseCommand(message, /(.*)/);
 
     await startTyping(message.channel);
 
@@ -13,7 +14,7 @@ registerCommand('copyemote', ['emote', 'addemote'], async message => {
     const member = await message.guild.members.fetch(message.author.id)
 
     if (!member.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
-        sendReply(message, EMBED_ERROR_COLOR, makeError("Sorry, but you don't have permission to do that"));
+        bot.sendReply(message, EMBED_ERROR_COLOR, makeError("Sorry, but you don't have permission to do that"));
         return;
     }
 
@@ -33,7 +34,7 @@ registerCommand('copyemote', ['emote', 'addemote'], async message => {
         let m = emoji.match(/<(a?):([^:]+):([0-9]+)>/i);
 
         if (!m) {
-            sendReply(message, EMBED_ERROR_COLOR, makeError("No emoji detected"));
+            bot.sendReply(message, EMBED_ERROR_COLOR, makeError("No emoji detected"));
             return;
         }
 
@@ -52,9 +53,9 @@ registerCommand('copyemote', ['emote', 'addemote'], async message => {
         const newEmoji = await message.guild.emojis.create(url, name.replace(/:/g, ''));
         log('info', `${message.author.tag} has added a new emote (${url}, name: ${newEmoji.name}, id: ${newEmoji.id})`);
         setTimeout(() => {
-            sendReply(message, EMBED_SUCCESS_COLOR, `Your new emote has been added <${url.includes('.gif') ? 'a' : ''}:${newEmoji.name}:${newEmoji.id}>`);
+            bot.sendReply(message, EMBED_SUCCESS_COLOR, `Your new emote has been added <${url.includes('.gif') ? 'a' : ''}:${newEmoji.name}:${newEmoji.id}>`);
         }, 100);
     } catch (err) {
-        sendReply(message, EMBED_ERROR_COLOR, makeError("Failed to create emoji: " + err));
+        bot.sendReply(message, EMBED_ERROR_COLOR, makeError("Failed to create emoji: " + err));
     }
 });

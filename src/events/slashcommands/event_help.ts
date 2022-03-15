@@ -1,7 +1,7 @@
 import { TextChannel } from 'discord.js';
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { client } from '../../client';
-import { execCommand} from '../../utils';
+import { bot } from '../../bot';
 
 export const data = (builder: SlashCommandSubcommandBuilder) => builder
 	.setName('help')
@@ -14,5 +14,5 @@ client.on('interactionCreate', async interaction => {
         return;
     }
 
-   execCommand('event_help', interaction as any);
+   bot.execCommand('event_help', interaction as any);
 });

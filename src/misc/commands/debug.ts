@@ -1,10 +1,10 @@
 import { Message, TextChannel } from 'discord.js';
 import { createWelcomeChannel } from '../../admin/welcome_channel';
-import { client } from '../../client';
-import { registerCommand, parseCommand, findMembers, makeTable, sendReply, EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log } from '../../utils';
+import { bot } from '../../bot';
+import { findMembers, makeTable, sendReply, EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log } from '../../utils';
 
-registerCommand('debug', [], async message => {
-    let [subCommand, params] = parseCommand(message, /(.*?) (.*)/);
+bot.registerCommand('debug', [], async message => {
+    let [subCommand, params] = bot.parseCommand(message, /(.*?) (.*)/);
     
     if (!message.guild) {
         message.reply('Sorry, this command can only be used in a Server');
@@ -15,10 +15,10 @@ registerCommand('debug', [], async message => {
         let members = await findMembers(message.guild, params);
 
         if (members.length === 0) {
-            sendReply(message, EMBED_ERROR_COLOR, 'No users were found that matched your search parameter');
+            bot.sendReply(message, EMBED_ERROR_COLOR, 'No users were found that matched your search parameter');
             return;
         } else if (members.length === 1) {
-            sendReply(message, EMBED_INFO_COLOR, `One user was found that match your search parameters: <@${members[0]?.user.id}>`);
+            bot.sendReply(message, EMBED_INFO_COLOR, `One user was found that match your search parameters: <@${members[0]?.user.id}>`);
             return;
         }
 

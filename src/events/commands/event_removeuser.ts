@@ -1,13 +1,13 @@
 import { MessageEmbed } from 'discord.js';
+import { bot } from '../../bot';
 import { client } from '../../client';
 import { findMembers } from '../../utils';
-import { parseCommand, registerCommand } from '../../utils/commands';
 import { EMBED_ERROR_COLOR, makeTable, sendError, sendReply } from '../../utils/replies';
 import { updateEventEmbeds } from '../embeds';
 import { events, saveEvents } from '../persistence';
 
-registerCommand('event_removeuser', ['event_removeusers', 'event_remove_user', 'eru'], async message => {
-    let [eventId, eventRole, eventUser] = parseCommand(message, /(.*?) (.*?) (.*)/);
+bot.registerCommand('event_removeuser', ['event_removeusers', 'event_remove_user', 'eru'], async message => {
+    let [eventId, eventRole, eventUser] = bot.parseCommand(message, /(.*?) (.*?) (.*)/);
 
     if (!eventId || !eventRole || !eventUser) {
         sendError(message.channel, 'Invalid syntax. The correct syntax is:\n\n`!event_removeuser <EVENT_ID> <EVENT_ROLE> <USER>`');
@@ -28,7 +28,7 @@ registerCommand('event_removeuser', ['event_removeusers', 'event_remove_user', '
         let users = await findMembers(message.guild, eventUser);
 
         if (users.length === 0) {
-            sendReply(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
+            bot.sendReply(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
             return;
         } else if (users.length === 1) {
             user = users[0]?.user;

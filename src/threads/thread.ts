@@ -1,10 +1,10 @@
 
 
-import { MessageEmbed, TextChannel } from 'discord.js';
-import { registerCommand } from '../utils/commands';
+import { TextChannel } from 'discord.js';
+import { bot } from '../bot';
 import { log } from '../utils/logging';
 
-registerCommand('test', [], async message => {
+bot.registerCommand('test', [], async message => {
     let target = message.mentions.channels.first() as TextChannel;
 
     if (target?.isText()) {

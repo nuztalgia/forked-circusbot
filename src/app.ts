@@ -4,10 +4,10 @@ import { registerEventReactions } from './events/reaction_signups';
 import { antispamHandler } from './misc/antispam';
 import { easterEggHandler } from './misc/easter_eggs';
 import { cannedReplyHandler } from './cannedreplies/listener';
-import { isValidCommand, runCommand, log } from './utils';
+import { log } from './utils';
 import { client } from './client';
 import { DMChannel } from 'discord.js';
-import config from '../config.json';
+import { bot } from './bot';
 
 import './admin/removed_member_log';
 import './admin/welcome_channel';
@@ -34,8 +34,8 @@ client.on('messageCreate', async (message) => {
     }
 
     // If it's a registered command, call the command handler
-    if (isValidCommand(message.content)) {
-        runCommand(message);
+    if (bot.isValidCommand(message.content)) {
+        bot.runCommand(message);
         return;
     }
 
@@ -60,4 +60,4 @@ process.on('unhandledRejection', error => {
     console.error('Unhandled rejection: ', error);
 });
 
-client.login(config.BOT_TOKEN);
+client.login(bot.config.BOT_TOKEN);

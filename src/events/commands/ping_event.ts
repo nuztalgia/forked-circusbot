@@ -1,9 +1,10 @@
 import { MessageEmbed } from 'discord.js';
-import { EMBED_INFO_COLOR, getDisplayName, parseCommand, registerCommand, sendError } from '../../utils';
+import { bot } from '../../bot';
+import { EMBED_INFO_COLOR, getDisplayName, sendError } from '../../utils';
 import { findEvent } from '../persistence';
 
-registerCommand('ping_event', ['event_ping'], async message => {
-    const [eventId, _, pingMsg] = parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
+bot.registerCommand('ping_event', ['event_ping'], async message => {
+    const [eventId, _, pingMsg] = bot.parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
     const targetChannel = message.mentions.channels.first();
     const event = findEvent(eventId);
 

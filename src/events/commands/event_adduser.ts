@@ -1,9 +1,10 @@
-import { parseCommand, registerCommand, sendError, sendReply, EMBED_SUCCESS_COLOR, findMembers, EMBED_ERROR_COLOR, makeTable } from '../../utils';
+import { bot } from '../../bot';
+import { sendError, sendReply, EMBED_SUCCESS_COLOR, findMembers, EMBED_ERROR_COLOR, makeTable } from '../../utils';
 import { updateEventEmbeds } from '../embeds';
 import { findEvent, saveEvents } from '../persistence';
 
-registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau'], async message => {
-    let [eventId, eventRole, eventUser, userNotes] = parseCommand(message, /(.*?) (.*?) (.*?)(?: |$)(.*)?/);
+bot.registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau'], async message => {
+    let [eventId, eventRole, eventUser, userNotes] = bot.parseCommand(message, /(.*?) (.*?) (.*?)(?: |$)(.*)?/);
 
     if (!eventId || !eventRole || !eventUser) {
         sendError(message.channel, 'Invalid syntax. The correct syntax is:\n\n`!event_adduser <EVENT_ID> <eventRole> <USER> <NOTES>`');
@@ -25,7 +26,7 @@ registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau'], as
         let users = await findMembers(message.guild, eventUser);
 
         if (users.length === 0) {
-            sendReply(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
+            bot.sendReply(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
             return;
         } else if (users.length === 1) {
             user = users[0]?.user;
@@ -68,9 +69,9 @@ registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau'], as
     }
 
     if (updated) {
-        sendReply(message, EMBED_SUCCESS_COLOR, `✅ Updated <@${user.id}> for [${event.title}](${message.url.replace(message.id, event.id)})`);
+        bot.sendReply(message, EMBED_SUCCESS_COLOR, `✅ Updated <@${user.id}> for [${event.title}](${message.url.replace(message.id, event.id)})`);
     } else if (smartMatch) {
-        sendReply(message, EMBED_SUCCESS_COLOR, `✅ Added <@${user.id}> as a ${eventRole.replace(/(tank|healer)s/, '$1')} to [${event.title}](${message.url.replace(message.id, event.id)})`);
+        bot.sendReply(message, EMBED_SUCCESS_COLOR, `✅ Added <@${user.id}> as a ${eventRole.replace(/(tank|healer)s/, '$1')} to [${event.title}](${message.url.replace(message.id, event.id)})`);
     } else {
         message.react('👍');
     }

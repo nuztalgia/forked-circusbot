@@ -1,8 +1,9 @@
 import { MessageEmbed } from 'discord.js';
-import { EMBED_INFO_COLOR, parseCommand, registerCommand } from '../../utils';
+import { bot } from '../../bot';
+import { EMBED_INFO_COLOR } from '../../utils';
 import { cannedReplies } from '../listener';
 
-registerCommand('crlist', [], message => {
+bot.registerCommand('crlist', [], message => {
     const searchTerm = message.content.split(' ')[1];
     let fields: string[][] = [];
     let replies = cannedReplies[message.guildId];

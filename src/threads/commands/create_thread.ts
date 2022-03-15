@@ -1,8 +1,8 @@
 
 
-import { registerCommand } from '../../utils/commands';
+import { bot } from '../../bot';
 import { beginThreadCreation } from '../thread_creator';
 
-registerCommand('create_thread', [], message => {
+bot.registerCommand('create_thread', [], message => {
     beginThreadCreation(message);
 });

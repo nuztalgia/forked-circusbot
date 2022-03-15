@@ -1,6 +1,7 @@
 import { Message, MessageEmbed, TextChannel } from 'discord.js';
+import { bot } from '../../bot';
 import { client } from '../../client';
-import { registerCommand, parseCommand, sendReply, EMBED_ERROR_COLOR, loadPersistentData, log, getFormattedDate, savePersistentData, EMBED_DMM_COLOR, makeError, arrayRandom } from '../../utils';
+import { sendReply, EMBED_ERROR_COLOR, loadPersistentData, log, getFormattedDate, savePersistentData, EMBED_DMM_COLOR, makeError, arrayRandom } from '../../utils';
 
 let reminders = loadPersistentData('reminders', []);
 
@@ -50,25 +51,25 @@ function scheduleReminder(reminder: any) {
     }, Date.parse(reminder.remindAt) - Date.now());
 }
 
-registerCommand('remind_me', ['remindme', 'remind'], message => {
+bot.registerCommand('remind_me', ['remindme', 'remind'], message => {
     if (!(message instanceof Message)) return;
 
-    let [user, remindTime, remindUnit, reminder] = parseCommand(message, /(<.*?> )?(([0-9]+) ?(?:seconds?|s|minutes?|m|hours?|h|days?|d|weeks?|w|months?|mo|years?|y)|[0-9]{1,2}:[0-9]{2} ?(?:AM|PM))(.*)/i);
+    let [user, remindTime, remindUnit, reminder] = bot.parseCommand(message, /(<.*?> )?(([0-9]+) ?(?:secs?|seconds?|s|mins?|minutes?|m|hrs?|hours?|h|days?|d|weeks?|w|months?|mo|years?|y)|[0-9]{1,2}:[0-9]{2} ?(?:AM|PM))(.*)/i);
     
     let remindee = user ? message.mentions.users.first() : message.author;
 
     if (!remindee || !remindTime) {
-        sendReply(message, EMBED_ERROR_COLOR, makeError('Incorrect usage. Please specify a time and reason for the reminder, for example:\n\n```\n!remindme 3 hours Login for raid\n```\n'));
+        bot.sendReply(message, EMBED_ERROR_COLOR, makeError('Incorrect usage. Please specify a time and reason for the reminder, for example:\n\n```\n!remindme 3 hours Login for raid\n```\n'));
         return;
     }
 
     let remindAt = new Date();
 
-    if (remindTime.includes('second') || remindTime.match(/[0-9] ?s$/)) {
+    if (remindTime.match(/([0-9] ?s$|sec)/i)) {
         remindAt.setSeconds(remindAt.getSeconds() + parseInt(remindUnit));
-    } else if (remindTime.includes('minute') || remindTime.match(/[0-9] ?m$/)) {
+    } else if (remindTime.match(/([0-9] ?m$|min)/i)) {
         remindAt.setMinutes(remindAt.getMinutes() + parseInt(remindUnit));
-    } else if (remindTime.includes('hour') || remindTime.match(/[0-9] ?h$/)) {
+    } else if (remindTime.match(/([0-9] ?h$|hour|hr)/i)) {
         remindAt.setHours(remindAt.getHours() + parseInt(remindUnit));
     } else if (remindTime.includes('day') || remindTime.match(/[0-9] ?d$/)) {
         remindAt.setHours(remindAt.getHours() + parseInt(remindUnit) * 24);

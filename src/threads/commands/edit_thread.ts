@@ -1,7 +1,7 @@
 
 
 import { TextBasedChannel } from 'discord.js';
-import { parseCommand, registerCommand } from '../../utils/commands';
+import { bot } from '../../bot';
 import { EMBED_INFO_COLOR, sendError, sendReply } from '../../utils/replies';
 import { saveThreads, scheduleThreadArchival, threads, updateThread } from '../persistence';
 
@@ -22,8 +22,8 @@ function editEventUsage(channel: TextBasedChannel) {
         " - roles");
 }
 
-registerCommand('edit_thread', ['et'], message => {
-    const [threadId, threadField, threadValue] = parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
+bot.registerCommand('edit_thread', ['et'], message => {
+    const [threadId, threadField, threadValue] = bot.parseCommand(message, /([0-9]+) +([\S]+) +(.*)/);
 
     if (!threadId) {
         editEventUsage(message.channel);
@@ -48,7 +48,7 @@ registerCommand('edit_thread', ['et'], message => {
         scheduleThreadArchival(threads[threadId]);
     } else if (threadField === 'channel') {
         threads[threadId].newChannel = message.mentions.channels.first()?.id || '';
-        sendReply(message, EMBED_INFO_COLOR, 'The next time the thread is archived and recreated, the thread will be created in the updated channel. To move the thread now, use the `!rebuild_thread` command');
+        bot.sendReply(message, EMBED_INFO_COLOR, 'The next time the thread is archived and recreated, the thread will be created in the updated channel. To move the thread now, use the `!rebuild_thread` command');
         return;
     } else if (threads[threadId].hasOwnProperty(threadField)) {
         threads[threadId][threadField] = threadValue;

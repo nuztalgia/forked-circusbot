@@ -1,17 +1,18 @@
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, EMOJI_ERROR, parseCommand, registerCommand, sendReply, startTyping } from '../../utils';
+import { bot } from '../../bot';
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, EMOJI_ERROR, sendReply, startTyping } from '../../utils';
 import { queueEventUpdate } from '../embeds';
 import { findEvent } from '../persistence';
 
-registerCommand('refresh_event', ['rebuild_event', 're'], async message => {
-    const [eventId] = parseCommand(message, /([0-9]+)/);
+bot.registerCommand('refresh_event', ['rebuild_event', 're'], async message => {
+    const [eventId] = bot.parseCommand(message, /([0-9]+)/);
     const event = findEvent(eventId);
 
     if (!event) {
-        sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to close event, invalid event ID provided`);
+        bot.sendReply(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to close event, invalid event ID provided`);
         return;
     }
     
     await startTyping(message.channel);
     await queueEventUpdate(event);
-    sendReply(message, EMBED_INFO_COLOR, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) has been re-rendered and updated across all channels`);
+    bot.sendReply(message, EMBED_INFO_COLOR, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) has been re-rendered and updated across all channels`);
 });

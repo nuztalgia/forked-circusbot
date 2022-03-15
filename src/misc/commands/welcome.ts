@@ -1,8 +1,8 @@
-import { Message } from 'discord.js';
-import { registerCommand, parseCommand, findMembers, sendReply, EMBED_ERROR_COLOR } from '../../utils';
+import { bot } from '../../bot';
+import { findMembers, sendReply, EMBED_ERROR_COLOR } from '../../utils';
 
-registerCommand('welcome', [], async message => {
-    if (!(message instanceof Message) || !message.member || !message.guild) {
+bot.registerCommand('welcome', [], async message => {
+    if (!message.member || !message.guild) {
         return;
     } else if (!message.member.roles.cache.some(role => ['Bacon Maker', 'Clowncil', 'Goddess of Death'].includes(role.name))) {
         return;
@@ -10,11 +10,11 @@ registerCommand('welcome', [], async message => {
 
     await message.channel.sendTyping();
 
-    let [userId] = parseCommand(message, /(.*)/);
+    let [userId] = bot.parseCommand(message, /(.*)/);
     const user = await findMembers(message.guild, userId);
 
     if (!user || user.length !== 1) {
-        sendReply(message, EMBED_ERROR_COLOR, 'Unknown user');
+        bot.sendReply(message, EMBED_ERROR_COLOR, 'Unknown user');
         return;
     }
 

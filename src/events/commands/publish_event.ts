@@ -1,9 +1,9 @@
-import { registerCommand } from '../../utils/commands';
+import { bot } from '../../bot';
 import { sendError } from '../../utils/replies';
 import { createEventEmbed, updateEventEmbeds } from '../embeds';
 import { events, saveEvents } from '../persistence';
 
-registerCommand('publish_event', ['pe'], async message => {
+bot.registerCommand('publish_event', ['pe'], async message => {
     const messageContent = message.content.replace(/  +/g, ' ');
     const event_id = messageContent.split(' ')[1];
     const target_channel = message.mentions.channels.first();
