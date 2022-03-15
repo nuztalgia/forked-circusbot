@@ -6,7 +6,7 @@ import { cannedReplies } from '../listener';
 bot.registerCommand('crlist', [], message => {
     const searchTerm = message.content.split(' ')[1];
     let fields: string[][] = [];
-    let replies = cannedReplies[message.guildId];
+    let replies = cannedReplies[message.guildId || message.channelId];
 
     for (const [name, reply] of Object.entries(replies).sort()) {
         let flags = [];

@@ -1,8 +1,15 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { bot } from '../bot';
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log, sendReply, loadPersistentData, savePersistentData, makeError } from "../utils";
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log, loadPersistentData, savePersistentData, makeError } from "../utils";
 
-export const cannedReplies = loadPersistentData('cannedreplies', {});
+interface CannedReply {
+    url?: string; 
+    value: string; 
+    locked: boolean; 
+    author: string;
+}
+
+export const cannedReplies = loadPersistentData('cannedreplies', {}) as { [guildId: string]: { [name: string]: CannedReply } };
 
 /**
  * Only load images/embeds from trusted domains for security reasons. Don't want spammers to
@@ -43,21 +50,21 @@ export function saveCannedReplies() {
  * @param reply The canned reply
  * @returns MessageEmbed | string
  */
-export function renderCannedReply(reply: any) {
+export function renderCannedReply(reply: CannedReply) {
+    let match;
+
     if (!reply) {
         return new MessageEmbed()
             .setTitle('Well, this is embarassing')
             .setDescription('<a:confusedPsyduck:861432384318996510> Hmmm, for some reason, there is nothing here (probably a broken alias).');
-    } else if (reply.hasOwnProperty('url') && NO_EMBED_WHITELIST.some(x => reply.url.match(x))) {
+    } else if (reply.url && NO_EMBED_WHITELIST.some(x => reply.url?.match(x))) {
         return 'noembed:' + reply.url;
-    } else if (reply.hasOwnProperty('url')) {
+    } else if (reply.url) {
         return new MessageEmbed().setDescription(reply.value || '').setImage(reply.url);
-    } else if (reply.value.trim().match(/^<:[^:]+?:([0-9]+)>$/)) {
-        const emoji = reply.value.trim().match(/^<:.*?:([0-9]+)>$/);
-        return new MessageEmbed().setImage(`https://cdn.discordapp.com/emojis/${emoji[1]}.png?size=96&quality=lossless`);
-    } else if (reply.value.trim().match(/^<a:[^:]+?:([0-9]+)>$/)) {
-        const emoji = reply.value.trim().match(/^<a:.*?:([0-9]+)>$/);
-        return new MessageEmbed().setImage(`https://cdn.discordapp.com/emojis/${emoji[1]}.gif?size=96&quality=lossless`);
+    } else if (match = reply.value.trim().match(/^<:[^:]+?:([0-9]+)>$/)) {
+        return new MessageEmbed().setImage(`https://cdn.discordapp.com/emojis/${match[1]}.png?size=96&quality=lossless`);
+    } else if (match = reply.value.trim().match(/^<a:[^:]+?:([0-9]+)>$/)) {
+        return new MessageEmbed().setImage(`https://cdn.discordapp.com/emojis/${match[1]}.gif?size=96&quality=lossless`);
     } else {
         return new MessageEmbed().setDescription(reply.value || '⠀');
     }
@@ -67,7 +74,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
     if (!message.content.startsWith('=') || !message.guildId) {
         return;
     } else if (!cannedReplies.hasOwnProperty(message.guildId)) {
-        cannedReplies[message.guildId] = { '__auto_update__': {} };
+        cannedReplies[message.guildId] = { '__auto_update__': { author: 'CirqueBot', locked: true, value: '' } };
     }
 
     const content = message.content.substring(1);
