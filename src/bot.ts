@@ -1,5 +1,5 @@
 import { ColorResolvable, CommandInteraction, Message, MessageEmbed, TextBasedChannel, TextChannel, User } from 'discord.js';
-import { log, EMBED_ERROR_COLOR, sendReply } from './utils';
+import { log, EMBED_ERROR_COLOR, sendReply, makeError } from './utils';
 import config from '../config.json';
 
 const commands: { [command: string]: (message: Message<boolean>, user: User) => any } = {};
@@ -90,7 +90,22 @@ class Bot {
             bot.replyTo(interaction, EMBED_ERROR_COLOR, "Sorry, but I can only run this command in whitelisted channels.");
         } else if (commands.hasOwnProperty(cmd)) {
             log('info', `User ${author.tag} ran a command in #${this.getChannelName(interaction)}: ${command}`);
-            commands[cmd](interaction, author);
+
+            try {
+                let response = commands[cmd](interaction, author);
+
+                if (response instanceof Promise) {
+                    response.catch(err => {
+                        console.error(err);
+                        log('error', `${command} failed with an error: ${err}`);
+                        this.replyTo(interaction, EMBED_ERROR_COLOR, makeError('There was an unexpected error while trying to complete your request. Please inform <@200716538729201664> as soon as possible.'));
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                log('error', `${command} failed with an error: ${err}`);
+                this.replyTo(interaction, EMBED_ERROR_COLOR, makeError('There was an unexpected error while trying to complete your request. Please inform <@200716538729201664> as soon as possible.'));
+            }
         } else {
             log('warn', `execCommand called with an invalid command: ${cmd}`);
         }
