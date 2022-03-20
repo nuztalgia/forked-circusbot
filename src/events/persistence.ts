@@ -12,7 +12,7 @@ if (fs.existsSync('data/events.json')) {
 }
 
 export function findEvent(eventId: string): CircusEvent | null {
-    eventId = eventId.trim();
+    eventId = (eventId || '').trim();
 
     if (events.hasOwnProperty(eventId)) {
         return events[eventId];

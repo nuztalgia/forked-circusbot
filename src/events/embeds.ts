@@ -77,7 +77,7 @@ export async function updateEventEmbeds(event: CircusEvent) {
                 return;
             }
 
-            if (event.signup_status === 'open' && !(msg.reactions.cache.get(EMOJI_DPS_SUB)?.count || 0 > 0)) {
+            if (event.signup_status === 'open' && !((msg.reactions.cache.get(EMOJI_DPS_SUB)?.count || 0) > 0 || (msg.reactions.cache.get('❌')?.count || 0) > 0)) {
                 log('debug', `Event ${event.id} is open to sign-ups, adding sign-up reactions (message: ${msg.id})`);
 
                 if (event.template === 'swtor_raid') {
@@ -181,7 +181,7 @@ export function createEventEmbed(event: CircusEvent) {
     if (event.template === 'generic_event') {
         embed.setAuthor({ name: event.title, iconURL: 'https://cdn.discordapp.com/attachments/814616443919532062/953372804756152340/Circle-icons-calendar.png' });
     } else if (event.template === 'lostark_raid') {
-        embed.setAuthor({ name: event.title, iconURL: 'https://cdn.discordapp.com/attachments/814616443919532062/953383310917263421/ODEoHFKQfD4C2DnKS1FpoQMwLSwYb2Okej2E-3ZOsKQ.jpg' });
+        embed.setAuthor({ name: event.titlew, iconURL: 'https://cdn.discordapp.com/attachments/814616443919532062/953383310917263421/ODEoHFKQfD4C2DnKS1FpoQMwLSwYb2Okej2E-3ZOsKQ.jpg' });
     } else if (event.title.match(/Pub/)) {
         embed.setAuthor({ name: event.title, iconURL: PUB_SIDE_ICON_URL });
     } else if (event.title?.match(/(Imp|Empire)/)) {

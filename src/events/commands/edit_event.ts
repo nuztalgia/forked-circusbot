@@ -20,7 +20,9 @@ function editEventUsage(message: Message<boolean>) {
         " - tank_limit\n" +
         " - healer_limit\n" + 
         " - dps_limit\n" +  
-        " - going_limit\n");
+        " - group1_limit\n" +  
+        " - group2_limit\n" +  
+        " - group3_limit\n");
 }
 
 bot.registerCommand('edit_event', ['event_edit', 'ee'], message => {

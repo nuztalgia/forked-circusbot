@@ -12,3 +12,4 @@ import './ping_event';
 import './export_event';
 import './event_help';
 import './register_slash_commands';
+import './unpublish_event';
