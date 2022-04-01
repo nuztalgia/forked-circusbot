@@ -36,7 +36,7 @@ let userRateLimits = {
 
 export function registerEventReactions(client: Client) {
     client.on('messageReactionAdd', async (reaction, user) => {
-        if (user.bot) {
+        if (user.bot || !pendingUserUpdates.hasOwnProperty(reaction.emoji.toString())) {
             return;
         }
 
@@ -48,6 +48,8 @@ export function registerEventReactions(client: Client) {
         const emoji = reaction.emoji.toString();
 
         if (!event) return;
+    
+        // console.log(`REACTION ON EVENT ${reaction.message.id} : '${reaction.emoji.toString()}'`);
 
         if (pendingUserUpdates[emoji].hasOwnProperty(user.id)) {
             return;
@@ -99,8 +101,6 @@ async function handleGenericEventReactionAdd(event: CircusEvent, emoji: string, 
         log('debug', `Received reaction from ${user.tag} on closed event ${event.id} (${event.title})`);
         return;
     }
-    
-    // console.log(`REACTION ON EVENT ${reaction.message.id} : '${reaction.emoji.toString()}'`);
 
     const exclusiveRoles = {
         '1️⃣': 'group1',
@@ -115,23 +115,25 @@ async function handleGenericEventReactionAdd(event: CircusEvent, emoji: string, 
         let role = exclusiveRoles[emoji];
 
         if (event.signups[role].hasOwnProperty(user.id)) {
-            log('info', `User ${user.tag} has removed themself as '${role}' for event ${event.id} (${event.title})`);
+            log('info', `${user.tag} has removed themself as '${role}' for event ${event.id} (${event.title})`);
             delete event.signups[role][user.id];
             return;
         } else if (Object.values(event.signups[role]).length >= event.role_limits[role]) {
-            log('info', `  Unable to sign-up user ${user.tag} as '${role}' for event ${event.id} - '${role}' spots are full`);
+            log('info', `  Unable to sign-up ${user.tag} as '${role}' for event ${event.id} - '${role}' spots are full`);
             messageUser(user, `<:error:935248898086273045> Sorry, '${role}' sign-ups for ${event.title} are currently full.`);
             return;
         }
 
+        let logMsg = `${user.tag} has added themself as '${role}' for event ${event.id} (${event.title})`;
+
         Object.keys(event.signups).forEach(r => {
             if (event.signups[r].hasOwnProperty(user.id)) {
-                log('info', `User ${user.tag} has removed themself as '${r}' for event ${event.id} (${event.title})`);
+                logMsg = `${user.tag} has changed their signup from '${r}' to '${role}' for event ${event.id} (${event.title})`;
                 delete event.signups[r][user.id];
             }
         });
 
-        log('info', `User ${user.tag} has added themself as '${role}' for event ${event.id} (${event.title})`);
+        log('info', logMsg);
         event.signups[role][user.id] = await getDisplayName(reaction, user);
     }
 }
@@ -143,8 +145,6 @@ async function handleReactionAdd(event: CircusEvent, emoji: string, reaction: Me
         return;
     }
     
-    // console.log(`REACTION ON EVENT ${reaction.message.id} : '${reaction.emoji.toString()}'`);
-
     if (emoji === '<:tank:933048000727629835>') {
         if (event.signups.tanks.hasOwnProperty(user.id)) {
             log('info', `User ${user.tag} has removed themself as a Tank for event ${event.id} (${event.title})`);

@@ -22,6 +22,9 @@ bot.registerCommand('ping_event', ['event_ping'], async message => {
     let allUsers = Object.keys(event.signups.tanks);
     allUsers = allUsers.concat(Object.keys(event.signups.healers));
     allUsers = allUsers.concat(Object.keys(event.signups.dps));
+    allUsers = allUsers.concat(Object.keys(event.signups.group1));
+    allUsers = allUsers.concat(Object.keys(event.signups.group2));
+    allUsers = allUsers.concat(Object.keys(event.signups.group3));
 
     const embed = new MessageEmbed()
         .setColor(EMBED_INFO_COLOR)

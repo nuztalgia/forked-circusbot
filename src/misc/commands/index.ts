@@ -5,5 +5,6 @@ import './debug';
 import './help';
 import './nroll';
 import './remind_me';
+import './poll';
 import './plssnip';
 import './welcome';

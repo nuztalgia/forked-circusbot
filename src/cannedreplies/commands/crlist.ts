@@ -34,7 +34,9 @@ bot.registerCommand('crlist', [], message => {
         .setColor(EMBED_INFO_COLOR);
 
     if (fields.length === 0) {
-        embed.setDescription(`There are no canned repleis events in this server. You can create a canned reply using the \`=\` command.`);
+        embed.setDescription(
+            searchTerm ? `There are no canned replies matching your search query in this server. You can create a canned reply using the \`=\` command.`
+            : `There are no canned replies events in this server. You can create a canned reply using the \`=\` command.`);
     } else {
         embed.setDescription(`${searchTerm ? 'All canned replies matching your search term' : 'All canned replies in this server'}:`)
             .addFields([ 

@@ -29,7 +29,7 @@ client.on('ready', () => {
 function scheduleReminder(reminder: any) {
     if ((Date.parse(reminder.remindAt) - Date.now()) >= 2147483647) {
         setTimeout(() => scheduleReminder(reminder), 2147483646)
-        log('info', `${reminder.remindedBy} has set a reminder for ${reminder.remindee} at ${reminder.remindAt} (scheduling recursively as value exceeds MAX_INT)`);
+        log('info', `${reminder.remindedByTag} has set a reminder for ${reminder.remindeeTag} at ${reminder.remindAt} (scheduling recursively as value exceeds MAX_INT)`);
         return;
     }   
 
@@ -90,6 +90,7 @@ bot.registerCommand('remind_me', ['remindme', 'remind'], message => {
         remindedBy: message.author.id,
         remindedByTag: message.author.tag,
         remindee: remindee.id,
+        remindeeTag: remindee.tag,
         remindAt: getFormattedDate(remindAt),
         reminder: reminder,
     };
