@@ -11,6 +11,7 @@ interface CannedReply {
 
 export const cannedReplies = loadPersistentData('cannedreplies', {}) as { [guildId: string]: { [name: string]: CannedReply } };
 
+
 /**
  * Only load images/embeds from trusted domains for security reasons. Don't want spammers to
  * abuse this feature.
@@ -37,8 +38,22 @@ const WHITELISTED_DOMAINS = [
 const NO_EMBED_WHITELIST = [
     /\.mp4$/i,
     /https:\/\/tenor\.com\//i,
-]
+];
 
+const OPS_ROTATION = [
+    'KP/Ravagers/Gods',
+    'DF/DP/SnV or Dxun',
+    'EV/EC/TFB',
+    'SNV/ToS/Dxun',
+];
+
+function getWeeks(endDate: Date) {
+    const msInWeek = 1000 * 60 * 60 * 24 * 7;
+    const startDate = new Date('2022-01-01');
+  
+    return Math.floor(Math.abs(endDate.getTime() - startDate.getTime()) / msInWeek);
+}
+  
 export function saveCannedReplies() {
     savePersistentData('cannedreplies', cannedReplies);
 }
@@ -183,7 +198,15 @@ export function cannedReplyHandler(message: Message<boolean>) {
         ));
     } else if (reply && content.startsWith('?')) {
         bot.replyTo(message, EMBED_INFO_COLOR, '```\n' + reply.value.replace(/^```/, '\\`\\`\\`') + '\n```');
-    } else if (reply) {
+    } else if (reply && content === 'ops') {
+        let cannedReply = reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply;
+        let weeks = getWeeks(new Date());
+        let op = OPS_ROTATION[weeks % 4];
+        let nextOp = OPS_ROTATION[(weeks + 1) % 4];
+        cannedReply.value = `This week's op is: **${op}**\nNext week's op is: *${nextOp}*`;
+
+        bot.replyTo(message, EMBED_INFO_COLOR, renderCannedReply(cannedReply));
+    } else if (reply) { 
         bot.replyTo(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
     } else if (name.includes('rotation')) {
         bot.execCommand('crlist', message);
