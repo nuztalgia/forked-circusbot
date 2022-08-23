@@ -54,7 +54,12 @@ client.on('messageCreate', async (message) => {
     cannedReplyHandler(message);
 });
 
-registerEventReactions(client);
+if (process.env.MODE !== 'development') {
+    console.log('Disabling event reaction handler in development mode');
+    // registerEventReactions(client);
+} else {
+    registerEventReactions(client);
+}
 
 process.on('unhandledRejection', error => {
     console.error('Unhandled rejection: ', error);

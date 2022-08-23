@@ -39,7 +39,7 @@ class Bot {
     }
 
     public parseCommand(message: Message<boolean>, regex: RegExp) {
-        const cmd = config.BOT_PREFIX + message.content.replace(config.BOT_PREFIX, '').split(' ')[0] + ' ';
+        const cmd = config.BOT_PREFIX + message.content.replace(config.BOT_PREFIX, '').split(/[ \n]/)[0] + ' ';
         let msg = (message.content + ' ').replace(cmd, '').trim();
 
         if (msg.match(regex)) {
@@ -112,7 +112,7 @@ class Bot {
     }
 
     private getCommand(message: string) {
-        const cmd = message.toLowerCase().replace(config.BOT_PREFIX, '').split(' ')[0];
+        const cmd = message.toLowerCase().replace(config.BOT_PREFIX, '').split(/[ \n]/)[0];
     
         if (aliases.hasOwnProperty(cmd)) {
             return aliases[cmd];

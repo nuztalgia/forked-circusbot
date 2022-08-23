@@ -41,6 +41,7 @@ export function scheduleThreadArchival(thread: CircusThread) {
         date.setDate(date.getDate() + thread.archiveDays);
         thread.archiveDate = getFormattedDate(date).split(' ')[0];
         saveThreads();
+        scheduleThreadArchival(thread);
     }, (date - Date.now()) + 5000);
 }
 

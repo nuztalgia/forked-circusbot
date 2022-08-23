@@ -77,9 +77,21 @@ export function cannedReplyHandler(message: Message<boolean>) {
         cannedReplies[message.guildId] = { '__auto_update__': { author: 'CirqueBot', locked: true, value: '' } };
     }
 
-    const content = message.content.substring(1);
-    const name = content.split('=')[0].toLowerCase().replace(/(\\|^\?)/g, '').trim();
-    const reply = cannedReplies[message.guildId][name];
+    let content = message.content.substring(1);
+    let name = content.split('=')[0].toLowerCase().replace(/(\\|^\?)/g, '').trim();
+    let reply = cannedReplies[message.guildId][name];
+    
+    // Not an assignment, and no existing reply was found
+    if (!content.includes('=') && !reply) {
+        if (name.includes(' ')) {
+            // Try searching without spaces, e.g. if they searched "pyro rotation", search "pyrorotation"
+            reply = cannedReplies[message.guildId][name.replaceAll(' ', '')];
+        } else {
+            // Remove spaces from saved replies
+            let actualName = Object.keys(cannedReplies[message.guildId]).find(x => x.replaceAll(' ', '') === name) || name;
+            reply = cannedReplies[message.guildId][actualName];
+        }   
+    }
 
     // Assign a message
     if (content.includes('=')) {
@@ -173,7 +185,9 @@ export function cannedReplyHandler(message: Message<boolean>) {
         bot.replyTo(message, EMBED_INFO_COLOR, '```\n' + reply.value.replace(/^```/, '\\`\\`\\`') + '\n```');
     } else if (reply) {
         bot.replyTo(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
+    } else if (name.includes('rotation')) {
+        bot.execCommand('crlist', message);
     } else {
-        bot.replyTo(message, EMBED_ERROR_COLOR, `Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n\`=${name}=Your custom text here\`\n\nThen you can print the content of the canned reply using \`=${name}\` in any channel with this bot in it.`);
+        bot.replyTo(message, EMBED_ERROR_COLOR, `Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n\`=${name}=Your custom text here\`\n\nThen you can print the content of the canned reply using \`=${name}\` in any channel with this bot in it.\n\nIf you're trying to find a canned reply, you can use the \`=search\` feature, e.g. \`=search rotation\` will show all canned replies with rotation in the name.`);
     }
 }
