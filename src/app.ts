@@ -28,6 +28,12 @@ client.on('ready', async () => {
 });
 
 client.on('messageCreate', async (message) => {
+    // In development mode, ignore messages unless listed in BOT_DEVS to avoid duplicate responses
+    // from CircusBot (e.g. if both the prod and dev bots respond).
+    if (process.env.MODE === 'development' && !bot.config.BOT_DEVS.includes(message.author.id)) {
+        return;
+    }
+
     // Ignore messages written by other bots
     if (message.author.bot) {
         return;
