@@ -4,6 +4,17 @@ import { arrayRandom, diffDate, EMBED_ERROR_COLOR, getFormattedDate, log } from 
 import { getConfig } from "./configuration";
 
 const memberLeftMessages = [
+    `Was it something I said? <:sadge:786846456769544253>`,
+    `I guess we pinged them one too many times <:sadge:786846456769544253>`,
+    `Maybe they were offended by my gangbang command <:sadge:786846456769544253>`,
+    `I hope we didn't scare them away <:sadge:786846456769544253>`,
+    `I'll try not to take it personallyy <:sadge:786846456769544253>`,
+    `Maybe they accidentally left the server <:sadge:786846456769544253>`,
+    `Perhaps Peggy scared them away <:sadge:786846456769544253>`,
+    `Perhaps NoBones scared them away <:sadge:786846456769544253>`,
+    `Perhaps Cad scared them away <:sadge:786846456769544253>`,
+    `Perhaps the Shadow Clowncil scared them away <:sadge:786846456769544253>`,
+    `Looks like our brainwashing failed to keep them here <:sadge:786846456769544253>`,
     `Sad! Let's just hope that they enjoyed their stay <:sadge:786846456769544253>`,
     `Awww man, hopefully they enjoyed their stay <:sadge:786846456769544253>`,
     `Oh no, another one bites the dust! Hopefully they enjoyed their stay <:sadge:786846456769544253>`,
@@ -34,7 +45,10 @@ client.on('guildMemberRemove', async member => {
     if (banLog?.target?.id === member.id && diffDate(banLog.createdAt, new Date()) < 300) {
         message = 'just got banned from the server!'
         goodbye = `And don't EVER come back <:pepeGun:821569090304999424>! Thanks <@${banLog.executor?.id}> for taking care of that. Reason: ${banLog.reason?.trim()}`
-    } else if (kickLog?.target?.id === member.id && diffDate(kickLog.createdAt, new Date()) < 300) {
+    } else if (kickLog?.target?.id === member.id && diffDate(kickLog.createdAt, new Date()) < 300 && member.roles.cache.entries.length === 0) {
+        message = 'just got removed from the server'
+        goodbye = `Looks like they didn't have a role yet, maybe they'll come back later. Thanks <@${kickLog.executor?.id}> for keeping the server clean. Reason: ${kickLog.reason?.trim()}`
+    }  else if (kickLog?.target?.id === member.id && diffDate(kickLog.createdAt, new Date()) < 300) {
         message = 'just got kicked from the server!'
         goodbye = `Adios amigo! Thanks <@${kickLog.executor?.id}> for taking out the trash <:pepetrash:740924034493055038>. Reason: ${kickLog.reason?.trim()}`
     } else if (member.joinedAt && diffDate(member.joinedAt, new Date()) < 60 * 60 * 4) {

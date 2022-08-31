@@ -4,6 +4,7 @@ import { EMBED_INFO_COLOR, findMember, getFormattedDate, loadPersistentData, log
 import { getConfig } from "./configuration";
 
 const userWelcomeChannels = loadPersistentData('welcome', {});
+const threadRoles = {};
 
 // Cleanup any welcome channels that should have been deleted by event handlers, but
 // maybe the bot wasn't running.
@@ -15,6 +16,13 @@ client.on('ready', async () => {
     if (!config.enabled) return;
 
     await guild.channels.fetch();
+
+    if (config.thread_roles) {
+        const threadGroups = guild.roles.cache.filter(x => config.thread_roles.includes(x.id));
+        threadRoles[guild.id] = Object.fromEntries(threadGroups.map(x => [x.id, x.members.size]));
+    
+        console.log(threadRoles);
+    }
 
     guild.channels.cache.forEach(async channel => {
         if (!channel.name.startsWith(config.prefix) || !(channel instanceof TextChannel) || !channel.topic) {
@@ -53,6 +61,20 @@ client.on('guildMemberAdd', async member => {
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
     if (oldMember.roles.cache.size === 1 && newMember.roles.cache.size > 1 && userWelcomeChannels[newMember.guild.id].hasOwnProperty(newMember.id)) {
         archiveWelcomeChannel(newMember.id, newMember.user.tag, newMember.guild, newMember.displayAvatarURL(), `${newMember.user.tag} was given a role`);
+        
+        if (Object.values(threadRoles[newMember.guild.id]).length > 0) {
+            const roleId = Object.entries(threadRoles[newMember.guild.id]).filter((x: any) => x[1] < 98)[0][0];
+            const role = newMember.guild.roles.cache.find(x => x.id === roleId);
+
+            if (!role) {
+                log('warn', `Unable to assign thread group to ${newMember.user.tag}, no available groups found`);
+                return;
+            }
+
+            log('info', `Assigning new member ${newMember.user.tag} to thread group '${role.name}'`);
+            newMember.roles.add(role);
+            threadRoles[newMember.guild.id][roleId] += 1;
+        }
     }
 });
 
@@ -129,7 +151,9 @@ async function archiveWelcomeChannel(memberId: string, userTag: string, guild: G
 
     guild.systemChannel?.send({ embeds: [embed] });
 
-    channel?.delete(reason);
+    setTimeout(() => {
+        channel?.delete(reason);
+    }, 500);
     delete userWelcomeChannels[guild.id][memberId];
     savePersistentData('welcome', userWelcomeChannels);
 }

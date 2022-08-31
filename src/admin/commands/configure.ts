@@ -1,7 +1,7 @@
 import { Message, MessageEmbed, TextChannel } from 'discord.js';
 import { bot } from '../../bot';
 import { client } from '../../client';
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, EMBED_SUCCESS_COLOR, makeError, savePersistentData, sendReply } from '../../utils';
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, makeError } from '../../utils';
 import { getConfig, saveConfig } from '../configuration';
 
 /**
@@ -18,8 +18,9 @@ bot.registerCommand('configure', ['conf'], async message => {
     }
 
     if (namespace === 'welcome') {
-        const config = getConfig(message.guildId, 'welcome', { enabled: false, admin_roles: ' ', prefix: '🎪welcome-', greeting: 'Hello <user>! Welcome to **<server>**! 😄' });
-        const adminRoles = message.guild?.roles.cache.filter(x => config.admin_roles.includes(x.id));
+        const config = getConfig(message.guildId, 'welcome', { enabled: false, admin_roles: ' ', thread_roles: ' ', prefix: '🎪welcome-', greeting: 'Hello <user>! Welcome to **<server>**! 😄' });
+        const adminRoles = message.guild?.roles.cache.filter(x => (config.admin_roles || []).includes(x.id));
+        const threadGroups = message.guild?.roles.cache.filter(x => (config.thread_roles || []).includes(x.id));
 
         if (option === 'enabled') {
             config.enabled = value.toLocaleLowerCase() === 'true' || value.toLocaleLowerCase() === 'yes';
@@ -30,6 +31,9 @@ bot.registerCommand('configure', ['conf'], async message => {
         } else if (option === 'admin_roles' || option === 'roles') {
             const newRoles = value.split(/[ ,]/).map(x => x.replace(/^@/, ''));
             config.admin_roles = message.guild?.roles.cache.filter(x => newRoles.includes(x.name)).concat(message.mentions.roles).map(x => x.id);
+        } else if (option === 'thread_groups' || option === 'thread_roles') {
+            const newRoles = value.split(/[ ,]/).map(x => x.replace(/^@/, ''));
+            config.thread_roles = message.guild?.roles.cache.filter(x => newRoles.includes(x.name)).concat(message.mentions.roles).map(x => x.id);
         } else if (option) {
             bot.replyTo(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
             return;
@@ -59,6 +63,11 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'A list of roles that will be added to the welcome channel when one is created.\n' + 
                 'Current Configuration:\n' + 
                 '```\n' + (adminRoles?.map(x => `@` + x.name).join(' ') || '-') + '\n```\n\n' + 
+
+                '⚙️ `!configure welcome.thread_groups`\n' + 
+                'A list of possible roles to automatically add the user to. Used to add people to threads given the 100 member limit.\n' + 
+                'Current Configuration:\n' + 
+                '```\n' + (threadGroups?.map(x => `@` + x.name).join(' ') || '-') + '\n```\n\n' + 
 
                 '📢 `!configure welcome.greeting`\n' + 
                 'The greeting message for CirqueBot to send to a user once their welcome channel has been created.\n\n' + 
