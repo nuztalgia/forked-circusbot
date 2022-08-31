@@ -60,7 +60,7 @@ client.on('messageCreate', async (message) => {
     cannedReplyHandler(message);
 });
 
-if (process.env.MODE !== 'development') {
+if (process.env.MODE === 'development') {
     console.log('Disabling event reaction handler in development mode');
     // registerEventReactions(client);
 } else {
