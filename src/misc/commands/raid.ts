@@ -44,6 +44,7 @@ let hard_modes = {
         `Can your DPS drop their stacks or are they going to dummy parse til they die?`,
         `"Desync", ya right, thats what they all say. Left and Right is hard`,
         `"This is the easiest boss", right until your DPS stand in the conal until they die`,
+        `Everyone's worst nightmare. Understanding analog clocks.`
     ],
     'Gods from the Machine': [
         `The pinnacle of operation design. Good luck on the puzzle before Izax!`,
@@ -72,13 +73,16 @@ let nightmare_ops = {
         `Kephess tanking be like: <a:rooSlide:1012385894998745198>`,
         `The only good part about tanks is seeing if you can out-DPS everyone as a tank doing stormcaller`,
         `"I don't think I damaged the shield" -the only person with damage in the raid challenge`,
-        `Catye probably has the defusal kit`
+        `Catye probably has the defusal kit`,
+        `Imagine wiping at the end of minefield because somebody drops an enraged bomb on top of the entire group`
     ],
     'Terror from Beyond': [
         `Its an easy op as long as nobody dies to tentacle slams four times in one pull`,
         `Dread Guards or Dread Prog?`,
         `Its KEPHESS not QWEPHESS`,
-        `If you wipe to Writhing Horror, we'll be judging you`
+        `If you wipe to Writhing Horror, we'll be judging you`,
+        `Always fun to hear the tanks yelling at their DPS for taking too long with the adds`,
+        `"I was nowhere near that add" -person who auto attacked the add`
     ],
     'Scum and Villainy': [
         `I'll be here for you when you wipe 16 minutes into Styrak due to a bad knock and need to cry`,
@@ -88,6 +92,7 @@ let nightmare_ops = {
         `Styrak can choke me anytime <:uwuThonk:859325583255404545>`
     ],
     'The Dread Fortress': [
+        `Hopefully you don't get stuck with a tank who RP walks to the boss`,
         `Hahahahaha, good luck with Brontes`,
         `Six finger phase, where you get to prog figuring out what clockwise means`,
         `Don't worry if you shadow stride to Brontes, we've all done it at least once`,
@@ -104,7 +109,8 @@ let nightmare_ops = {
         `Listen, you should probably just reroll for a different op. Or do SM, thats more your speed.`,
         `I hope you enjoy only seeing one boss for the entire raid`,
         `There is no easy boss for this one`,
-        `"I'M A GOD!" -tank who died three seconds later`
+        `"I'M A GOD!" -tank who died three seconds later`,
+        `Despite what some guildmasters might say, there are magma droids at the start of Tyth`
     ],
     'Nature of Progress': [
         `Better lube up for when you get to Apex`,
