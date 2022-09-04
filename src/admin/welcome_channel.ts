@@ -1,6 +1,6 @@
 import { Guild, GuildMember, MessageEmbed, OverwriteResolvable, TextChannel } from "discord.js";
 import { client } from "../client";
-import { EMBED_INFO_COLOR, findMember, getFormattedDate, loadPersistentData, log, randomStr, savePersistentData } from "../utils";
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, findMember, getFormattedDate, loadPersistentData, log, randomStr, savePersistentData } from "../utils";
 import { getConfig } from "./configuration";
 
 const userWelcomeChannels = loadPersistentData('welcome', {});
@@ -78,14 +78,6 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     }
 });
 
-// When a guild member is removed/leaves the server, delete their welcome channel if they
-// have one.
-client.on('guildMemberRemove', async member => {
-    if (userWelcomeChannels[member.guild.id].hasOwnProperty(member.id)) {
-        archiveWelcomeChannel(member.id, member.user.tag, member.guild, member.displayAvatarURL(), `${member.user.tag} has left the server`);
-    }
-});
-
 /**
  * Create a welcome channel for the specified member. Can optionally ping/not ping the member,
  * e.g. if this feature is being enabled on a server that didn't previously use it.
@@ -124,12 +116,16 @@ export async function createWelcomeChannel(member: GuildMember, ping: boolean) {
     });
 }
 
-async function archiveWelcomeChannel(memberId: string, userTag: string, guild: Guild, avatar: string | null, reason: string) {
+export async function archiveWelcomeChannel(memberId: string, userTag: string, guild: Guild, avatar: string | null, reason: string) {
+    if (!userWelcomeChannels[guild.id].hasOwnProperty(memberId)) {
+        return false;
+    }
+
     const channel = await client.channels.fetch(userWelcomeChannels[guild.id][memberId]);
 
     if (!channel || !(channel instanceof TextChannel)) {
         log('warn', `Unable to archive welcome channel for ${userTag} in ${guild.name}: Could not find channel`);
-        return;
+        return false;
     }
 
     const messages = await channel.messages.fetch();
@@ -138,16 +134,24 @@ async function archiveWelcomeChannel(memberId: string, userTag: string, guild: G
 
     let messageLog = '';
     let transcript = '';
+    let hasTranscript = false;
 
     messages.reverse().forEach(message => {
-        messageLog += `[${getFormattedDate(message.createdAt)}] ${message.author.tag}: ${message.content}\n`;
+        hasTranscript = transcript !== '';
         transcript += `<@${message.author.id}>: ${message.content}\n\n`;
+        messageLog += `[${getFormattedDate(message.createdAt)}] ${message.author.tag}: ${message.content}\n`;
     });
 
+    if (hasTranscript) {
+        transcript = `Transcript:\n\n> \n> ${transcript.trim().replace(/\n/g, '\n> ')}\n> ⠀\n`;
+    } else {
+        transcript = `Transcript: N/A (no messages posted to welcome channel)`;
+    }
+
     const embed = new MessageEmbed()
-        .setColor(EMBED_INFO_COLOR)
+        .setColor(reason.match(/(left|banned|removed|kicked)/i) ? EMBED_ERROR_COLOR : EMBED_INFO_COLOR)
         .setAuthor({ iconURL: avatar || '', name: `The welcome channel for ${userTag} has been archived` })
-        .setDescription(`The welcome channel for <@${memberId}> has been archived (${reason}). Transcript:\n\n> \n> ${transcript.trim().replace(/\n/g, '\n> ')}\n> ⠀\n`);
+        .setDescription(`The welcome channel for <@${memberId}> has been archived (${reason}). ${transcript}`);
 
     guild.systemChannel?.send({ embeds: [embed] });
 
@@ -156,4 +160,5 @@ async function archiveWelcomeChannel(memberId: string, userTag: string, guild: G
     }, 500);
     delete userWelcomeChannels[guild.id][memberId];
     savePersistentData('welcome', userWelcomeChannels);
+    return true;
 }

@@ -2,6 +2,7 @@ import { GuildTextBasedChannel, MessageEmbed, TextChannel } from "discord.js";
 import { client } from "../client";
 import { arrayRandom, diffDate, EMBED_ERROR_COLOR, getFormattedDate, log } from "../utils";
 import { getConfig } from "./configuration";
+import { archiveWelcomeChannel } from "./welcome_channel";
 
 const memberLeftMessages = [
     `Was it something I said? <:sadge:786846456769544253>`,
@@ -29,12 +30,6 @@ client.on('guildMemberRemove', async member => {
 
     log('info', `${member.user.tag} (${nickname}) has just left ${member.guild.name}`);
 
-    if (!config.removed_user_channel) {
-        return;
-    }
-
-    channel = await client.channels.fetch(config.removed_user_channel) as TextChannel;
-
     // Grab the most recent MEMBER_KICK audit event to see if this user was kicked or left on their own
     const fetchedBans = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_BAN_ADD' });
     const fetchedLogs = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_KICK' });
@@ -58,6 +53,17 @@ client.on('guildMemberRemove', async member => {
         message = 'just left the server!';
         goodbye = arrayRandom(memberLeftMessages);
     }
+    
+    // If this returns true, they had a welcome channel and weren't a full member
+    if (await archiveWelcomeChannel(member.id, member.user.tag, member.guild, member.displayAvatarURL(), `${member.user.tag} ${message}`)) {
+        return;
+    }
+
+    if (!config.removed_user_channel) {
+        return;
+    }
+
+    channel = await client.channels.fetch(config.removed_user_channel) as TextChannel;
 
     // Include their roles so they can be restored easier if the user accidentally left or comes back later
     let roles = member.roles.cache.filter(x => x.name !== '@everyone');
