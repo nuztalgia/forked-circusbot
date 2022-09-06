@@ -20,8 +20,6 @@ client.on('ready', async () => {
     if (config.thread_roles) {
         const threadGroups = guild.roles.cache.filter(x => config.thread_roles.includes(x.id));
         threadRoles[guild.id] = Object.fromEntries(threadGroups.map(x => [x.id, x.members.size]));
-    
-        console.log(threadRoles);
     }
 
     guild.channels.cache.forEach(async channel => {
