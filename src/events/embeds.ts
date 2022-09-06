@@ -196,7 +196,7 @@ export function createEventEmbed(event: CircusEvent) {
 function formatSignups(event: CircusEvent, role: keyof CircusEvent['signups'], emoji: string) {
     if (!event.signups[role]) {
         log('warn', `Event ${event.id} is missing a signup key for ${role}`);
-        return '';
+        return '⠀';
     }
 
     let signups = (Object.values(event.signups[role]).length > 0 ? `${emoji} ` : "");
@@ -204,5 +204,5 @@ function formatSignups(event: CircusEvent, role: keyof CircusEvent['signups'], e
 
     let limit = event.role_limits[role] >= 99 ? 1 : Math.min(16, event.role_limits[role]);
 
-    return signups || '\u200b\n'.repeat(limit - Math.max(0, Object.values(event.signups[role]).length - 1));
+    return signups || '\u200b\n'.repeat(limit - Math.max(0, Object.values(event.signups[role]).length - 1)) || '⠀';
 }
