@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { MessageActionRow, MessageEmbed, MessageSelectMenu } from 'discord.js';
 import { bot } from '../../bot';
 import { client } from '../../client';
 import { findMembers } from '../../utils';
@@ -25,7 +25,7 @@ bot.registerCommand('event_removeuser', ['event_removeusers', 'event_remove_user
 
     if (!user && message.guild) {
         smartMatch = true;
-        let users = await findMembers(message.guild, eventUser);
+        let users = (await findMembers(message.guild, eventUser)).filter(u => events[eventId].signups[eventRole].hasOwnProperty(u?.id));
 
         if (users.length === 0) {
             bot.replyTo(message, EMBED_ERROR_COLOR, "No users matched your search criteria, please use a tag (e.g. @Cad#1234) or mention");
@@ -33,16 +33,32 @@ bot.registerCommand('event_removeuser', ['event_removeusers', 'event_remove_user
         } else if (users.length === 1) {
             user = users[0]?.user;
         } else {
-            const fields: string[][] = [];
+            const fields: any = [];
 
             for (let member of users) {
-                fields.push([ member.user.id, member.user.tag, member.displayName ])
+                if (!member) continue;
+                fields.push({ description: member.user.tag, label: member.displayName, value: member.id })
             }
 
-            const embed = makeTable(['User Id', 'User Tag', 'Display Name'], fields)
-                .setDescription(`Multiple users were found that matched your query, please try again using their ID or Tag:`);
-            message.reply({ embeds: [embed] });
-            return;
+            const row = new MessageActionRow()
+                .addComponents(
+                    new MessageSelectMenu()
+                        .setCustomId('event_deluser_select')
+                        .setPlaceholder('Select the correct user')
+                        .addOptions(...fields),
+                );
+
+            const filter = i => {
+                i.deferUpdate();
+                return i.user.id === message.author.id;
+            };
+        
+            await message.reply({ content: `Multiple users were found that matched your query, please select the correct user to remove:`, components: [row] });
+            
+            let interaction = await message.channel.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 120000 });
+
+            user = users.find(u => u?.id == interaction.values[0])?.user;
+            setTimeout(() => interaction.deleteReply(), 150);
         }
     }
 

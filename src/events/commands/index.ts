@@ -10,6 +10,7 @@ import './event_removeuser';
 import './publish_event';
 import './ping_event';
 import './export_event';
+import './repost_event';
 import './event_help';
 import './register_slash_commands';
 import './unpublish_event';

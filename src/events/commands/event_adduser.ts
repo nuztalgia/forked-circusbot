@@ -1,3 +1,5 @@
+import { ComponentType } from 'discord-api-types';
+import { MessageActionRow, MessageSelectMenu } from 'discord.js';
 import { bot } from '../../bot';
 import { sendError, sendReply, EMBED_SUCCESS_COLOR, findMembers, EMBED_ERROR_COLOR, makeTable } from '../../utils';
 import { updateEventEmbeds } from '../embeds';
@@ -19,6 +21,12 @@ bot.registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau']
         eventRole = 'healers';
     } else if (eventRole === 'tank') {
         eventRole = 'tanks';
+    } else if (eventRole === 'heal_sub' || eventRole === 'healer_sub' || eventRole === 'healsub' || eventRole === 'healersub') {
+        eventRole = 'healer_subs ';
+    } else if (eventRole === 'dps_sub' || eventRole === 'dpssub') {
+        eventRole = 'dps_subs ';
+    }else if (eventRole === 'tank_sub' || eventRole === 'tanksub') {
+        eventRole = 'tank_subs ';
     }
 
     if (!user && message.guild) {
@@ -31,16 +39,32 @@ bot.registerCommand('event_adduser', ['event_addusers', 'event_add_user', 'eau']
         } else if (users.length === 1) {
             user = users[0]?.user;
         } else {
-            const fields: string[][] = [];
+            const fields: any = [];
 
             for (let member of users) {
-                fields.push([ member.user.id, member.user.tag, member.displayName ])
+                if (!member) continue;
+                fields.push({ description: member.user.tag, label: member.displayName, value: member.id })
             }
 
-            const embed = makeTable(['User Id', 'User Tag', 'Display Name'], fields)
-                .setDescription(`Multiple users were found that matched your query, please try again using their ID or Tag:`);
-            message.reply({ embeds: [embed] });
-            return;
+            const row = new MessageActionRow()
+                .addComponents(
+                    new MessageSelectMenu()
+                        .setCustomId('event_adduser_select')
+                        .setPlaceholder('Select the correct user')
+                        .addOptions(...fields),
+                );
+
+            const filter = i => {
+                i.deferUpdate();
+                return i.user.id === message.author.id;
+            };
+        
+            await message.reply({ content: `Multiple users were found that matched your query, please select the correct user to add:`, components: [row] });
+            
+            let interaction = await message.channel.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 120000 });
+
+            user = users.find(u => u?.id == interaction.values[0])?.user;
+            setTimeout(() => interaction.deleteReply(), 150);
         }
     }
 

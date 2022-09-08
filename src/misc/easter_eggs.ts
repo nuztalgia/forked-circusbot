@@ -26,7 +26,7 @@ export async function easterEggHandler(message: Message<boolean>) {
         setTimeout(() => message.react('<a:pepeRunCry:786844735754338304>'), 100);
     } else if (message.content.match(/^((<@\!?912376778939584562> )? *(hi|hello|hey) cirque ?bot *|<@\!?912376778939584562> *(hi|hello|hey) *)/i)) {
         setTimeout(() => message.react('<a:clownWave:819822599726432266>'), 100);
-    } else if (message.content.match(/^(<@\!?912376778939584562>).*\berp\b/)) {
+    } else if (message.content.match(/^(<@\!?912376778939584562>).*\berp\b/i)) {
         setTimeout(() => message.react('<:no:740146335197691945>'), 100);
     } else if (message.content.match(/blame cirque ?bot/i)) {
         setTimeout(() => message.react('<a:pineappleNopers:925470285015183400>'), 100);
