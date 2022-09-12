@@ -22,6 +22,15 @@ bot.registerCommand('help', [], async interaction => {
     if (bot.checkPermissions('nroll', interaction.channel)) {
         helpMsg += "🎲 `roll`\nRoll a random number. Useful if you are indecisive, or just want to fairly select an option. Can take a range to roll (min & max, or just max). Default minimum value is 1.\n**Example:** `!roll 5 20`\n\n";
     }
+    if (bot.checkPermissions('pick', interaction.channel)) {
+        helpMsg += "⛏️ `pick`\nPick a random option from the provided comma/space separated options. Useful if you are indecisive, or just want to fairly select an option.\n**Example:** `!pick red, blue, green`\n\n";
+    }
+    if (bot.checkPermissions('poll', interaction.channel)) {
+        helpMsg += "📊 `poll`\nAutomatically format the choices and add reactions for each choice to allow people to vote on their preferred option.\n**Example:** `!poll Which raid today? Dxun, Gods, Dread Fortress, Dread Palace`\n\n";
+    }
+    if (bot.checkPermissions('raid', interaction.channel)) {
+        helpMsg += "⛰️ `raid`\nPick a random hardmode or nightmare operation. Can filter by HM/NiM or allow the bot to choose from either.\n**Example:** `!raid nim`\n\n";
+    }
 
     helpMsg += "🗒️ `=`\nCanned Messages allow you to create an interactive Discord 'wiki' of sorts, where users can create a named message with an assigned value, and users can re-post the assigned value using just the name in any channel. For more information, type `=help`.\n**Example:** `=parse=Here is our StarParse information`\n\n";
     helpMsg += "<:worrySnipe:953042402074050560> `pls snipe`\nThis infamous command allows you to 'snipe' a deleted message posted within the configured time limit. CirqueBot will repost the message & author of the deleted message. Please use responsibly.\n\n";
