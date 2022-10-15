@@ -35,6 +35,20 @@ bot.registerCommand('debug', [], async message => {
         return;
     } else if (subCommand === 'welcome' && message instanceof Message) {
         createWelcomeChannel(message.mentions.members?.first(), false);
+    } else if (subCommand === 'unarchivethread' && message instanceof Message) {
+        const channel = message.mentions.channels.first() as TextChannel;
+        const archivedThreads = await channel.threads.fetchArchived();
+        const existingThread = archivedThreads.threads.find(x => x.id === params.split(' ')[1]);
+        
+        if (existingThread) {
+            log('info', `Unarchiving thread ${existingThread.id} (${existingThread.name})`);
+            await existingThread.setArchived(false);
+            await existingThread.setLocked(false);
+            log('info', `  The thread should now be reopened`);
+            message.react('👍');
+        } else {
+            message.react('👎');
+        }
     } else if (subCommand === 'archivethread' && message instanceof Message) {
         const channel = message.mentions.channels.first() as TextChannel;
         const existingThread = channel.threads.cache.find(x => x.id === params.split(' ')[1]);
@@ -43,7 +57,7 @@ bot.registerCommand('debug', [], async message => {
             log('info', `Archiving thread ${existingThread.id} (${existingThread.name})`);
             await existingThread.setLocked(true);
             await existingThread.setArchived(true);
-            log('info', `  Archived thread should now be archived`);
+            log('info', `  The thread should now be archived`);
             message.react('👍');
         } else {
             message.react('👎');

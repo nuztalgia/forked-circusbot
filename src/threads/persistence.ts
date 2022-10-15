@@ -39,9 +39,9 @@ export function scheduleThreadArchival(thread: CircusThread) {
 
         let date = new Date();
         date.setDate(date.getDate() + thread.archiveDays);
-        thread.archiveDate = getFormattedDate(date).split(' ')[0];
+        threads[thread.id].archiveDate = getFormattedDate(date).split(' ')[0];
         saveThreads();
-        scheduleThreadArchival(thread);
+        scheduleThreadArchival(threads[thread.id]);
     }, (date - Date.now()) + 5000);
 }
 
@@ -101,6 +101,11 @@ export async function updateThread(thread: CircusThread) {
                 message.edit({ embeds: message.embeds });
             }
 
+            if (message.embeds[0].description !== thread.notes) {
+                message.embeds[0].setDescription(thread.notes);
+                message.edit({ embeds: message.embeds });
+            }
+
             if (message.embeds[0].footer?.text !== getFooterText(thread)) {
                 message.embeds[0].setFooter({ text: getFooterText(thread) });
                 message.edit({ embeds: message.embeds });
@@ -156,10 +161,14 @@ export async function buildThread(thread: CircusThread) {
     threads[thread.id].threadId = newThread.id;
     await newThread.join();
     
-    const embed = new MessageEmbed()
+    let embed = new MessageEmbed()
         .setColor(EMBED_INFO_COLOR)
         .setTitle(thread.description)
         .setFooter({ text: getFooterText(thread) });
+
+    if (thread.notes) {
+        embed = embed.setDescription(thread.notes);
+    }
 
     await newThread.send({ embeds: [embed] });
     const msg = await newThread.send('Adding Users');

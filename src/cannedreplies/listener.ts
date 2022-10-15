@@ -11,7 +11,6 @@ interface CannedReply {
 
 export const cannedReplies = loadPersistentData('cannedreplies', {}) as { [guildId: string]: { [name: string]: CannedReply } };
 
-
 /**
  * Only load images/embeds from trusted domains for security reasons. Don't want spammers to
  * abuse this feature.
@@ -207,7 +206,13 @@ export function cannedReplyHandler(message: Message<boolean>) {
 
         bot.replyTo(message, EMBED_INFO_COLOR, renderCannedReply(cannedReply));
     } else if (reply) { 
-        bot.replyTo(message, EMBED_INFO_COLOR, renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply));
+        let cannedReply = renderCannedReply(reply.value.startsWith('@') ? cannedReplies[message.guildId][reply.value.substring(1)] : reply);
+
+        if (name.includes('rotation') && cannedReply instanceof MessageEmbed) {
+            cannedReply = cannedReply.setFooter({ text: `${name} | Use =rotation to select a different rotation guide`});
+        }
+
+        bot.replyTo(message, EMBED_INFO_COLOR, cannedReply);
     } else if (name.includes('rotation')) {
         bot.execCommand('crlist', message);
     } else {

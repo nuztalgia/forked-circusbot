@@ -13,6 +13,7 @@ function editEventUsage(channel: TextBasedChannel) {
         "Valid fields:\n\n" +
         " - title\n" + 
         " - description\n" +
+        " - notes\n" +
         " - enabled\n" +
         " - archiveDate\n" +
         " - archiveDays\n" +
@@ -50,14 +51,14 @@ bot.registerCommand('edit_thread', ['et'], message => {
         threads[threadId].newChannel = message.mentions.channels.first()?.id || '';
         bot.replyTo(message, EMBED_INFO_COLOR, 'The next time the thread is archived and recreated, the thread will be created in the updated channel. To move the thread now, use the `!rebuild_thread` command');
         return;
-    } else if (threads[threadId].hasOwnProperty(threadField)) {
+    } else if (threads[threadId].hasOwnProperty(threadField) || threadField === 'notes') {
         threads[threadId][threadField] = threadValue;
     } else {
         editEventUsage(message.channel);
         return;
     }
 
-    if (['title', 'description', 'archiveDays'].includes(threadField)) {
+    if (['title', 'description', 'notes', 'archiveDays'].includes(threadField)) {
         updateThread(threads[threadId]);
     }
 

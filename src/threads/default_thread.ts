@@ -7,6 +7,7 @@ export function makeEmptyThread(): CircusThread {
         messageId: '',
         title: '',
         description: '',
+        notes: '',
         channel: '',
         newChannel: null,
         enabled: true,

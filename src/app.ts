@@ -6,7 +6,7 @@ import { easterEggHandler } from './misc/easter_eggs';
 import { cannedReplyHandler } from './cannedreplies/listener';
 import { log } from './utils';
 import { client } from './client';
-import { DMChannel } from 'discord.js';
+import { DMChannel, TextChannel } from 'discord.js';
 import { bot } from './bot';
 
 import './admin/removed_member_log';
@@ -27,6 +27,14 @@ client.on('ready', async () => {
   });
 });
 
+client.on('messageUpdate', async (message) => {
+    // Easter egg - emote only channel
+    // TODO: Move into separate handler
+    if (message.channel instanceof TextChannel && message.channel.name.includes('emotes-only')) {
+        message.delete();
+    }
+});
+
 client.on('messageCreate', async (message) => {
     // In development mode, ignore messages unless listed in BOT_DEVS to avoid duplicate responses
     // from CircusBot (e.g. if both the prod and dev bots respond).
@@ -37,6 +45,17 @@ client.on('messageCreate', async (message) => {
     // Ignore messages written by other bots
     if (message.author.bot) {
         return;
+    }
+
+    // Easter egg - emote only channel
+    // TODO: Move into separate handler
+    if (message.channel instanceof TextChannel && message.channel.name.includes('emotes-only')) {
+        const text = message.content.replace(/<a?:.+?:\d+>|\p{Extended_Pictographic}/gu, '').replace(/\s+/g, '');
+
+        if (text) {
+            console.log(`Deleting message from ${message.channel.name} by ${message.author.tag}: ${message.content}`);
+            message.delete();
+        }
     }
 
     // If it's a registered command, call the command handler
@@ -57,7 +76,7 @@ client.on('messageCreate', async (message) => {
     threadCreationHandler(message);
     antispamHandler(message);
     easterEggHandler(message);
-    cannedReplyHandler(message);
+    cannedReplyHandler(message, true);
 });
 
 if (process.env.MODE === 'development') {

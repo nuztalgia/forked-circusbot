@@ -33,7 +33,8 @@ function scheduleReminder(reminder: any) {
         return;
     }   
 
-    log('info', `${reminder.remindedBy} has set a reminder for ${reminder.remindee} at ${reminder.remindAt}`);
+    let hours = Math.abs(Date.parse(reminder.remindAt) - Date.now()) / 36e5;
+    log('info', `${reminder.remindedByTag} has set a reminder for ${reminder.remindeeTag} at ${reminder.remindAt} (${hours} hours from now)`);
 
     setTimeout(async () => {
         const channel = await client.channels.fetch(reminder.channel) as TextChannel;
@@ -54,7 +55,7 @@ function scheduleReminder(reminder: any) {
 bot.registerCommand('remind_me', ['remindme', 'remind'], message => {
     if (!(message instanceof Message)) return;
 
-    let [user, remindTime, remindUnit, reminder] = bot.parseCommand(message, /(<.*?> )?(([0-9]+) ?(?:secs?|seconds?|s|mins?|minutes?|m|hrs?|hours?|h|days?|d|weeks?|w|months?|mo|years?|y)|[0-9]{1,2}:[0-9]{2} ?(?:AM|PM))(.*)/i);
+    let [user, remindTime, remindUnit, reminder] = bot.parseCommand(message, /(<.*?> )?(([0-9]+(?:\.[0-9]+)?) ?(?:seconds?|secs?|s|minutes?|mins?|m|hrs?|hours?|h|days?|d|weeks?|w|months?|mo|years?|y)|[0-9]{1,2}:[0-9]{2} ?(?:AM|PM))(.*)/i);
     
     let remindee = user ? message.mentions.users.first() : message.author;
 
@@ -66,19 +67,19 @@ bot.registerCommand('remind_me', ['remindme', 'remind'], message => {
     let remindAt = new Date();
 
     if (remindTime.match(/([0-9] ?s$|sec)/i)) {
-        remindAt.setSeconds(remindAt.getSeconds() + parseInt(remindUnit));
+        remindAt.setSeconds(remindAt.getSeconds() + parseFloat(remindUnit));
     } else if (remindTime.match(/([0-9] ?m$|min)/i)) {
-        remindAt.setMinutes(remindAt.getMinutes() + parseInt(remindUnit));
+        remindAt.setSeconds(remindAt.getSeconds() + parseFloat(remindUnit) * 60);
     } else if (remindTime.match(/([0-9] ?h$|hour|hr)/i)) {
-        remindAt.setHours(remindAt.getHours() + parseInt(remindUnit));
+        remindAt.setMinutes(remindAt.getMinutes() + parseFloat(remindUnit) * 60);
     } else if (remindTime.includes('day') || remindTime.match(/[0-9] ?d$/)) {
-        remindAt.setHours(remindAt.getHours() + parseInt(remindUnit) * 24);
+        remindAt.setHours(remindAt.getHours() + parseFloat(remindUnit) * 24);
     } else if (remindTime.includes('week') || remindTime.match(/[0-9] ?w$/)) {
-        remindAt.setHours(remindAt.getHours() + parseInt(remindUnit) * 24 * 7);
+        remindAt.setHours(remindAt.getHours() + parseFloat(remindUnit) * 24 * 7);
     } else if (remindTime.includes('month') || remindTime.match(/[0-9] ?mo$/)) {
-        remindAt.setMonth(remindAt.getMonth() + parseInt(remindUnit));
+        remindAt.setMonth(remindAt.getMonth() + parseFloat(remindUnit));
     } else if (remindTime.includes('year') || remindTime.match(/[0-9] ?y$/)) {
-        remindAt.setFullYear(remindAt.getFullYear() + parseInt(remindUnit));
+        remindAt.setFullYear(remindAt.getFullYear() + parseFloat(remindUnit));
     } else {
         let scheduledTime = remindAt.getFullYear() + "-" + ('0' + (remindAt.getMonth() + 1)).slice(-2) + "-" + ('0' + remindAt.getDate()).slice(-2) + ' ' + remindTime + ' EST';
         remindAt = new Date(scheduledTime);

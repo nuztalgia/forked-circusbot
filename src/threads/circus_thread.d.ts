@@ -6,6 +6,7 @@ interface CircusThread {
     messageId: string?;
     title: string;
     description: string;
+    notes: string;
     channel: string;
     newChannel: string?;
     visibility: string;
