@@ -115,6 +115,8 @@ bot.registerCommand('configure', ['conf'], async message => {
 
         if (option === 'removed_user_channel') {
             config.removed_user_channel = message.mentions.channels.first()?.id;
+        } else if (option === 'deletion_log_channel') {
+            config.deletion_log_channel = message.mentions.channels.first()?.id;
         } else if (option) {
             bot.replyTo(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
             return;
@@ -126,12 +128,18 @@ bot.registerCommand('configure', ['conf'], async message => {
             return;
         }
 
-        let removedUserChannel;
+        let removedUserChannel, deletionLogChannel;
         
         try {
             removedUserChannel = await client.channels.fetch(config.removed_user_channel) as TextChannel;
         } catch {
             removedUserChannel = { name: '<N/A>' };
+        }
+
+        try {
+            deletionLogChannel = await client.channels.fetch(config.deletion_log_channel) as TextChannel;
+        } catch {
+            deletionLogChannel = { name: '<N/A>' };
         }
 
         const embed = new MessageEmbed()
@@ -142,6 +150,11 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'be disabled.\n' + 
                 'Current Configuration:\n' + 
                 '```\n#' + removedUserChannel?.name + '\n```\n\n' + 
+                '🗑️ `!configure admin.deletion_log_channel`\n' + 
+                'The channel to log when a message is deleted. Only messages deleted by other users are recorded, not messages ' + 
+                'by the author themselves (for privacy reasons).\n' + 
+                'Current Configuration:\n' + 
+                '```\n#' + deletionLogChannel?.name + '\n```\n\n' + 
                 '');
         bot.replyTo(message, EMBED_INFO_COLOR, embed);
     } else if (namespace === 'cannedreplies') {

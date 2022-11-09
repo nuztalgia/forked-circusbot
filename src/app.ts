@@ -9,6 +9,7 @@ import { client } from './client';
 import { DMChannel, TextChannel } from 'discord.js';
 import { bot } from './bot';
 
+import './admin/deletion_log';
 import './admin/removed_member_log';
 import './admin/welcome_channel';
 import './admin/commands';
