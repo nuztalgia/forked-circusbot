@@ -24,6 +24,31 @@ const rotations = {
     "Virulence / Dirty Fighting": ["=virulence rotation"],
 };
 
+const trees = {
+    "Advanced Prototype / Tactics": ["=ap tree"],
+    "Annihilation / Watchman": ["=annihilation tree"],
+    "Apple / Tree": ["=appletree"],
+    "Arsenal / Gunnery": ["=arsenal tree"],
+    "Bodyguard / Combat Medic": ["=bodyguard tree"],
+    "Carnage / Combat": ["=carnage tree"],
+    "Concealment / Scrapper": ["=concealment tree"],
+    "Corruption / Seer": ["=corruption tree"],
+    "Deception / Infiltration": ["=deception tree"],
+    "Engineering / Saboteur": ["=engineering tree"],
+    "Fury / Concentration": ["=fury tree"],
+    "Hatred / Serenity": ["=hatred tree",],
+    "Innovative Ordnance / Assault Specialist": ["=io tree"],
+    "Lethality / Ruffian": ["=lethtree"],
+    "Lightning / Telekinetics": ["=lightning tree"],
+    "Madness / Balance": ["=madness tree"],
+    "Marksmanship / Sharpshooter": ["=marksman tree"],
+    "Medicine / Sawbones": ["=medicine tree"],
+    "Pyrotech / Plasmatech": ["=pyro tree"],
+    "Rage / Focus": ["=rage tree"],
+    "Vengeance / Vigilance": ["=vengeance tree"],
+    "Virulence / Dirty Fighting": ["=virulence tree"],
+};
+
 bot.registerCommand('crlist', [], async message => {
     let searchTerm = message.content.split(' ')[1];
     let fields: string[][] = [];
@@ -32,6 +57,9 @@ bot.registerCommand('crlist', [], async message => {
 
     if (!searchTerm && message.content.endsWith('rotation')) {
         searchTerm = 'rotation';
+        couldntFind = true;
+    } else if (!searchTerm && message.content.endsWith('tree')) {
+        searchTerm = 'tree';
         couldntFind = true;
     }
 
@@ -57,6 +85,7 @@ bot.registerCommand('crlist', [], async message => {
         // Allow nice names for a subset of canned replies
         let niceName = name;
         if (searchTerm === 'rotation') niceName = name.replace(/ ?rotation/, ' rotation');
+        if (searchTerm === 'tree') niceName = name.replace(/ ?tree/, ' tree');
 
         // Avoid duplicates
         if (fields.find(x => x[0] === `=${niceName}`)) continue;
@@ -64,11 +93,17 @@ bot.registerCommand('crlist', [], async message => {
         fields.push([ `=${niceName}`, reply.author, flags.join(', ') || '⠀' ])
     }
 
-    if (searchTerm === 'rotation' && !message.content.split(' ')[0].includes('search')) {
+    if ((searchTerm === 'rotation' || searchTerm === 'tree') && !message.content.split(' ')[0].includes('search')) {
         const options: any = [];
 
-        for (let spec in rotations) {
-            options.push({ label: spec, value: rotations[spec].join(',') })
+        if (searchTerm === 'rotation') {
+            for (let spec in rotations) {
+                options.push({ label: spec, value: rotations[spec].join(',') })
+            }
+        } else if (searchTerm === 'tree') {
+            for (let spec in trees) {
+                options.push({ label: spec, value: trees[spec].join(',') })
+            }
         }
 
         const row = new MessageActionRow()

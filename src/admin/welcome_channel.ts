@@ -119,7 +119,16 @@ export async function archiveWelcomeChannel(memberId: string, userTag: string, g
         return false;
     }
 
-    const channel = await client.channels.fetch(userWelcomeChannels[guild.id][memberId]);
+    let channel;
+
+    try {
+        channel = await client.channels.fetch(userWelcomeChannels[guild.id][memberId]);
+    } catch (err) {
+        log('warn', `Unable to archive welcome channel for ${userTag} in ${guild.name}: Could not find channel`);
+        return false;
+    }
+
+    const config = getConfig(guild.id, 'welcome', { enabled: false });
 
     if (!channel || !(channel instanceof TextChannel)) {
         log('warn', `Unable to archive welcome channel for ${userTag} in ${guild.name}: Could not find channel`);
@@ -155,8 +164,14 @@ export async function archiveWelcomeChannel(memberId: string, userTag: string, g
 
     setTimeout(() => {
         channel?.delete(reason);
-    }, 500);
+    }, 15000);
     delete userWelcomeChannels[guild.id][memberId];
     savePersistentData('welcome', userWelcomeChannels);
+
+    if (!(transcript.includes('!nowelcome') || transcript.includes('!no welcome'))) {
+        let greetingChannel = await client.channels.fetch(config.channel) as TextChannel;
+        await greetingChannel.send({ content: config.message.replace(/<user>/i, `<@${memberId}>`).replace(/<server>/i, guild.name) });
+    }
+
     return true;
 }

@@ -210,10 +210,12 @@ export function cannedReplyHandler(message: Message<boolean>) {
 
         if (name.includes('rotation') && cannedReply instanceof MessageEmbed) {
             cannedReply = cannedReply.setFooter({ text: `${name} | Use =rotation to select a different rotation guide`});
+        } else if (name.includes('tree') && cannedReply instanceof MessageEmbed) {
+            cannedReply = cannedReply.setFooter({ text: `${name} | Use =tree to select a different passive tree`});
         }
 
         bot.replyTo(message, EMBED_INFO_COLOR, cannedReply);
-    } else if (name.includes('rotation')) {
+    } else if (name.includes('rotation') || name.includes('tree')) {
         bot.execCommand('crlist', message);
     } else {
         bot.replyTo(message, EMBED_ERROR_COLOR, `Unknown canned message. To create a new canned message, please use the following syntax (anyone can create canned messages):\n\n\`=${name}=Your custom text here\`\n\nThen you can print the content of the canned reply using \`=${name}\` in any channel with this bot in it.\n\nIf you're trying to find a canned reply, you can use the \`=search\` feature, e.g. \`=search rotation\` will show all canned replies with rotation in the name.`);

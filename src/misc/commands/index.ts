@@ -9,4 +9,3 @@ import './remind_me';
 import './pick';
 import './poll';
 import './plssnip';
-import './welcome';

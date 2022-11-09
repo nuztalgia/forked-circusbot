@@ -20,14 +20,22 @@ bot.registerCommand('configure', ['conf'], async message => {
     if (namespace === 'welcome') {
         const config = getConfig(message.guildId, 'welcome', { enabled: false, admin_roles: ' ', thread_roles: ' ', prefix: '🎪welcome-', greeting: 'Hello <user>! Welcome to **<server>**! 😄' });
         const adminRoles = message.guild?.roles.cache.filter(x => (config.admin_roles || []).includes(x.id));
+        const defaultRoles = message.guild?.roles.cache.filter(x => (config.default_roles || []).includes(x.id));
         const threadGroups = message.guild?.roles.cache.filter(x => (config.thread_roles || []).includes(x.id));
 
         if (option === 'enabled') {
             config.enabled = value.toLocaleLowerCase() === 'true' || value.toLocaleLowerCase() === 'yes';
         } else if (option === 'prefix') {
             config.prefix = value.replace(/^#/, ''); 
-        }  else if (option === 'greeting') {
+        } else if (option === 'greeting') {
             config.greeting = value; 
+        } else if (option === 'message') {
+            config.message = value; 
+        } else if (option === 'default_roles') {
+            const newRoles = value.split(/[ ,]/).map(x => x.replace(/^@/, ''));
+            config.default_roles = message.guild?.roles.cache.filter(x => newRoles.includes(x.name)).concat(message.mentions.roles).map(x => x.id);
+        } else if (option === 'channel') {
+            config.channel = message.mentions.channels.first()?.id;
         } else if (option === 'admin_roles' || option === 'roles') {
             const newRoles = value.split(/[ ,]/).map(x => x.replace(/^@/, ''));
             config.admin_roles = message.guild?.roles.cache.filter(x => newRoles.includes(x.name)).concat(message.mentions.roles).map(x => x.id);
@@ -43,6 +51,14 @@ bot.registerCommand('configure', ['conf'], async message => {
             saveConfig(message.guildId, 'welcome', config);
             message.react('👍');
             return;
+        }
+
+        let welcomeChannel;
+        
+        try {
+            welcomeChannel = await client.channels.fetch(config.channel) as TextChannel;
+        } catch {
+            welcomeChannel = { name: '<N/A>' };
         }
 
         const embed = new MessageEmbed()
@@ -64,10 +80,25 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'Current Configuration:\n' + 
                 '```\n' + (adminRoles?.map(x => `@` + x.name).join(' ') || '-') + '\n```\n\n' + 
 
+                '⚙️ `!configure welcome.default_roles`\n' + 
+                'A list of roles that will be added to the user by the !welcome or !nowelcome commands.\n' + 
+                'Current Configuration:\n' + 
+                '```\n' + (defaultRoles?.map(x => `@` + x.name).join(' ') || '-') + '\n```\n\n' + 
+
                 '⚙️ `!configure welcome.thread_groups`\n' + 
                 'A list of possible roles to automatically add the user to. Used to add people to threads given the 100 member limit.\n' + 
                 'Current Configuration:\n' + 
                 '```\n' + (threadGroups?.map(x => `@` + x.name).join(' ') || '-') + '\n```\n\n' + 
+
+                '⚙️ `!configure welcome.channel`\n' + 
+                'The channel to send a welcome message in, once the new user is assigned a role. See `welcome.message` to change the message itself.\n' + 
+                'Current Configuration:\n' + 
+                '```\n' + (welcomeChannel?.name) + '\n```\n\n' + 
+
+                '⚙️ `!configure welcome.message`\n' + 
+                'The channel to send a greeting for if the new user is assigned a role. See `welcome.greeting` to change the message itself.\n' + 
+                'Current Configuration:\n' + 
+                '```\n' + (config.message) + '\n```\n\n' + 
 
                 '📢 `!configure welcome.greeting`\n' + 
                 'The greeting message for CirqueBot to send to a user once their welcome channel has been created.\n\n' + 
