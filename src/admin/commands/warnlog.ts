@@ -1,12 +1,10 @@
 import { Message, MessageEmbed, Permissions } from 'discord.js';
 import { bot } from '../../bot';
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, makeError, makeTable, startTyping } from '../../utils';
-
-import { loadPersistentData } from '../../utils';
+import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, makeError, makeTable, loadPersistentData } from '../../utils';
 
 bot.registerCommand('warnlog', [], async message => {
     const warnedUser = message.mentions.users.first();
-    await startTyping(message.channel);
+    await bot.startTyping(message.channel);
 
     if (!(message instanceof Message) || !message.guild) {
         return;

@@ -1,5 +1,5 @@
 import { ColorResolvable, CommandInteraction, Message, MessageEmbed, TextBasedChannel, TextChannel, User } from 'discord.js';
-import { log, EMBED_ERROR_COLOR, sendReply, makeError } from './utils';
+import { log, EMBED_ERROR_COLOR, sendReply, makeError, startTyping } from './utils';
 import config from '../config.json';
 
 const commands: { [command: string]: (message: Message<boolean>, user: User) => any } = {};
@@ -17,6 +17,10 @@ class Bot {
 
     get config() {
         return config;
+    }
+
+    public async startTyping(channel: TextBasedChannel | null) {
+        return await startTyping(channel);
     }
 
     /**

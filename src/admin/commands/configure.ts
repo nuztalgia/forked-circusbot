@@ -1,7 +1,7 @@
 import { Message, MessageEmbed, TextChannel } from 'discord.js';
 import { bot } from '../../bot';
 import { client } from '../../client';
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, makeError } from '../../utils';
+import { makeError } from '../../utils';
 import { getConfig, saveConfig } from '../configuration';
 
 /**
@@ -43,7 +43,7 @@ bot.registerCommand('configure', ['conf'], async message => {
             const newRoles = value.split(/[ ,]/).map(x => x.replace(/^@/, ''));
             config.thread_roles = message.guild?.roles.cache.filter(x => newRoles.includes(x.name)).concat(message.mentions.roles).map(x => x.id);
         } else if (option) {
-            bot.replyTo(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
+            bot.replyTo(message, bot.COLORS.ERROR, makeError('Invalid option'));
             return;
         }
 
@@ -109,7 +109,7 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'Current Configuration:\n' + 
                 '```\n' + (config.greeting) + '\n```\n\n' + 
                 '');
-        bot.replyTo(message, EMBED_INFO_COLOR, embed);
+        bot.replyTo(message, bot.COLORS.INFO, embed);
     } else if (namespace === 'admin') {
         const config = getConfig(message.guildId, 'admin', { removed_user_channel: '' });
 
@@ -118,7 +118,7 @@ bot.registerCommand('configure', ['conf'], async message => {
         } else if (option === 'deletion_log_channel') {
             config.deletion_log_channel = message.mentions.channels.first()?.id;
         } else if (option) {
-            bot.replyTo(message, EMBED_ERROR_COLOR, makeError('Invalid option'));
+            bot.replyTo(message, bot.COLORS.ERROR, makeError('Invalid option'));
             return;
         }
 
@@ -156,7 +156,7 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'Current Configuration:\n' + 
                 '```\n#' + deletionLogChannel?.name + '\n```\n\n' + 
                 '');
-        bot.replyTo(message, EMBED_INFO_COLOR, embed);
+        bot.replyTo(message, bot.COLORS.INFO, embed);
     } else if (namespace === 'cannedreplies') {
 
     } else {
@@ -181,6 +181,6 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'have multiple roles that a user can sign-up as, role limitations, role requirements, and functionality to open/close sign-ups ' +
                 'at a specific date/time, message users who signed up, etc.\n\n' +
                 '');
-        bot.replyTo(message, EMBED_INFO_COLOR, embed);
+        bot.replyTo(message, bot.COLORS.INFO, embed);
     }
 });

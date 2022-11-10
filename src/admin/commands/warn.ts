@@ -1,36 +1,33 @@
-import { Message, MessageEmbed, Permissions } from 'discord.js';
+import { Message, MessageEmbed, Permissions, TextChannel } from 'discord.js';
 import { bot } from '../../bot';
-import { EMBED_ERROR_COLOR, getFormattedDate, makeError, startTyping } from '../../utils';
-
-import { loadPersistentData, savePersistentData } from '../../utils';
+import { getFormattedDate, makeError, loadPersistentData, savePersistentData } from '../../utils';
 
 bot.registerCommand('warn', [], async message => {
     const [_user, warnReason] = bot.parseCommand(message, /(<.*?> )(.*)/);
     const warnedUser = message.mentions.users.first();
-
-    await startTyping(message.channel);
-
-    if (!(message instanceof Message) || !message.guild) {
-        return;
-    }
-
     const warnings = loadPersistentData('warnings', {});
-    const member = await message.guild.members.fetch(message.author.id)
+    const member = await message.guild?.members.fetch(message.author.id)
 
-    if (!member.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
-        bot.replyTo(message, EMBED_ERROR_COLOR, makeError("Sorry, but you don't have permission to do that"));
+    await bot.startTyping(message.channel);
+
+    if (!(message instanceof Message) || !message.guild || !(message.channel instanceof TextChannel)) {
+        return;
+    } else if (!warnedUser) {
+        return bot.replyTo(message, bot.COLORS.ERROR, makeError("Please specify a user to warn"));
+    } else if (!member?.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
+        bot.replyTo(message, bot.COLORS.ERROR, makeError("Sorry, but you don't have permission to do that"));
         return;
     }
 
     if (!warnings.hasOwnProperty(message.guildId)) {
-        warnings[message.guildId] = {};
+        warnings[message.guild.id] = {};
     }
 
-    if (!warnings[message.guildId].hasOwnProperty(warnedUser.id)) {
-        warnings[message.guildId][warnedUser.id] = [];
+    if (!warnings[message.guild.id].hasOwnProperty(warnedUser.id)) {
+        warnings[message.guild.id][warnedUser.id] = [];
     }
 
-    warnings[message.guildId][warnedUser.id].push({
+    warnings[message.guild.id][warnedUser.id].push({
         warnedBy: message.author.id,
         warnedByTag: message.author.tag,
         reason: warnReason,
@@ -44,7 +41,7 @@ bot.registerCommand('warn', [], async message => {
     savePersistentData('warnings', warnings);
 
     const embed = new MessageEmbed()
-        .setColor(EMBED_ERROR_COLOR)
+        .setColor(bot.COLORS.ERROR)
         .setAuthor({
             iconURL: warnedUser.displayAvatarURL() || '',
             name: `${warnedUser?.tag} has been warned`

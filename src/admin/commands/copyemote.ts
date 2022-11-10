@@ -1,11 +1,11 @@
 import { Message, Permissions } from 'discord.js';
 import { bot } from '../../bot';
-import { EMBED_ERROR_COLOR, EMBED_SUCCESS_COLOR, log, makeError, sendReply, startTyping } from '../../utils';
+import { log, makeError } from '../../utils';
 
 bot.registerCommand('copyemote', ['emote', 'addemote'], async message => {
     const [emote] = bot.parseCommand(message, /(.*)/);
 
-    await startTyping(message.channel);
+    await bot.startTyping(message.channel);
 
     if (!(message instanceof Message) || !message.guild) {
         return;
@@ -14,7 +14,7 @@ bot.registerCommand('copyemote', ['emote', 'addemote'], async message => {
     const member = await message.guild.members.fetch(message.author.id)
 
     if (!member.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)) {
-        bot.replyTo(message, EMBED_ERROR_COLOR, makeError("Sorry, but you don't have permission to do that"));
+        bot.replyTo(message, bot.COLORS.ERROR, makeError("Sorry, but you don't have permission to do that"));
         return;
     }
 
@@ -41,7 +41,7 @@ bot.registerCommand('copyemote', ['emote', 'addemote'], async message => {
 
         // Message didn't contain an emoji to copy
         if (!m) {
-            bot.replyTo(message, EMBED_ERROR_COLOR, makeError("No emoji detected"));
+            bot.replyTo(message, bot.COLORS.ERROR, makeError("No emoji detected"));
             return;
         }
 
@@ -63,10 +63,10 @@ bot.registerCommand('copyemote', ['emote', 'addemote'], async message => {
 
         // Need a slight timeout after adding the emote or it won't load in the resulting message
         setTimeout(() => {
-            bot.replyTo(message, EMBED_SUCCESS_COLOR, `Your new emote has been added <${url.includes('.gif') ? 'a' : ''}:${newEmoji.name}:${newEmoji.id}>`);
+            bot.replyTo(message, bot.COLORS.SUCCESS, `Your new emote has been added <${url.includes('.gif') ? 'a' : ''}:${newEmoji.name}:${newEmoji.id}>`);
         }, 100);
     } catch (err) {
         // Typical failures is only if we're out of emoji slots, or the attachment is too big
-        bot.replyTo(message, EMBED_ERROR_COLOR, makeError("Failed to create emoji: " + err));
+        bot.replyTo(message, bot.COLORS.ERROR, makeError("Failed to create emoji: " + err));
     }
 });

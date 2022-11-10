@@ -1,11 +1,9 @@
 import { Message, MessageEmbed, Permissions } from 'discord.js';
 import { bot } from '../../bot';
-import { EMBED_ERROR_COLOR, EMBED_INFO_COLOR, makeError, makeTable, startTyping } from '../../utils';
-
-import { loadPersistentData } from '../../utils';
+import { makeError, makeTable, loadPersistentData } from '../../utils';
 
 bot.registerCommand('warnhistory', [], async message => {
-    await startTyping(message.channel);
+    await bot.startTyping(message.channel);
 
     if (!(message instanceof Message) || !message.guild) {
         return;
@@ -16,7 +14,7 @@ bot.registerCommand('warnhistory', [], async message => {
     let userWarnings = [];
 
     if (!member.permissions.has(Permissions.FLAGS.KICK_MEMBERS)) {
-        bot.replyTo(message, EMBED_ERROR_COLOR, makeError("Sorry, but you don't have permission to do that"));
+        bot.replyTo(message, bot.COLORS.ERROR, makeError("Sorry, but you don't have permission to do that"));
         return;
     }
 
@@ -34,7 +32,7 @@ bot.registerCommand('warnhistory', [], async message => {
 
     if (userWarnings.length === 0) {
         embed = new MessageEmbed()
-            .setColor(EMBED_INFO_COLOR)
+            .setColor(bot.COLORS.INFO)
             .setDescription(`The warning history for this server is empty. You can issue a warning with the \`!warn\` command`);
     } else {
         embed = makeTable(['User', 'Link', 'Reason'], userWarnings.slice(0, 24).map(warning => { 
