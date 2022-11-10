@@ -49,7 +49,7 @@ client.on('guildMemberAdd', async member => {
     log('info', `${member.user.tag} has just joined ${member.guild.name}`);
 
     const config = getConfig(member.guild.id, 'welcome', { enabled: false });
-    if (!config.enabled) return;
+    if (!config.enabled || member.user.bot) return;
 
     createWelcomeChannel(member, true);
 });
