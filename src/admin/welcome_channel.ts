@@ -58,7 +58,7 @@ client.on('guildMemberAdd', async member => {
 // role (e.g. a new user receiving the Piglet role).
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
     if (oldMember.roles.cache.size === 1 && newMember.roles.cache.size > 1 && userWelcomeChannels[newMember.guild.id].hasOwnProperty(newMember.id)) {
-        archiveWelcomeChannel(newMember.id, newMember.user.tag, newMember.guild, newMember.displayAvatarURL(), `${newMember.user.tag} was given a role`);
+        archiveWelcomeChannel(newMember.id, newMember.user.tag, newMember.guild, newMember.displayAvatarURL(), `${newMember.user.tag} was given a role`, newMember.roles.cache);
         
         if (Object.values(threadRoles[newMember.guild.id]).length > 0) {
             const roleId = Object.entries(threadRoles[newMember.guild.id]).filter((x: any) => x[1] < 98)[0][0];
@@ -114,7 +114,7 @@ export async function createWelcomeChannel(member: GuildMember, ping: boolean) {
     });
 }
 
-export async function archiveWelcomeChannel(memberId: string, userTag: string, guild: Guild, avatar: string | null, reason: string) {
+export async function archiveWelcomeChannel(memberId: string, userTag: string, guild: Guild, avatar: string | null, reason: string, roleCache?: any) {
     if (!userWelcomeChannels[guild.id].hasOwnProperty(memberId)) {
         return false;
     }
@@ -168,7 +168,7 @@ export async function archiveWelcomeChannel(memberId: string, userTag: string, g
     delete userWelcomeChannels[guild.id][memberId];
     savePersistentData('welcome', userWelcomeChannels);
 
-    if (!(transcript.includes('!nowelcome') || transcript.includes('!no welcome'))) {
+    if (!(transcript.includes('!nowelcome') || transcript.includes('!no welcome')) && reason.includes('given a role') && roleCache?.some(x => config.default_roles.includes(x.id))) {
         let greetingChannel = await client.channels.fetch(config.channel) as TextChannel;
         await greetingChannel.send({ content: config.message.replace(/<user>/i, `<@${memberId}>`).replace(/<server>/i, guild.name) });
     }

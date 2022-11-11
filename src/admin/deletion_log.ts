@@ -24,7 +24,7 @@ client.on('messageDelete', async message => {
     console.log(deletionLog);
 
     if (deletionLog.target.id === message.author?.id && deletionLog.extra.channel.id === message.channelId && diffDate(deletionLog.createdAt, new Date()) < 60) {
-		console.log(`A message by ${message.author.tag} in #${message.channel.name} was deleted by ${deletionLog.executor.tag}.`);
+		console.log(`A message by ${message.author.tag} in #${message.channel.name} was deleted by ${deletionLog.executor?.tag}.`);
         let content = message.content?.split("\n").join("\n> ");
 
         // Send the message in the designated channel
@@ -32,10 +32,10 @@ client.on('messageDelete', async message => {
         .setColor(EMBED_INFO_COLOR)
         .setAuthor({
             iconURL: message.author.displayAvatarURL() || '',
-            name: `${deletionLog.executor.tag} deleted a message from ${message.author.tag}`
+            name: `${deletionLog.executor?.tag} deleted a message from ${message.author.tag}`
         })
         .setFooter({ text: `Audit log recorded at ${getFormattedDate(deletionLog.createdAt)} • Audit ID #${deletionLog.id}` })
-        .setDescription(`<@${deletionLog.executor.id}> deleted a message in <#${message.channel.id}> from <@${message.author.id}>. Message content:\n\n> ${content}`);
+        .setDescription(`<@${deletionLog.executor?.id}> deleted a message in <#${message.channel.id}> from <@${message.author.id}>. Message content:\n\n> ${content}`);
 
         await logChannel.send({ embeds: [embed] });
     } else if (!message.author && deletionLog.extra.channel.id === message.channelId && diffDate(deletionLog.createdAt, new Date()) < 60) {
@@ -47,21 +47,21 @@ client.on('messageDelete', async message => {
             author = members[0]?.user.tag || '';
         }
 
-		console.log(`A message by ${author} in #${message.channel.name} was deleted by ${deletionLog.executor.tag}.`);
+		console.log(`A message by ${author} in #${message.channel.name} was deleted by ${deletionLog.executor?.tag}.`);
 
         // Send the message in the designated channel
         const embed = new MessageEmbed()
         .setColor(EMBED_INFO_COLOR)
         .setAuthor({
             iconURL: members[0]?.displayAvatarURL() || '',
-            name: `${deletionLog.executor.tag} deleted a message from ${author}`
+            name: `${deletionLog.executor?.tag} deleted a message from ${author}`
         })
         .setFooter({ text: `Audit log recorded at ${getFormattedDate(deletionLog.createdAt)} • Audit ID #${deletionLog.id}` })
-        .setDescription(`<@${deletionLog.executor.id}> deleted a message in <#${message.channel.id}> from <@${deletionLog.target.id}>. No message content available (bot cache does not contain the deleted message)`);
+        .setDescription(`<@${deletionLog.executor?.id}> deleted a message in <#${message.channel.id}> from <@${deletionLog.target.id}>. No message content available (bot cache does not contain the deleted message)`);
 
         await logChannel.send({ embeds: [embed] });
     } else {
-        console.log(`A message by ${message.author.tag} in #${message.channel.name} was deleted (no corresponding audit log detected - user probably deleted their own message`);
+        console.log(`A message by ${message.author?.tag} in #${message.channel.name} was deleted (no corresponding audit log detected - user probably deleted their own message`);
     }
 });
 
