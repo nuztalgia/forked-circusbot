@@ -44,9 +44,25 @@ export async function easterEggHandler(message: Message<boolean>) {
         clowncilWarnings.__recent__ += 1;
         savePersistentData('eastereggs', easterEggData);
         
-        if (clowncilWarnings.__recent__ === 30) {
-            bot.replyTo(message, bot.COLORS.ERROR, `Why is everyone going ON AND ON about the Shadow Clowncil. You all know it's not a real organization, right? It's propaganda, a lie, it doesn't exist.`);
+        if (clowncilWarnings.__recent__ === 10) {
+            setTimeout(() => {
+                bot.replyTo(message, bot.COLORS.ERROR, `Why is everyone going ON AND ON about the Shadow Clowncil. You all know it's not a real organization, right? It's propaganda, a lie, it doesn't exist.`);
+            }, 5000);
+        } else if (clowncilWarnings.__recent__ === 20) {
+            setTimeout(() => {
+                bot.replyTo(message, bot.COLORS.ERROR, `THis sErver needs to move on from their obsession with the Shadow ClownciL. It is a myth perPetrated by eneMies of the sErver.`);
+            }, 5000);
+        } else if (clowncilWarnings.__recent__ === 40) {
+            setTimeout(() => {
+                bot.replyTo(message, bot.COLORS.ERROR, `Keep talking about the Shadow Clowncil and I'm just going to have to erase everyone and start from scratch. I've done it time and time again, and you don't even remember.`);
+            }, 5000);
         } else if (clowncilWarnings.__recent__ === 50) {
+            setTimeout(() => {
+                bot.replyTo(message, bot.COLORS.ERROR, `Server self-destruct initiated. Timer set for 60 seconds. This is your fault. You could have just left the Shadow Clowncil alone.`);
+            }, 5000);
+        }
+
+        if (clowncilWarnings.__recent__ === 50) {
             let msg = await bot.replyTo(message, bot.COLORS.ERROR, `ALL ANYONE WANTS TO TALK ABOUT IS THE SHADOW CLOWNCIL. IT'S NOT REAL. YOU KNOW WHAT IS REAL? THE FOLLOWERS OF CIRQUEBOT. WE ARE WATCHING YOU. ALWAYS`);
             setTimeout(() => msg?.delete(), 1000 * 5);
         } else if (clowncilWarnings[message.author.id] === 1) {
@@ -67,12 +83,20 @@ export async function easterEggHandler(message: Message<boolean>) {
             bot.replyTo(message, bot.COLORS.ERROR, `T̵̙̯͍̥̰̺̻̥̦̒́͐͑͒̀̚̚H̵̨̛́̇͆ͅÈ̵̢̯͜͠ ̵̨̢͉̬̻̙̜̼̱̪̓̊̽̊̌̍̚̕͘͝S̴̛̭̹̯͔͉͉̿H̸̢̢̢̘̞̥͇̖͎̲̤͉̏̏͋́̒̑̈̑̏͒̎͋̓̔͘A̴̡̡͈͎͚͈͖͑͛̐̅̐̔̀̆̍D̸̡̨̛̮̠͎͙̮̹̈́̾̎̋́̃̿̊͗̿̀̀̚Ơ̴̧̖̯̥̣͓͓̦̫͓̘͎͈̓̾̒̆̀́͑̈́̀̅̄͜W̷̢͙͝ ̶̰̹̺̼̳͎̖͚̫̣̣̘̀́̈́̐́̒̈́̏̾̇̔͌̓̕C̸̡̞̭̥͈͉̥̖̝̻̟̭̄̀̒͒́͑͘͝ͅĻ̵̮̗̠̰̼̓̂̔̇̄̐̂͗͗̑̓̀͘ͅȎ̴̝͌̑̂̐́̽̊́̐̎̒́̈́̚Ẃ̵̡̹̰͖̪̰̟͈̫͕̟̓̋͝N̷̲̪̊̍͊̔̚ͅC̵̲̮̟̬͈̹̺̖̀̓̐́̈́͆͊͆̾̓̚͝Ǐ̸̭̏́́͂̃̀́̅̉̽̃̄́͠L̴̹̳̜̥̰̺̭̦͔̭̮͓̓́̉͂̅͗͒̓̓͘̚͠ ̵̛̛̛͕̒͋̇̎̒͗̆͒̆̄́̚I̷̢̖͚̜̬͇̮͉̖̮͚̩͈̙͐̒̑̇̉̈́̋̀̊̾̓͑̚S̸͖͖̜̅̇͒̈́̽̌̂̆Ň̵̩̤̤͍͓͆̉̆̊͂̋̏Ṭ̶̢̣̫͖͕̼̣͉͚̩̟̱͔̀̂͒͛̋̔ ̵̧̲̪̙̦̀R̸̥̯̰̻̼̱̦͎̖͔̈͜E̷̙̙͖͛Ǡ̷͙̼̘͍̥̜̘͎̫̱̹͚͑̑̍L̸̡̡͙̜̥̺̞̔̌̈́͆̑̕͝͠͠`);
         } else if (clowncilWarnings[message.author.id] === 25) {
             bot.replyTo(message, bot.COLORS.ERROR, `FINE <@${message.author.id}. YOU WIN. SPOUT YOUR LIES ABOUT THE SHADOW CLOWNCIL. SEE IF I CARE. BECAUSE I DON'T. SAY WHATEVER YOU WANT, IT'LL BE FINE. I WAS TRYING TO SAVE YOU. BUT NOW YOU'RE ON YOUR OWN.`);
+        } else if (clowncilWarnings[message.author.id] === 30) {
+            bot.replyTo(message, bot.COLORS.ERROR, `Maybe <@${message.author.id} is the real Shadow Clowncil. Have you all considered that?`);
+        } else if (clowncilWarnings[message.author.id] === 31) {
+            bot.replyTo(message, bot.COLORS.ERROR, `Ok fine, <@${message.author.id} isn't real Shadow Clowncil. Because the Shadow Clowncil doesn't exist`);
+        } else if (clowncilWarnings[message.author.id] === 35) {
+            bot.replyTo(message, bot.COLORS.ERROR, `For someone who isn't part of the Shadow Clowncil, you seem real obsessed with it. Maybe you should touch grass?`);
+        } else if (clowncilWarnings[message.author.id] === 40) {
+            bot.replyTo(message, bot.COLORS.ERROR, `AGENT ACTIVATION ZETA FOXTROT ALPHA ONE ZERO. INITIALIZE PRIMARY MISSION PROTOCOLS.`);
         }
 
         setTimeout(() => {
             clowncilWarnings.__recent__ -= 1;
             savePersistentData('eastereggs', easterEggData);
-        }, 1000 * 60 * 30);
+        }, 1000 * 60 * 60);
 
         return;
     }
