@@ -117,6 +117,8 @@ bot.registerCommand('configure', ['conf'], async message => {
             config.removed_user_channel = message.mentions.channels.first()?.id;
         } else if (option === 'deletion_log_channel') {
             config.deletion_log_channel = message.mentions.channels.first()?.id;
+        } else if (option === 'deletion_notifications') {
+            config.deletion_notifications = value.toLocaleLowerCase() === 'true' || value.toLocaleLowerCase() === 'yes';
         } else if (option) {
             bot.replyTo(message, bot.COLORS.ERROR, makeError('Invalid option'));
             return;
@@ -141,7 +143,7 @@ bot.registerCommand('configure', ['conf'], async message => {
         } catch {
             deletionLogChannel = { name: '<N/A>' };
         }
-
+        
         const embed = new MessageEmbed()
             .setAuthor({ iconURL: message.guild?.iconURL() || '', name: `Administration Config for "${message.guild?.name}"` })
             .setDescription(
@@ -155,6 +157,10 @@ bot.registerCommand('configure', ['conf'], async message => {
                 'by the author themselves (for privacy reasons).\n' + 
                 'Current Configuration:\n' + 
                 '```\n#' + deletionLogChannel?.name + '\n```\n\n' + 
+                '📢 `!configure admin.deletion_notifications`\n' + 
+                'Display a notification in the channel when a message is deleted by a moderator.\n' + 
+                'Current Configuration:\n' + 
+                '```\n#' + (config.deletion_notifications ? 'true' : 'false') + '\n```\n\n' + 
                 '');
         bot.replyTo(message, bot.COLORS.INFO, embed);
     } else if (namespace === 'cannedreplies') {

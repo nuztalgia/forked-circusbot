@@ -190,7 +190,7 @@ export function cannedReplyHandler(message: Message<boolean>) {
             '```\n=parse=**StarParse Group:** CirqueBot/Cirquebot\n```\n' + 
             'Then, anytime a user needs the parse or asks for it, instead of trying to dig thru your pinned messages to ' + 
             'find it, you can simply use the `=parse` command and CirqueBot will post your saved messages.\n\n' + 
-            'Canned replies are meant to be a collaborate feature, so anyone can create, edit, or use them. If you want to ' +
+            'Canned replies are meant to be a collaborative feature, so anyone can create, edit, or use them. If you want to ' +
             'lock down a certain reply, admins can use the `!crlock` and `!crunlock` commands.\n\n' +
             'If you are trying to find a canned reply but cannot remember the exact name, you can use the `=search` command to ' + 
             'find partial matches. For example: `=search guide` will return any canned replies with "guide" in the name.' 

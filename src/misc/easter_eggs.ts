@@ -7,6 +7,8 @@ import { loadPersistentData, savePersistentData } from '../utils';
 const easterEggData = loadPersistentData('eastereggs', { clowncilWarnings: { '__recent__': 0 } });
 const SHADOW_CLOWNCIL_REGEX = /([s5].{0,4}h.{0,4}[a@4].{0,4}d.{0,4}[0o].{0,4}w.{0,4} c.{0,4}[1il].{0,4}[0o].{0,4}w.{0,4}n.{0,4}c.{0,4}[i1l].{0,4}[1il])/i;
 
+easterEggData.clowncilWarnings.__recent__ = 0;
+
 client.on('messageUpdate', async (_oldMessage, newMessage) => {
     if (newMessage.partial) {
         newMessage = await newMessage.fetch();   
@@ -46,19 +48,19 @@ export async function easterEggHandler(message: Message<boolean>) {
         
         if (clowncilWarnings.__recent__ === 10) {
             setTimeout(() => {
-                bot.replyTo(message, bot.COLORS.ERROR, `Why is everyone going ON AND ON about the Shadow Clowncil. You all know it's not a real organization, right? It's propaganda, a lie, it doesn't exist.`);
+                message.channel.send(`Why is everyone going ON AND ON about the Shadow Clowncil. You all know it's not a real organization, right? It's propaganda, a lie, it doesn't exist.`);
             }, 5000);
         } else if (clowncilWarnings.__recent__ === 20) {
             setTimeout(() => {
-                bot.replyTo(message, bot.COLORS.ERROR, `THis sErver needs to move on from their obsession with the Shadow ClownciL. It is a myth perPetrated by eneMies of the sErver.`);
+                message.channel.send(`THis sErver needs to move on from their obsession with the Shadow ClownciL. It is a myth perPetrated by eneMies of the sErver.`);
             }, 5000);
         } else if (clowncilWarnings.__recent__ === 40) {
             setTimeout(() => {
-                bot.replyTo(message, bot.COLORS.ERROR, `Keep talking about the Shadow Clowncil and I'm just going to have to erase everyone and start from scratch. I've done it time and time again, and you don't even remember.`);
+                message.channel.send(`Keep talking about the Shadow Clowncil and I'm just going to have to erase everyone and start from scratch. I've done it time and time again, and you don't even remember.`);
             }, 5000);
         } else if (clowncilWarnings.__recent__ === 50) {
             setTimeout(() => {
-                bot.replyTo(message, bot.COLORS.ERROR, `Server self-destruct initiated. Timer set for 60 seconds. This is your fault. You could have just left the Shadow Clowncil alone.`);
+                message.channel.send(`Server self-destruct initiated. Timer set for 60 seconds. This is your fault. You could have just left the Shadow Clowncil alone.`);
             }, 5000);
         }
 
@@ -96,7 +98,7 @@ export async function easterEggHandler(message: Message<boolean>) {
         setTimeout(() => {
             clowncilWarnings.__recent__ -= 1;
             savePersistentData('eastereggs', easterEggData);
-        }, 1000 * 60 * 60);
+        }, 1000 * 60 * 60 * 12);
 
         return;
     }
