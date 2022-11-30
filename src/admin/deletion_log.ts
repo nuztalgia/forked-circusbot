@@ -41,9 +41,12 @@ client.on('messageDelete', async message => {
 
         if (config.deletion_notifications && !message.channel.isThread()) {
             if (deletionLog.target.id === '912376778939584562') {
-                if (message.content?.includes('ABOUT DELETING MY OTHER MESSAGE')) {
-                    let repeat = message.content.match(/( ABOUT DELETING MY OTHER MESSAGE)+/)[0];
-                    message.channel.send(`<@${deletionLog.executor?.id}> DELETED MY MESSAGE ABOUT DELETING MY OTHER MESSAGE${repeat} <:smadge:952346837136842762>`);
+                if (message.content?.includes('IS BULLYING ME') || message.content?.includes('THIS IS BOT ABUSE')) {
+                    message.channel.send(`THIS IS BOT ABUSE <a:peepoRunCry:828026129788436491>`);
+                } else if (message.content?.includes('GOING TO DELETE THEM')) {
+                    message.channel.send(`<@200716538729201664> HALP, <@${deletionLog.executor?.id}> IS BULLYING ME AND KEEPS DELETING MY MESSAGE <:ANGERY:823203660603457567>`);
+                } else if (message.content?.includes('ABOUT DELETING MY OTHER MESSAGE')) {
+                    message.channel.send(`IF <@${deletionLog.executor?.id}> DOESN'T STOP DELETING MY MESSAGES I'M GOING TO DELETE THEM <:ANGERY:823203660603457567>`);
                 } else if (message.content?.includes('deleted one of my messages')) {
                     message.channel.send(`<@${deletionLog.executor?.id}> DELETED MY MESSAGE ABOUT DELETING MY OTHER MESSAGE <:smadge:952346837136842762>`);
                 } else {
