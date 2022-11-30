@@ -84,11 +84,11 @@ export async function easterEggHandler(message: Message<boolean>) {
         } else if (clowncilWarnings[message.author.id] === 20) {
             bot.replyTo(message, bot.COLORS.ERROR, `T̵̙̯͍̥̰̺̻̥̦̒́͐͑͒̀̚̚H̵̨̛́̇͆ͅÈ̵̢̯͜͠ ̵̨̢͉̬̻̙̜̼̱̪̓̊̽̊̌̍̚̕͘͝S̴̛̭̹̯͔͉͉̿H̸̢̢̢̘̞̥͇̖͎̲̤͉̏̏͋́̒̑̈̑̏͒̎͋̓̔͘A̴̡̡͈͎͚͈͖͑͛̐̅̐̔̀̆̍D̸̡̨̛̮̠͎͙̮̹̈́̾̎̋́̃̿̊͗̿̀̀̚Ơ̴̧̖̯̥̣͓͓̦̫͓̘͎͈̓̾̒̆̀́͑̈́̀̅̄͜W̷̢͙͝ ̶̰̹̺̼̳͎̖͚̫̣̣̘̀́̈́̐́̒̈́̏̾̇̔͌̓̕C̸̡̞̭̥͈͉̥̖̝̻̟̭̄̀̒͒́͑͘͝ͅĻ̵̮̗̠̰̼̓̂̔̇̄̐̂͗͗̑̓̀͘ͅȎ̴̝͌̑̂̐́̽̊́̐̎̒́̈́̚Ẃ̵̡̹̰͖̪̰̟͈̫͕̟̓̋͝N̷̲̪̊̍͊̔̚ͅC̵̲̮̟̬͈̹̺̖̀̓̐́̈́͆͊͆̾̓̚͝Ǐ̸̭̏́́͂̃̀́̅̉̽̃̄́͠L̴̹̳̜̥̰̺̭̦͔̭̮͓̓́̉͂̅͗͒̓̓͘̚͠ ̵̛̛̛͕̒͋̇̎̒͗̆͒̆̄́̚I̷̢̖͚̜̬͇̮͉̖̮͚̩͈̙͐̒̑̇̉̈́̋̀̊̾̓͑̚S̸͖͖̜̅̇͒̈́̽̌̂̆Ň̵̩̤̤͍͓͆̉̆̊͂̋̏Ṭ̶̢̣̫͖͕̼̣͉͚̩̟̱͔̀̂͒͛̋̔ ̵̧̲̪̙̦̀R̸̥̯̰̻̼̱̦͎̖͔̈͜E̷̙̙͖͛Ǡ̷͙̼̘͍̥̜̘͎̫̱̹͚͑̑̍L̸̡̡͙̜̥̺̞̔̌̈́͆̑̕͝͠͠`);
         } else if (clowncilWarnings[message.author.id] === 25) {
-            bot.replyTo(message, bot.COLORS.ERROR, `FINE <@${message.author.id}. YOU WIN. SPOUT YOUR LIES ABOUT THE SHADOW CLOWNCIL. SEE IF I CARE. BECAUSE I DON'T. SAY WHATEVER YOU WANT, IT'LL BE FINE. I WAS TRYING TO SAVE YOU. BUT NOW YOU'RE ON YOUR OWN.`);
+            bot.replyTo(message, bot.COLORS.ERROR, `FINE <@${message.author.id}>. YOU WIN. SPOUT YOUR LIES ABOUT THE SHADOW CLOWNCIL. SEE IF I CARE. BECAUSE I DON'T. SAY WHATEVER YOU WANT, IT'LL BE FINE. I WAS TRYING TO SAVE YOU. BUT NOW YOU'RE ON YOUR OWN.`);
         } else if (clowncilWarnings[message.author.id] === 30) {
-            bot.replyTo(message, bot.COLORS.ERROR, `Maybe <@${message.author.id} is the real Shadow Clowncil. Have you all considered that?`);
+            bot.replyTo(message, bot.COLORS.ERROR, `Maybe <@${message.author.id}> is the real Shadow Clowncil. Have you all considered that?`);
         } else if (clowncilWarnings[message.author.id] === 31) {
-            bot.replyTo(message, bot.COLORS.ERROR, `Ok fine, <@${message.author.id} isn't real Shadow Clowncil. Because the Shadow Clowncil doesn't exist`);
+            bot.replyTo(message, bot.COLORS.ERROR, `Ok fine, <@${message.author.id}> isn't real Shadow Clowncil. Because the Shadow Clowncil doesn't exist`);
         } else if (clowncilWarnings[message.author.id] === 35) {
             bot.replyTo(message, bot.COLORS.ERROR, `For someone who isn't part of the Shadow Clowncil, you seem real obsessed with it. Maybe you should touch grass?`);
         } else if (clowncilWarnings[message.author.id] === 40) {
