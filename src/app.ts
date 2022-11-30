@@ -4,9 +4,10 @@ import { registerEventReactions } from './events/reaction_signups';
 import { antispamHandler } from './misc/antispam';
 import { easterEggHandler } from './misc/easter_eggs';
 import { cannedReplyHandler } from './cannedreplies/listener';
+import { nukeMessageHandler } from './misc/commands/nuke';
 import { log } from './utils';
 import { client } from './client';
-import { DMChannel, TextChannel } from 'discord.js';
+import { DMChannel, Message, TextChannel } from 'discord.js';
 import { bot } from './bot';
 
 import './admin/deletion_log';
@@ -78,6 +79,7 @@ client.on('messageCreate', async (message) => {
     antispamHandler(message);
     easterEggHandler(message);
     cannedReplyHandler(message, true);
+    nukeMessageHandler(message);
 });
 
 if (process.env.MODE === 'development') {
