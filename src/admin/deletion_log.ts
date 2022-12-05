@@ -5,7 +5,14 @@ import { getConfig } from "./configuration";
 
 const auditLogs = {};
 
-client.on('messageDelete', async message => {
+client.on('messageDelete', msg => onMessageDelete(msg, false));
+
+client.on('messageDeleteBulk', async messages => {
+    console.log('messageDeleteBulk event detected');
+    messages.forEach(x => onMessageDelete(x, true));
+});
+
+async function onMessageDelete(message, bulk) {
 	// Ignore direct messages
 	if (!message.guild) return;
 
@@ -15,12 +22,16 @@ client.on('messageDelete', async message => {
     const logChannel = await client.channels.fetch(config.deletion_log_channel) as TextChannel;
 
     // Grab the most recent MEMBER_KICK audit event to see if this user was kicked or left on their own
-    const fetchedDeletes = await message.guild?.fetchAuditLogs({ limit: 5, type: 'MESSAGE_DELETE' });
+    const fetchedDeletes = await message.guild?.fetchAuditLogs({ limit: 5, type: bulk ? 'MESSAGE_BULK_DELETE' : 'MESSAGE_DELETE' });
     const deletionLogs = fetchedDeletes.entries.values();
     let deletionLog: GuildAuditLogsEntry<any> | null = null;
 
     for (let log of deletionLogs) {
-        if (log.target.id === message.author?.id && log.extra.channel.id === message.channelId && log.extra.count - (auditLogs[log.id] || 0) > 0 && diffDate(log.createdAt, new Date()) < 300) {
+        if (bulk && log.target.id === message.channelId && log.extra.count - (auditLogs[log.id] || 0) > 0 && diffDate(log.createdAt, new Date()) < 300) {
+            deletionLog = log;
+            auditLogs[log.id] = (auditLogs[log.id] || 0) + 1;
+            break;    
+        } else if (log.target.id === message.author?.id && log.extra.channel.id === message.channelId && log.extra.count - (auditLogs[log.id] || 0) > 0 && diffDate(log.createdAt, new Date()) < 300) {
             deletionLog = log;
             auditLogs[log.id] = (auditLogs[log.id] || 0) + 1;
             break;
@@ -36,10 +47,10 @@ client.on('messageDelete', async message => {
         return console.log(`A message by ${message.author?.tag} in #${message.channel.name} was deleted, but no relevant audit logs were found.`);
     }
 
-    if (deletionLog.target.id === message.author?.id && deletionLog.extra.channel.id === message.channelId && diffDate(deletionLog.createdAt, new Date()) < 300) {
+    if (bulk || (deletionLog.target.id === message.author?.id && deletionLog.extra.channel.id === message.channelId && diffDate(deletionLog.createdAt, new Date()) < 300)) {
 		console.log(`A message by ${message.author.tag} in #${message.channel.name} was deleted by ${deletionLog.executor?.tag} (log #${deletionLog.id}).`);
 
-        if (config.deletion_notifications && !message.channel.isThread()) {
+        if (config.deletion_notifications && !message.channel.isThread() && !deletionLog.executor?.bot) {
             if (deletionLog.target.id === '912376778939584562') {
                 if (message.content?.includes('IS BULLYING ME') || message.content?.includes('THIS IS BOT ABUSE')) {
                     message.channel.send(`THIS IS BOT ABUSE <a:peepoRunCry:828026129788436491>`);
@@ -97,7 +108,7 @@ client.on('messageDelete', async message => {
 
 		console.log(`A message by ${author} in #${message.channel.name} was deleted by ${deletionLog.executor?.tag} (log #${deletionLog.id}).`);
 
-        if (config.deletion_notifications && !message.channel.isThread()) {
+        if (config.deletion_notifications && !message.channel.isThread() && !deletionLog.executor?.bot) {
             if (deletionLog.target.id === '912376778939584562') {
                 message.channel.send(`<@${deletionLog.executor?.id}> deleted one of my messages <:smadge:952346837136842762>`);
             } else {
@@ -119,8 +130,4 @@ client.on('messageDelete', async message => {
     } else {
         console.log(`A message by ${message.author?.tag} in #${message.channel.name} was deleted (no corresponding audit log detected - user probably deleted their own message`);
     }
-});
-
-client.on('messageDeleteBulk', async messages => {
-
-});
+}

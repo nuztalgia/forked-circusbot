@@ -51,7 +51,16 @@ client.on('guildMemberAdd', async member => {
     const config = getConfig(member.guild.id, 'welcome', { enabled: false });
     if (!config.enabled || member.user.bot) return;
 
-    createWelcomeChannel(member, true);
+    if (member.user.tag.startsWith('ceph#') || member.user.tag.startsWith('cephana#')) {
+        const embed = new MessageEmbed()
+            .setColor(EMBED_ERROR_COLOR)
+            .setAuthor({ iconURL: member.avatar || '', name: `The welcome channel for ${member.user.tag} has been archived` })
+            .setDescription(`The welcome channel for <@${member.user.tag}> has been automatically archived (User was automatically kicked by CirqueBot).`);
+
+        config.systemChannel?.send({ embeds: [embed] });
+    } else {
+        createWelcomeChannel(member, true);
+    }
 });
 
 // When a guild member is updated, check if its a member who has no roles, receiving a
