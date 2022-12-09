@@ -9,7 +9,7 @@ bot.registerCommand('repost_event', [], async message => {
     const target_channel = message.mentions.channels.first() || message.channel;
 
     if (!events.hasOwnProperty(event_id)) {
-        sendError(message.channel, "Unable to publish event, no such event ID was found");
+        sendError(message.channel, "Unable to repost event, no such event ID was found");
         return;
     }
     

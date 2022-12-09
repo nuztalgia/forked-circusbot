@@ -38,6 +38,12 @@ bot.registerCommand('event_help', ['events', 'event'], interaction => {
     if (bot.checkPermissions('list_events', interaction.channel)) {
         helpMsg += "📆 `list_events`\nList all upcoming events in the current channel. Pass the 'all' parameter to list previous events as well.\n**Example:** `!list_events`\n\n";
     }
+    if (bot.checkPermissions('rebuild_event', interaction.channel)) {
+        helpMsg += "🔄 `rebuild_event`\nRe-render the event post across all channels (e.g. if the template has changed or the post has somehow become desynced).\n**Example:** `!rebuild_event 123456789`\n\n";
+    }
+    if (bot.checkPermissions('repost_event', interaction.channel)) {
+        helpMsg += "🔁 `repost_event`\nRe-post the event in the specified channel as a new message (e.g. if you want to repost it at the bottom of a channel for previewing it). The old message in the channel will no longer be updated.\n**Example:** `!repost_event 123456789 #schedule-planning`\n\n";
+    }
 
     if (!helpMsg) {
         bot.replyTo(interaction, EMBED_ERROR_COLOR, "There are no commands whitelisted for this channel");

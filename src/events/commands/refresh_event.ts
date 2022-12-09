@@ -8,7 +8,7 @@ bot.registerCommand('refresh_event', ['rebuild_event', 're'], async message => {
     const event = findEvent(eventId);
 
     if (!event) {
-        bot.replyTo(message, bot.COLORS.ERROR, `${EMOJI_ERROR} Unable to close event, invalid event ID provided`);
+        bot.replyTo(message, bot.COLORS.ERROR, `${EMOJI_ERROR} Unable to rebuild event, invalid event ID provided`);
         return;
     }
     
