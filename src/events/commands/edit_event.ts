@@ -4,8 +4,8 @@ import { EMBED_ERROR_COLOR, EMOJI_ERROR, sendReply } from '../../utils';
 import { updateEventEmbeds } from '../embeds';
 import { events, findEvent, saveEvents } from '../persistence';
 
-function editEventUsage(message: Message<boolean>) {
-    bot.replyTo(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Incorrect syntax to edit event. Correct usage:\n\n` +
+function editEventUsage(message: Message<boolean>, extra: string) {
+    bot.replyTo(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Incorrect syntax to edit event (**${extra}**). Correct usage:\n\n` +
         "`!edit_event <eventId> <FIELD_NAME> <NEW VALUE>`\n\n" +
         "Example:\n\n" +
         "`!edit_event 123456789 tank_requirements Previous tank clear in 8m required`\n\n" +
@@ -30,7 +30,7 @@ bot.registerCommand('edit_event', ['event_edit', 'ee'], message => {
     const event = findEvent(eventId);
 
     if (!eventId) {
-        editEventUsage(message);
+        editEventUsage(message, `No Event ID Specified`);
         return;
     } else if (!event) {
         bot.replyTo(message, EMBED_ERROR_COLOR, `${EMOJI_ERROR} Unable to edit event, invalid event ID provided`);
@@ -62,7 +62,7 @@ bot.registerCommand('edit_event', ['event_edit', 'ee'], message => {
     } else if (event.hasOwnProperty(eventField)) {
         event[eventField] = eventValue;
     } else {
-        editEventUsage(message);
+        editEventUsage(message, 'Unknown field name');
         return;
     }
 

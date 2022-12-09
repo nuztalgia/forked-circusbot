@@ -14,5 +14,5 @@ bot.registerCommand('refresh_event', ['rebuild_event', 're'], async message => {
     
     await bot.startTyping(message.channel);
     await queueEventUpdate(event);
-    bot.replyTo(message, bot.COLORS.INFO, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) has been re-rendered and updated across all channels`);
+    bot.replyTo(message, bot.COLORS.INFO, `✅ [${event.title}](${message.url.replace(message.id, eventId)}) has been re-rendered and updated across all channels. If you would like to repost the event as a new message, use the \`!repost_event\` command instead.`);
 });
