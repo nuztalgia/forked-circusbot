@@ -1,4 +1,4 @@
-import { ColorResolvable, CommandInteraction, Message, MessageEmbed, TextBasedChannel, TextChannel, User } from 'discord.js';
+import { ColorResolvable, CommandInteraction, Message, MessageEmbed, TextBasedChannel, TextChannel, ThreadChannel, User } from 'discord.js';
 import { log, EMBED_ERROR_COLOR, sendReply, makeError, startTyping } from './utils';
 import config from '../config.json';
 
@@ -87,7 +87,7 @@ class Bot {
         const author = interaction instanceof Message ? interaction.author : interaction.user;
         const command = interaction instanceof Message ? interaction.content : `/${interaction.commandName} ${interaction.options.getSubcommand()}`;
     
-        if (!(interaction.channel instanceof TextChannel)) {
+        if (!(interaction.channel instanceof TextChannel) && !(interaction.channel instanceof ThreadChannel)) {
             log('warn', `execCommand called from an invalid channel`);
         } else if (!this.checkPermissions(cmd, interaction.channel)) {
             log('warn', `User ${author.tag} tried to run !${cmd} in #${this.getChannelName(interaction)} but channel is not in the whitelist`);
