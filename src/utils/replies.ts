@@ -70,6 +70,14 @@ export function makeError(message: string) {
     return embed;
 }
 
+export function makeSuccess(message: string) {
+    const embed = new MessageEmbed()
+        .setColor(EMBED_SUCCESS_COLOR)
+        .setDescription('✅' + ' ' + message)
+    
+    return embed;
+}
+
 export function sendError(channel: TextBasedChannel, message: string) {
     channel.send({ embeds: [makeError(message)] });
 

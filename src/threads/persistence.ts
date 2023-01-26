@@ -125,7 +125,9 @@ export async function archiveThread(thread: CircusThread) {
         const embed = new MessageEmbed()
             .setColor(EMBED_INFO_COLOR)
             .setDescription('👋 This thread is now being archived. Goodbye.');
-
+        
+        let archivalDate = getFormattedDate(new Date()).split(' ')[0];
+        await existingThread.setName(`${existingThread.name} (${archivalDate})`);
         await existingThread.send({ embeds: [embed] });
         await existingThread.setLocked(true);
         await existingThread.setArchived(true);
@@ -171,9 +173,25 @@ export async function buildThread(thread: CircusThread) {
     }
 
     await newThread.send({ embeds: [embed] });
-    const msg = await newThread.send('Adding Users');
-    await msg.edit('Adding Users: ' + thread.autoAddRoles.map(x => `<@&${x}>`).join(', '));
-    msg.delete();
+
+    try {
+        for (let role in thread.autoAddRoles) {
+            (async function() {
+                const msg = await newThread.send('Adding user group');
+                await msg.edit(`Adding users from <@&${role}>`);
+                msg.delete();
+            })();
+        }
+    } catch (err) {
+        log('error', 'Failed to add all roles to thread: ' + err);
+
+        try {
+            await newThread.send('<@200716538729201664> something went wrong and I couldn\'t add all the roles to the thread, halp me <a:pepeRunCry:786844735754338304>');
+        } catch { 
+            log('error', 'Failed to send emergency notification to Cad');
+        }
+    }
+
     saveThreads();
 }
 

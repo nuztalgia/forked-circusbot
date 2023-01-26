@@ -5,6 +5,7 @@ import { getConfig } from "./configuration";
 
 const userWelcomeChannels = loadPersistentData('welcome', {});
 const threadRoles = {};
+export const quietWelcomeChannels = {};
 
 // Cleanup any welcome channels that should have been deleted by event handlers, but
 // maybe the bot wasn't running.
@@ -55,7 +56,7 @@ client.on('guildMemberAdd', async member => {
         const embed = new MessageEmbed()
             .setColor(EMBED_ERROR_COLOR)
             .setAuthor({ iconURL: member.avatar || '', name: `The welcome channel for ${member.user.tag} has been archived` })
-            .setDescription(`The welcome channel for <@${member.user.tag}> has been automatically archived (User was automatically kicked by CirqueBot).`);
+            .setDescription(`The welcome channel for <@${member.user.tag}> has been automatically archived (User was automatically kicked by CirqueBot via Protect Cad Directive).`);
 
         config.systemChannel?.send({ embeds: [embed] });
     } else {
@@ -70,7 +71,7 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
         archiveWelcomeChannel(newMember.id, newMember.user.tag, newMember.guild, newMember.displayAvatarURL(), `${newMember.user.tag} was given a role`, newMember.roles.cache);
         
         if (Object.values(threadRoles[newMember.guild.id]).length > 0) {
-            const roleId = Object.entries(threadRoles[newMember.guild.id]).filter((x: any) => x[1] < 98)[0][0];
+            const roleId = Object.entries(threadRoles[newMember.guild.id]).filter((x: any) => x[1] < 99)[0][0];
             const role = newMember.guild.roles.cache.find(x => x.id === roleId);
 
             if (!role) {
@@ -177,7 +178,7 @@ export async function archiveWelcomeChannel(memberId: string, userTag: string, g
     delete userWelcomeChannels[guild.id][memberId];
     savePersistentData('welcome', userWelcomeChannels);
 
-    if (!(transcript.includes('!nowelcome') || transcript.includes('!no welcome')) && reason.includes('given a role') && roleCache?.some(x => config.default_roles.includes(x.id))) {
+    if (!quietWelcomeChannels[channel.id] && reason.includes('given a role') && roleCache?.some(x => config.default_roles.includes(x.id))) {
         let greetingChannel = await client.channels.fetch(config.channel) as TextChannel;
         await greetingChannel.send({ content: config.message.replace(/<user>/i, `<@${memberId}>`).replace(/<server>/i, guild.name) });
     }

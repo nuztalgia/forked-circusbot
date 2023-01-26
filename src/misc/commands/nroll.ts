@@ -2,6 +2,10 @@ import { bot } from '../../bot';
 import { getRandomInt, EMOJI_ERROR } from '../../utils';
 
 bot.registerCommand('nroll', ['roll'], message => {
+    if (message.content.includes(',')) {
+        return bot.execCommand('pick', message);
+    }
+
     let [params] = bot.parseCommand(message, /(.*)/);
     let min = 0, max = 0, minStr = '0', maxStr = '';
 
