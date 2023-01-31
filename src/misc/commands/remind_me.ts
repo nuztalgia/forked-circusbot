@@ -1,7 +1,7 @@
 import { Message, MessageEmbed, TextChannel } from 'discord.js';
 import { bot } from '../../bot';
 import { client } from '../../client';
-import { sendReply, EMBED_ERROR_COLOR, loadPersistentData, log, getFormattedDate, savePersistentData, EMBED_DMM_COLOR, makeError, arrayRandom } from '../../utils';
+import { EMBED_ERROR_COLOR, loadPersistentData, log, getFormattedDate, savePersistentData, EMBED_DMM_COLOR, makeError, arrayRandom } from '../../utils';
 
 let reminders = loadPersistentData('reminders', []);
 
@@ -22,7 +22,7 @@ const RANDOM_REASONS = [
     'Maybe it\'s time to send that email?',
 ];
 
-client.on('ready', () => {
+client.on('bot:ready', () => {
     reminders.forEach(reminder => scheduleReminder(reminder));
 });
 

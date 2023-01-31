@@ -7,7 +7,7 @@ import { cannedReplyHandler } from './cannedreplies/listener';
 import { nukeMessageHandler } from './misc/commands/nuke';
 import { log } from './utils';
 import { client } from './client';
-import { DMChannel, Message, TextChannel } from 'discord.js';
+import { DMChannel, GuildTextBasedChannel, Message, TextChannel } from 'discord.js';
 import { bot } from './bot';
 
 import './admin/deletion_log';
@@ -19,14 +19,25 @@ import './events/commands';
 import './threads/commands';
 import './misc/commands';
 
+log('info', `--------------------------------------------------------------------`);
+log('info', `CircusBot is now initializing...`);
+log('info', `--------------------------------------------------------------------`);
+
 client.on('ready', async () => {
   log('info', `Logged in as ${client?.user?.tag}!`);
 
-  client.guilds.cache.forEach(async guild => {
+  await Promise.all(client.guilds.cache.map(async guild => {
     log('debug', `Fetching members for server '${guild.name}'`);
     await guild.members.fetch();
     log('debug', `Finished fetching members for server '${guild.name}'`);
-  });
+
+    log('debug', `Fetching channels for server '${guild.name}'`);
+    await guild.channels.fetch();
+    log('debug', `Finished fetching channels for server '${guild.name}'`);
+  }));
+
+  log('info', 'Bot initialization and preloading complete. Now listening for commands');
+  client.emit('bot:ready');
 });
 
 client.on('messageUpdate', async (message) => {
@@ -78,7 +89,7 @@ client.on('messageCreate', async (message) => {
     threadCreationHandler(message);
     antispamHandler(message);
     easterEggHandler(message);
-    cannedReplyHandler(message, true);
+    cannedReplyHandler(message);
     nukeMessageHandler(message);
 });
 

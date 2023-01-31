@@ -13,7 +13,7 @@ if (fs.existsSync('data/threads.json')) {
     threads = JSON.parse(eventData);
 }
 
-client.on('ready', () => {
+client.on('bot:ready', () => {
     for (const thread of Object.values(threads)) {
         scheduleThreadArchival(thread);
     }
