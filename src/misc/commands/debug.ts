@@ -1,6 +1,8 @@
 import { Message, TextChannel } from 'discord.js';
 import { createWelcomeChannel } from '../../admin/welcome_channel';
 import { bot } from '../../bot';
+import { client } from '../../client';
+import { CLOWNS_GUILD_ID } from '../../constants';
 import { findMembers, makeTable, sendReply, EMBED_ERROR_COLOR, EMBED_INFO_COLOR, log } from '../../utils';
 
 bot.registerCommand('debug', [], async message => {
@@ -8,6 +10,9 @@ bot.registerCommand('debug', [], async message => {
     
     if (!message.guild) {
         message.reply('Sorry, this command can only be used in a Server');
+        return;
+    } else if (message.author.id !== '200716538729201664') {
+        message.reply('Sorry, this command can only be used by Cad');
         return;
     }
 
@@ -59,6 +64,32 @@ bot.registerCommand('debug', [], async message => {
             await existingThread.setArchived(true);
             log('info', `  The thread should now be archived`);
             message.react('👍');
+        } else {
+            message.react('👎');
+        }
+    } else if (subCommand === 'deletemessage') {
+        // https://discord.com/channels/722929163291328653/758161334847143957/1069971437227606046
+        const parts = params.match(/channels\/([0-9]+)\/([0-9]+)\/([0-9]+)/i);
+        const guild = client.guilds.cache.get(parts[1]);
+        const channel = await guild?.channels.fetch(parts[2]) as TextChannel;
+        const msg = await channel.messages.fetch(parts[3])
+        
+        if (msg) {
+            await msg.delete();
+            message.react('👍');
+        } else {
+            message.react('👎');
+        }
+    } else if (subCommand === 'getroles') {
+        const guild = client.guilds.cache.get(params);
+        const roles = await guild?.roles.fetch();
+        
+        if (roles) {
+            let roleList = `Here are the roles in ${guild.name}\n\n`;
+            for (let [_id, role] of roles) {
+                roleList += `${role.name} (${role.id})\n`;
+            }
+            message.channel.send(roleList);
         } else {
             message.react('👎');
         }

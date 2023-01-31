@@ -175,11 +175,18 @@ export async function buildThread(thread: CircusThread) {
     await newThread.send({ embeds: [embed] });
 
     try {
-        for (let role in thread.autoAddRoles) {
+        log('debug', 'Adding users to thread');
+        for (let role of thread.autoAddRoles) {
             (async function() {
+                log('debug', `  Adding users from <@&${role}>`);
                 const msg = await newThread.send('Adding user group');
+                const msgId = msg.id;
                 await msg.edit(`Adding users from <@&${role}>`);
-                msg.delete();
+                setTimeout(async () => {
+                    const channel = await client.channels.fetch(thread.channel) as TextChannel;
+                    const msg = await channel.messages.fetch(msgId);
+                    await msg.delete();
+                }, 1000 * 30);
             })();
         }
     } catch (err) {
